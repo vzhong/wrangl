@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 import ray
+import bz2
+from pathlib import Path
+from typing import Union, List
 
 
 class Processor:
@@ -35,7 +38,7 @@ class Dataloader:
 
     def __init__(self, pool: ray.util.ActorPool, cache_size: int = 1024):
         self.cache = Cache(pool, cache_size=cache_size)
-        self.reset()
+        ray.init(ignore_reinit_error=True)
 
     def load_next(self):
         raise NotImplementedError()
@@ -57,10 +60,39 @@ class Dataloader:
             else:
                 yield batch
 
-    @classmethod
-    def init(cls):
-        ray.init(ignore_reinit_error=True)
+    def close(self, shutdown_ray=False):
+        if shutdown_ray:
+            ray.shutdown()
 
-    @classmethod
-    def shutdown(cls):
-        ray.shutdown()
+
+class Fileloader(Dataloader):
+
+    def __init__(self, fnames: List[Union[str, Path]], pool: ray.util.ActorPool, cache_size: int = 1024):
+        assert fnames
+        super().__init__(pool, cache_size=cache_size)
+        self.fnames = fnames
+        self.current_file_idx = self.file = None
+        self.reset()
+
+    def load_next(self):
+        try:
+            line = next(self.file)
+            return line
+        except StopIteration:
+            self.current_file_idx += 1
+            if self.current_file_idx >= len(self.fnames):
+                return None
+            else:
+                self.file = self.open_file(self.fnames[self.current_file_idx])
+                return self.load_next()
+
+    def open_file(self, fname):
+        return bz2.open(fname, 'rt') if fname.endswith('.bz2') else open(fname, 'rt')
+
+    def reset(self):
+        self.current_file_idx = 0
+        self.file = self.open_file(self.fnames[self.current_file_idx])
+
+    def close(self, shutdown_ray=False):
+        super().close(shutdown_ray=shutdown_ray)
+        self.file.close()

@@ -1,13 +1,14 @@
 import ray
+import unittest
 from wrangl.dataloader import Dataloader, Processor
 
 
 class MyDataloader(Dataloader):
 
-    def __init__(self, pool: ray.util.ActorPool, cache_size: int = 1024):
+    def __init__(self, strings, pool: ray.util.ActorPool, cache_size: int = 1024):
         super().__init__(pool, cache_size=cache_size)
         self.current = 0
-        self.strings = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+        self.strings = strings
 
     def reset(self):
         self.current = 0
@@ -29,9 +30,13 @@ class MyProcessor(Processor):
 
 
 if __name__ == '__main__':
-    ray.init()
     pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
-    loader = MyDataloader(pool, cache_size=5)
+    strings = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    loader = MyDataloader(strings, pool, cache_size=5)
 
+    out = []
     for batch in loader.batch(2):
-        print(batch)
+        out.extend(batch)
+
+    expect = [s * 10 for s in strings]
+    unittest.TestCase().assertListEqual(expect, out)

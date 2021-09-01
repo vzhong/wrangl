@@ -5,6 +5,7 @@ import contextlib
 import tqdm
 import io
 import stanza
+import unittest
 
 
 class MyDataloader(Dataloader):
@@ -37,7 +38,6 @@ class MyProcessor(Processor):
 
 
 if __name__ == '__main__':
-    ray.init()
     zen = io.StringIO()
     with contextlib.redirect_stdout(zen):
         import this
@@ -67,9 +67,17 @@ if __name__ == '__main__':
         serial_out.append(nlp(line).text)
     serial = time.time() - start
 
-    if sorted(parallel_ordered_out) != sorted(parallel_unordered_out):
-        raise Exception('Parallel outputs are not equal!\nOrdered:\n{}\nUnordered\n{}'.format('\n'.join(sorted(parallel_ordered_out)), '\n'.join(sorted(parallel_unordered_out))))
+    tc = unittest.TestCase()
+    tc.assertListEqual(
+        sorted(parallel_ordered_out),
+        sorted(parallel_unordered_out),
+        'Parallel outputs are not equal!\nOrdered:\n{}\nUnordered\n{}'.format('\n'.join(sorted(parallel_ordered_out)), '\n'.join(sorted(parallel_unordered_out))),
+    )
 
-    if parallel_ordered_out != serial_out:
-        raise Exception('Parallel output is not equal to serial!\nOrdered:\n{}\nSerial\n{}'.format('\n'.join(parallel_ordered_out), '\n'.join(serial_out)))
+    tc.assertListEqual(
+        parallel_ordered_out,
+        serial_out,
+        'Parallel output is not equal to serial!\nOrdered:\n{}\nSerial\n{}'.format('\n'.join(parallel_ordered_out), '\n'.join(serial_out)),
+    )
+
     print('parallel ordered: {}s, parallel unordered: {}s, serial: {}s'.format(parallel_ordered, parallel_unordered, serial))
