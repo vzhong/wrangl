@@ -30,13 +30,19 @@ class MyProcessor(Processor):
 
 
 if __name__ == '__main__':
+    ray.init()
     pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
     strings = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-    loader = MyDataloader(strings, pool, cache_size=5)
 
+    serial_loader = MyDataloader(strings, None, cache_size=5)
+    serial_out = []
+    for batch in serial_loader.batch(2):
+        serial_out.extend(batch)
+    unittest.TestCase().assertListEqual(strings, serial_out)
+
+    loader = MyDataloader(strings, pool, cache_size=5)
     out = []
     for batch in loader.batch(2):
         out.extend(batch)
-
     expect = [s * 10 for s in strings]
     unittest.TestCase().assertListEqual(expect, out)

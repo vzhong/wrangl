@@ -38,10 +38,19 @@ class MyProcessor(Processor):
 
 
 if __name__ == '__main__':
+    ray.init()
+    tc = unittest.TestCase()
+
     zen = io.StringIO()
     with contextlib.redirect_stdout(zen):
         import this
     text = [zen.getvalue()] * 20
+
+    serial_loader = MyDataloader(text, None, cache_size=10)
+    out = []
+    for batch in tqdm.tqdm(serial_loader.batch(5), desc='identity'):
+        out.extend(batch)
+    tc.assertListEqual(text, out)
 
     pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
     loader = MyDataloader(text, pool, cache_size=10)
@@ -67,7 +76,6 @@ if __name__ == '__main__':
         serial_out.append(nlp(line).text)
     serial = time.time() - start
 
-    tc = unittest.TestCase()
     tc.assertListEqual(
         sorted(parallel_ordered_out),
         sorted(parallel_unordered_out),

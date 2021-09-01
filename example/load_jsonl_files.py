@@ -25,6 +25,7 @@ def create_file(num_lines, start=0):
 
 
 if __name__ == '__main__':
+    ray.init()
     pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
     fnames, data = [], []
     for i in range(3):

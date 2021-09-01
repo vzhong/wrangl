@@ -17,9 +17,15 @@ class Cache:
         self.pool = pool
         self.cache_size = cache_size
         self.in_pool = 0
+        if pool is None:
+            # emulate a cache with no processors
+            self.items = []
 
     def add(self, o):
-        self.pool.submit(lambda a, v: a.process.remote(v), o)
+        if self.pool is None:
+            self.items.append(o)
+        else:
+            self.pool.submit(lambda a, v: a.process.remote(v), o)
         self.in_pool += 1
 
     def is_full(self):
@@ -27,8 +33,11 @@ class Cache:
 
     def get_batch(self, batch_size=10, random=False):
         batch = []
-        while len(batch) < batch_size and self.pool.has_next():
-            get_next = self.pool.get_next_unordered if random else self.pool.get_next
+        while len(batch) < batch_size and self.in_pool > 0:
+            if self.pool is None:
+                get_next = lambda: self.items.pop(0)
+            else:
+                get_next = self.pool.get_next_unordered if random else self.pool.get_next
             batch.append(get_next())
             self.in_pool -= 1
         return batch
@@ -38,7 +47,6 @@ class Dataloader:
 
     def __init__(self, pool: ray.util.ActorPool, cache_size: int = 1024):
         self.cache = Cache(pool, cache_size=cache_size)
-        ray.init(ignore_reinit_error=True)
 
     def load_next(self):
         raise NotImplementedError()
@@ -60,9 +68,8 @@ class Dataloader:
             else:
                 yield batch
 
-    def close(self, shutdown_ray=False):
-        if shutdown_ray:
-            ray.shutdown()
+    def close(self):
+        pass
 
 
 class Fileloader(Dataloader):
@@ -93,6 +100,6 @@ class Fileloader(Dataloader):
         self.current_file_idx = 0
         self.file = self.open_file(self.fnames[self.current_file_idx])
 
-    def close(self, shutdown_ray=False):
-        super().close(shutdown_ray=shutdown_ray)
+    def close(self):
+        super().close()
         self.file.close()
