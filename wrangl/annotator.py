@@ -21,24 +21,31 @@ class Annotator:
         self.top_k = top_k
         self.max_char = max_char
         self.current_identifier = self.current_example = None
+        self.selected_examples = []
 
-        self.input_cell = control.add_scroll_menu('Input', 0, 0, row_span=height//10*7, column_span=width//10*7)
+        self.main_cell = control.add_scroll_menu('Input', 0, 0, row_span=height//10*7, column_span=width//10*7)
         self.annotation_cell = control.add_text_box('Annotation', height//10*7, 0, row_span=height//10*3, column_span=width//10*7)
         self.stats_cell = control.add_scroll_menu('Stats (top {})'.format(top_k), 0, width//10*7, row_span=10, column_span=width//10*3)
 
         # focus colours
-        self.stats_cell.set_selected_color(py_cui.colors.RED_ON_BLACK)
-        for w in [self.input_cell, self.annotation_cell, self.stats_cell]:
+        for w in [self.annotation_cell, self.stats_cell]:
             w.set_focus_border_color(py_cui.colors.RED_ON_BLACK)
+            w.set_selected_color(py_cui.colors.RED_ON_BLACK)
+        self.main_cell.set_focus_border_color(py_cui.colors.RED_ON_BLACK)
 
         # submit annotation
         self.annotation_cell.add_key_command(py_cui.keys.KEY_ENTER, self.submit_annotation)
 
         # view detailed statistics
         self.stats_cell.add_key_command(py_cui.keys.KEY_ENTER, self.update_detailed_stats)
+        self.stats_cell.add_key_command(py_cui.keys.KEY_Q_LOWER, self.update_example)
+
+        # view detailed example
+        self.main_cell.add_key_command(py_cui.keys.KEY_ENTER, self.update_detailed_example)
+        self.main_cell.add_key_command(py_cui.keys.KEY_Q_LOWER, self.update_example)
 
         # vim bindings
-        for w in [control, self.stats_cell]:
+        for w in [self.main_cell, control, self.stats_cell]:
             w.add_key_command(py_cui.keys.KEY_H_LOWER, lambda: control._handle_key_presses(py_cui.keys.KEY_LEFT_ARROW))
             w.add_key_command(py_cui.keys.KEY_L_LOWER, lambda: control._handle_key_presses(py_cui.keys.KEY_RIGHT_ARROW))
             w.add_key_command(py_cui.keys.KEY_K_LOWER, lambda: control._handle_key_presses(py_cui.keys.KEY_UP_ARROW))
@@ -73,9 +80,9 @@ class Annotator:
         self.annotation_cell.clear()
 
     def update_example(self):
-        self.input_cell.set_title('Current example')
-        self.input_cell.clear()
-        self.input_cell.add_item(self.current_example)
+        self.main_cell.set_title('Current example')
+        self.main_cell.clear()
+        self.render_example(self.current_example, self.main_cell)
 
     def update_stats(self):
         self.stats_cell.clear()
@@ -85,23 +92,39 @@ class Annotator:
         items = []
         for m, c in ordered[:self.top_k]:
             items.append('{} ({} -> {}%)'.format(m, c, round(c/total * 100, 2)))
-        items.append('back')
         self.stats_cell.add_item_list(items)
 
     def update_detailed_stats(self):
         selected = self.stats_cell.get()
-        if selected == 'back':
-            self.update_example()
-        else:
-            self.input_cell.set_title('Detailed stats for: {}'.format(selected))
-            self.input_cell.clear()
-            ann = selected.split('(')[0].strip()
-            self.input_cell.add_item_list([self.render_example(ex) for ex in self.grouped[ann][:self.top_k]])
+        self.main_cell.set_title('Detailed stats for: {}'.format(selected))
+        self.main_cell.clear()
+        ann = selected.split('(')[0].strip()
+        self.selected_examples = self.grouped[ann][:self.top_k]
+        for i, ex in enumerate(self.selected_examples):
+            self.render_example_summary(ex, identifier=i, cell=self.main_cell)
 
-    def render_example(self, ex):
+    def update_detailed_example(self):
+        if not self.main_cell.get_title().startswith('Detailed stats'):
+            return
+        selected = self.main_cell.get()
+        index = int(selected.split(':')[0])
+        ex = self.selected_examples[index]
+        self.main_cell.set_title('Detailed example')
+        self.main_cell.clear()
+        self.render_example(ex, self.main_cell)
+
+    def render_example_summary(self, ex, cell, identifier=None):
         if len(ex) > self.max_char:
             ex = ex[:self.max_char] + '...'
-        return ex
+        if identifier is not None:
+            ex = '{}: {}'.format(identifier, ex)
+        cell.add_item(ex)
+
+    def render_example(self, ex, cell, line_width=50):
+        if ex is None:
+            return
+        items = [ex[i:i+line_width] for i in range(0, len(ex), line_width)]
+        cell.add_item_list(items)
 
     def start(self):
         self.control.start()
