@@ -64,7 +64,7 @@ class Dataloader:
                 self.cache.add(o)
             batch = self.cache.get_batch(batch_size, random=random)
             if not batch:
-                raise StopIteration
+                return
             else:
                 yield batch
 
