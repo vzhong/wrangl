@@ -9,4 +9,4 @@ pip install wrangl
 pip install git+https://github.com/vzhong/wrangl
 ```
 
-See [examples](tree/main/examples) for usage.
+See [examples](https://github.com/vzhong/wrangl/tree/main/example) for usage.
