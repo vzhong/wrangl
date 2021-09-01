@@ -83,7 +83,7 @@ class Fileloader(Dataloader):
 
     def load_next(self):
         try:
-            line = next(self.file)
+            line = next(self.file).rstrip('\n')
             return line
         except StopIteration:
             self.current_file_idx += 1
