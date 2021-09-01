@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     start = time.time()
     parallel_unordered_out = []
-    for batch in tqdm.tqdm(loader.batch(5, random=True), desc='parallel unordered'):
+    for batch in tqdm.tqdm(loader.batch(5, ordered=False), desc='parallel unordered'):
         parallel_unordered_out.extend(batch)
     parallel_unordered = time.time() - start
 
