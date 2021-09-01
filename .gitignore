@@ -1,3 +1,5 @@
+example/annotator/annotation/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
