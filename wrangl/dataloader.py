@@ -31,14 +31,14 @@ class Cache:
     def is_full(self):
         return self.in_pool >= self.cache_size
 
-    def get_batch(self, batch_size=10, ordered=True):
+    def get_batch(self, batch_size=10, ordered=True, timeout=None):
         batch = []
         while len(batch) < batch_size and self.in_pool > 0:
             if self.pool is None:
-                get_next = lambda: self.items.pop(0)
+                batch.append(self.items.pop(0))
             else:
                 get_next = self.pool.get_next if ordered else self.pool.get_next_unordered
-            batch.append(get_next())
+                batch.append(get_next(timeout=timeout))
             self.in_pool -= 1
         return batch
 
@@ -54,7 +54,7 @@ class Dataloader:
     def reset(self):
         return
 
-    def batch(self, batch_size: int = 1, ordered: bool = True):
+    def batch(self, batch_size: int = 1, ordered: bool = True, timeout=None):
         self.reset()
         while True:
             while not self.cache.is_full():
@@ -62,7 +62,7 @@ class Dataloader:
                 if o is None:
                     break
                 self.cache.add(o)
-            batch = self.cache.get_batch(batch_size, ordered=ordered)
+            batch = self.cache.get_batch(batch_size, ordered=ordered, timeout=timeout)
             if not batch:
                 return
             else:
