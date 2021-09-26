@@ -24,12 +24,13 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='wrangl',
-    version='0.0.3',
+    version='0.0.4',
 
     python_requires='>3.7',
 
-    description='Data preprocessing.',
+    description='Ray-backed data preprocessing.',
     long_description=long_description,
+    long_description_content_type='text/markdown',
 
     # The project's main homepage.
     url='https://github.com/vzhong/wrangl',
