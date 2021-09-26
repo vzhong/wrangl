@@ -51,6 +51,7 @@
   <ul>
     <li><a href="#how-to-process-in-parallel">How to process in parallel</a></li>
     <li><a href="#additional-utilities">Additional utilities</a></li>
+    <li><a href="#run-tests">Run tests</a></li>
   </ul></li>
 </ul>
 
@@ -80,7 +81,7 @@ wrangl    </h1>
 
 <p>Ray-based parallel data preprocessing for NLP and ML.</p>
 
-<div class="codehilite"><pre><span></span><code>pip install wrangl
+<div class="codehilite"><pre><span></span><code>pip install -e .  <span class="c1"># add [dev] if you want to run tests and build docs.</span>
 
 <span class="c1"># for latest</span>
 pip install git+https://github.com/vzhong/wrangl
@@ -142,6 +143,11 @@ if __name__ == '__main__':
 <p>Annotate data in commandline:</p>
 
 <pre><code>wannotate -h
+</code></pre>
+
+<h2 id="run-tests">Run tests</h2>
+
+<pre><code>python -m unittest discover tests
 </code></pre>
 </div>
 
