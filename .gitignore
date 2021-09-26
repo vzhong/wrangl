@@ -1,4 +1,6 @@
 example/annotator/annotation/
+deploy/
+docs/build/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,9 +1,10 @@
 # Wrangl
 
 Ray-based parallel data preprocessing for NLP and ML.
+See [docs here](https://www.victorzhong.com/wrangl).
 
 ```bash
-pip install wrangl
+pip install -e .  # add [dev] if you want to run tests and build docs.
 
 # for latest
 pip install git+https://github.com/vzhong/wrangl
@@ -69,4 +70,11 @@ Annotate data in commandline:
 
 ```
 wannotate -h
+```
+
+
+## Run tests
+
+```
+python -m unittest discover tests
 ```
