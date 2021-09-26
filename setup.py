@@ -78,7 +78,7 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        'dev': ['check-manifest', 'sphinx', 'sphinx_rtd_theme'],
+        'dev': ['check-manifest', 'pdoc'],
         'test': ['coverage', 'nose'],
     },
 
@@ -98,6 +98,6 @@ setup(
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
-        'console_scripts': ['annotate=wrangl.annotator:annotate'],
+        'console_scripts': ['wannotate=wrangl.interactive.annotator:annotate', 'wdocs=wrangl.interactive.docs:generate_docs'],
     },
 )

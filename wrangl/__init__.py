@@ -1,2 +1,5 @@
-from .dataloader import *
-from .annotator import *
+"""
+.. include:: ../README.md
+"""
+from .data import *
+from .interactive import *

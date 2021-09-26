@@ -1,16 +1,34 @@
+"""
+Annotator class for annotating individual examples.
+You should run this with `wannotate -h`.
+"""
 import os
 import py_cui
 import argparse
 import ujson as json
 from pathlib import Path
+from typing import Callable, List
 from collections import defaultdict
 
-from .dataloader import Fileloader
+from ..data import Fileloader
 
 
 class Annotator:
+    """
+    Annotation interface for individual examples.
+    """
 
-    def __init__(self, get_data, write_annotation, grouped=None, height=10, width=10, top_k=10, max_char=40, name='Annotator'):
+    def __init__(self, get_data: Callable, write_annotation: Callable, grouped: defaultdict[List[str]] = None, height: int = 10, width : int = 10, top_k: int = 10, max_char: int = 40, name: str = 'Annotator'):
+        """
+        Args:
+            get_data: generator function with the signature `identifier, example = f()` to retrieve new examples.
+            write_annotation: function with the signature `f(identifier, example, annotation)` to write annotation.
+            grouped: mapping of annotation to examples.
+            height: height of annotation interface.
+            width: width of annotation interface.
+            top_k: number of most frequent label classes to visualize.
+            max_char: max number of characters per line to show before wrapping.
+        """
         control = py_cui.PyCUI(height, width)
         control.set_title(name)
         self.control = control

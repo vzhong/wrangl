@@ -1,6 +1,6 @@
 import ray
 import time
-from wrangl.dataloader import Dataloader, Processor
+from wrangl.data import Dataloader, Processor
 import contextlib
 import tqdm
 import io
