@@ -64,6 +64,7 @@
         </nav>
     <main class="pdoc">
             <section>
+                        <a class="pdoc-button git-button" href="https://github.com/vzhong/wrangl/blob/main/wrangl/interactive/docs.py">Edit on GitHub</a>
                     <h1 class="modulename">
 <a href="./../../wrangl.html">wrangl</a><wbr>.<a href="./../interactive.html">interactive</a><wbr>.docs    </h1>
 
@@ -86,9 +87,10 @@
 
 
 <span class="k">def</span> <span class="nf">generate_docs</span><span class="p">():</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WRANGL_DOCS_HOST&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">render</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
         <span class="n">docformat</span><span class="o">=</span><span class="s1">&#39;google&#39;</span><span class="p">,</span>
-        <span class="n">edit_url_map</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WRANGL_DOCS_HOST&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">edit_url_map</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">wrangl</span><span class="o">=</span><span class="n">host</span><span class="p">)</span> <span class="k">if</span> <span class="n">host</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">footer_text</span><span class="o">=</span><span class="s1">&#39;Copyright @</span><span class="si">{}</span><span class="s1"> by Victor Zhong&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">year</span><span class="p">),</span>
         <span class="n">logo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">logo_link</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -117,9 +119,10 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">generate_docs</span><span class="p">():</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WRANGL_DOCS_HOST&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">render</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
         <span class="n">docformat</span><span class="o">=</span><span class="s1">&#39;google&#39;</span><span class="p">,</span>
-        <span class="n">edit_url_map</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WRANGL_DOCS_HOST&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">edit_url_map</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">wrangl</span><span class="o">=</span><span class="n">host</span><span class="p">)</span> <span class="k">if</span> <span class="n">host</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">footer_text</span><span class="o">=</span><span class="s1">&#39;Copyright @</span><span class="si">{}</span><span class="s1"> by Victor Zhong&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">year</span><span class="p">),</span>
         <span class="n">logo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">logo_link</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
