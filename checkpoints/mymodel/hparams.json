@@ -1,0 +1,14 @@
+{
+  "learning_rate": 0.001,
+  "batch_size": 24,
+  "silent": false,
+  "order": "ordered",
+  "timeout": 60,
+  "num_train_steps": 1500,
+  "eval_period": 200,
+  "dout": "checkpoints/mymodel",
+  "resume": null,
+  "num_procs": 3,
+  "cache_size": 10,
+  "test": null
+}

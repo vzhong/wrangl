@@ -7,7 +7,7 @@ import py_cui
 import argparse
 import ujson as json
 from pathlib import Path
-from typing import Callable, List
+from typing import Callable, List, DefaultDict
 from collections import defaultdict
 
 from ..data import Fileloader
@@ -18,7 +18,7 @@ class Annotator:
     Annotation interface for individual examples.
     """
 
-    def __init__(self, get_data: Callable, write_annotation: Callable, grouped: defaultdict[List[str]] = None, height: int = 10, width : int = 10, top_k: int = 10, max_char: int = 40, name: str = 'Annotator'):
+    def __init__(self, get_data: Callable, write_annotation: Callable, grouped: DefaultDict[str, List[str]] = None, height: int = 10, width : int = 10, top_k: int = 10, max_char: int = 40, name: str = 'Annotator'):
         """
         Args:
             get_data: generator function with the signature `identifier, example = f()` to retrieve new examples.

@@ -7,10 +7,10 @@ class Dataloader:
     A generic dataloader that processes examples in parallel.
     """
 
-    def __init__(self, pool: ray.util.ActorPool, cache_size: int = 1024):
+    def __init__(self, pool: ray.util.ActorPool = None, cache_size: int = 1024):
         """
         Args:
-            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples.
+            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples. If not specified, then no processing will be done.
             cache_size: how many examples to keep in the cache.
         """
         self.cache = Cache(pool, cache_size=cache_size)
@@ -30,7 +30,7 @@ class Dataloader:
         """
         return
 
-    def batch(self, batch_size: int = 1, ordered: bool = True, timeout=None):
+    def batch(self, batch_size: int = 1, ordered: bool = True, timeout: int = None, auto_reset: bool = False):
         """
         A generator of batches of processed examples.
 
@@ -38,6 +38,7 @@ class Dataloader:
             batch_size: how many examples to yield.
             ordered: whether to yield examples in the order they were loaded.
             timeout: how long to wait for examples to load. `None` means wait indefinitely.
+            auto_reset: reset automatically after exhausting data source and continue again.
 
         Returns:
             A generator of list of examples.
@@ -51,7 +52,11 @@ class Dataloader:
                 self.cache.add(o)
             batch = self.cache.get_batch(batch_size, ordered=ordered, timeout=timeout)
             if not batch:
-                return
+                if auto_reset:
+                    self.reset()
+                    continue
+                else:
+                    return
             else:
                 yield batch
 
