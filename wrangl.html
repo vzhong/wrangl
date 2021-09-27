@@ -49,7 +49,6 @@
                     <ul>
   <li><a href="#wrangl">Wrangl</a>
   <ul>
-    <li><a href="#how-to-process-in-parallel">How to process in parallel</a></li>
     <li><a href="#additional-utilities">Additional utilities</a></li>
     <li><a href="#run-tests">Run tests</a></li>
   </ul></li>
@@ -59,7 +58,10 @@
                     <h2>Submodules</h2>
                     <ul>
                             <li><a href="wrangl/data.html">wrangl.data</a></li>
+                            <li><a href="wrangl/examples.html">wrangl.examples</a></li>
                             <li><a href="wrangl/interactive.html">wrangl.interactive</a></li>
+                            <li><a href="wrangl/learn.html">wrangl.learn</a></li>
+                            <li><a href="wrangl/metrics.html">wrangl.metrics</a></li>
                     </ul>
 
 
@@ -87,58 +89,25 @@ See <a href="https://www.victorzhong.com/wrangl">docs here</a>.</p>
 
 <span class="c1"># for latest</span>
 pip install git+https://github.com/vzhong/wrangl
+
+<span class="c1"># pypi release</span>
+pip install wrangl
 </code></pre></div>
 
-<p>See <a href="https://github.com/vzhong/wrangl/tree/main/example">examples</a> and <a href="https://github.com/vzhong/wrangl/tests">test cases</a> for usage.</p>
+<p>See <a href="https://github.com/vzhong/wrangl/tree/main/wrangl/examples">examples</a> for usage.
+Here are some common use cases:</p>
 
-<h2 id="how-to-process-in-parallel">How to process in parallel</h2>
-
-<p>Here is a trivial example where we simple repeat the input many times.</p>
-
-<pre><code>import ray
-from <a href="wrangl/data.html">wrangl.data</a> import Dataloader, Processor
-
-
-# define how to load your data
-class MyDataloader(Dataloader):
-
-    def __init__(self, strings, pool: ray.util.ActorPool, cache_size: int = 1024):
-        super().__init__(pool, cache_size=cache_size)
-        self.current = 0
-        self.strings = strings
-
-    def reset(self):
-        self.current = 0
-
-    def load_next(self):
-        if self.current &lt; len(self.strings):
-            ret = self.strings[self.current]
-            self.current += 1
-            return ret
-        else:
-            return None
-
-
-# define how a worker processes each example
-@ray.remote
-class MyProcessor(Processor):
-
-    def process(self, raw):
-        return raw * 10
-
-
-if __name__ == '__main__':
-    ray.init()
-    strings = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-
-    pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
-    loader = MyDataloader(self.strings, pool, cache_size=5)
-    out = []
-    for batch in loader.batch(2, ordered=True):  # you can use ordered=False here for faster speed if you do not care about retrieving examples in order.
-        out.extend(batch)
-    expect = [s * 10 for s in self.strings]
-    assert expect == out
-</code></pre>
+<ul>
+<li>process data in parallel
+<ul>
+<li><a href="https://github.com/vzhong/wrangl/tree/main/wrangl/examples/preprocess_repeat_string.py">repeat string</a></li>
+<li><a href="https://github.com/vzhong/wrangl/tree/main/wrangl/examples/preprocess_using_stanza.py">parse text using Stanza</a></li>
+</ul></li>
+<li>train models
+<ul>
+<li><a href="https://github.com/vzhong/wrangl/tree/main/wrangl/examples/train_xor_classifier.py">train XOR classifier</a></li>
+</ul></li>
+</ul>
 
 <h2 id="additional-utilities">Additional utilities</h2>
 

@@ -98,10 +98,10 @@
 <span class="sd">    A generic dataloader that processes examples in parallel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples.</span>
+<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples. If not specified, then no processing will be done.</span>
 <span class="sd">            cache_size: how many examples to keep in the cache.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">cache_size</span><span class="p">)</span>
@@ -121,7 +121,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span>
 
-    <span class="k">def</span> <span class="nf">batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ordered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ordered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">auto_reset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A generator of batches of processed examples.</span>
 
@@ -129,6 +129,7 @@
 <span class="sd">            batch_size: how many examples to yield.</span>
 <span class="sd">            ordered: whether to yield examples in the order they were loaded.</span>
 <span class="sd">            timeout: how long to wait for examples to load. `None` means wait indefinitely.</span>
+<span class="sd">            auto_reset: reset automatically after exhausting data source and continue again.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A generator of list of examples.</span>
@@ -142,7 +143,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">get_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="n">ordered</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">batch</span><span class="p">:</span>
-                <span class="k">return</span>
+                <span class="k">if</span> <span class="n">auto_reset</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">batch</span>
 
@@ -172,10 +177,10 @@
 <span class="sd">    A generic dataloader that processes examples in parallel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples.</span>
+<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples. If not specified, then no processing will be done.</span>
 <span class="sd">            cache_size: how many examples to keep in the cache.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">cache_size</span><span class="p">)</span>
@@ -195,7 +200,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span>
 
-    <span class="k">def</span> <span class="nf">batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ordered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ordered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">auto_reset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A generator of batches of processed examples.</span>
 
@@ -203,6 +208,7 @@
 <span class="sd">            batch_size: how many examples to yield.</span>
 <span class="sd">            ordered: whether to yield examples in the order they were loaded.</span>
 <span class="sd">            timeout: how long to wait for examples to load. `None` means wait indefinitely.</span>
+<span class="sd">            auto_reset: reset automatically after exhausting data source and continue again.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A generator of list of examples.</span>
@@ -216,7 +222,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">get_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="n">ordered</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">batch</span><span class="p">:</span>
-                <span class="k">return</span>
+                <span class="k">if</span> <span class="n">auto_reset</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">batch</span>
 
@@ -237,15 +247,15 @@
                                         <div class="attr function"><a class="headerlink" href="#Dataloader.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">Dataloader</span><span class="signature">(pool: ray.util.actor_pool.ActorPool, cache_size: int = 1024)</span>
+            <span class="name">Dataloader</span><span class="signature">(pool: ray.util.actor_pool.ActorPool = None, cache_size: int = 1024)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples.</span>
+<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples. If not specified, then no processing will be done.</span>
 <span class="sd">            cache_size: how many examples to keep in the cache.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">cache_size</span><span class="p">)</span>
@@ -256,7 +266,7 @@
             <div class="docstring"><h6 id="args">Args</h6>
 
 <ul>
-<li><strong>pool:</strong>  pool of <code><a href="processor.html#Processor">wrangl.data.loader.processor.Processor</a></code>s to process each examples.</li>
+<li><strong>pool:</strong>  pool of <code><a href="processor.html#Processor">wrangl.data.loader.processor.Processor</a></code>s to process each examples. If not specified, then no processing will be done.</li>
 <li><strong>cache_size:</strong>  how many examples to keep in the cache.</li>
 </ul>
 </div>
@@ -325,12 +335,18 @@
 
         
             <span class="def">def</span>
-            <span class="name">batch</span><span class="signature">(self, batch_size: int = 1, ordered: bool = True, timeout=None)</span>:
+            <span class="name">batch</span><span class="signature">(
+    self,
+    batch_size: int = 1,
+    ordered: bool = True,
+    timeout: int = None,
+    auto_reset: bool = False
+)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ordered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ordered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">auto_reset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A generator of batches of processed examples.</span>
 
@@ -338,6 +354,7 @@
 <span class="sd">            batch_size: how many examples to yield.</span>
 <span class="sd">            ordered: whether to yield examples in the order they were loaded.</span>
 <span class="sd">            timeout: how long to wait for examples to load. `None` means wait indefinitely.</span>
+<span class="sd">            auto_reset: reset automatically after exhausting data source and continue again.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A generator of list of examples.</span>
@@ -351,7 +368,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">get_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="n">ordered</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">batch</span><span class="p">:</span>
-                <span class="k">return</span>
+                <span class="k">if</span> <span class="n">auto_reset</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">batch</span>
 </pre></div>
@@ -366,6 +387,7 @@
 <li><strong>batch_size:</strong>  how many examples to yield.</li>
 <li><strong>ordered:</strong>  whether to yield examples in the order they were loaded.</li>
 <li><strong>timeout:</strong>  how long to wait for examples to load. <code>None</code> means wait indefinitely.</li>
+<li><strong>auto_reset:</strong>  reset automatically after exhausting data source and continue again.</li>
 </ul>
 
 <h6 id="returns">Returns</h6>
