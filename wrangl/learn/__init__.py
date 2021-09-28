@@ -1,1 +1,1 @@
-from .supervised_model import SupervisedModel
+from .supervised import SupervisedModel

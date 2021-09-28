@@ -7,8 +7,8 @@ import logging
 import pathlib
 from torch import nn
 from typing import Tuple, List, Dict, Union
-from ..data import Dataloader
-from ..metrics import Metric
+from ...data import Dataloader
+from ...metrics import Metric
 from argparse import Namespace, ArgumentParser, ArgumentDefaultsHelpFormatter
 
 
