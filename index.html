@@ -49,6 +49,8 @@
                     <ul>
   <li><a href="#wrangl">Wrangl</a>
   <ul>
+    <li><a href="#installation">Installation</a></li>
+    <li><a href="#usage">Usage</a></li>
     <li><a href="#additional-utilities">Additional utilities</a></li>
     <li><a href="#run-tests">Run tests</a></li>
   </ul></li>
@@ -82,8 +84,24 @@ wrangl    </h1>
 
                         <div class="docstring"><h1 id="wrangl">Wrangl</h1>
 
-<p>Ray-based parallel data preprocessing for NLP and ML.
-See <a href="https://www.victorzhong.com/wrangl">docs here</a>.</p>
+<p>Parallel data preprocessing for NLP and ML.
+See <a href="https://www.victorzhong.com/wrangl">docs here</a>.
+If you find this work helpful, please consider citing</p>
+
+<pre><code>@misc{zhong2021wrangl,
+  author = {Zhong, Victor},
+  title = {Wrangl: Parallel data preprocessing for NLP and ML},
+  year = {2021},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/vzhong/wrangl}}
+}
+</code></pre>
+
+<p>The supervised learning dataset parallelization component of this library uses <a href="https://ray.io">Ray</a>.
+The reinforcement learning environment parallelization component of this library uses <a href="https://github.com/facebookresearch/torchbeast">Torchbeast</a>.</p>
+
+<h2 id="installation">Installation</h2>
 
 <div class="codehilite"><pre><span></span><code>pip install -e .  <span class="c1"># add [dev] if you want to run tests and build docs.</span>
 
@@ -93,6 +111,8 @@ pip install git+https://github.com/vzhong/wrangl
 <span class="c1"># pypi release</span>
 pip install wrangl
 </code></pre></div>
+
+<h2 id="usage">Usage</h2>
 
 <p>See <a href="https://github.com/vzhong/wrangl/tree/main/wrangl/examples">examples</a> for usage.
 Here are some common use cases:</p>
