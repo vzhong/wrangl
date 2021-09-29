@@ -1,6 +1,7 @@
 example/annotator/annotation/
 deploy/
 docs/build/
+checkpoints/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

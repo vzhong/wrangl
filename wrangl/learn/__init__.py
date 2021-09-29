@@ -1,1 +1,2 @@
-from .supervised import SupervisedModel
+from .supervised import *
+from .rl import *
