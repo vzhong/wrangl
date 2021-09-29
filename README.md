@@ -1,6 +1,7 @@
 # Wrangl
 
-[![Tests](https://github.com/vzhong/wrangl/actions/workflows/python-app.yml/badge.svg)](https://github.com/vzhong/wrangl/actions/workflows/python-app.yml)
+[![Tests](https://github.com/vzhong/wrangl/actions/workflows/tests.yml/badge.svg)](https://github.com/vzhong/wrangl/actions/workflows/tests.yml)
+[![Docs](https://github.com/vzhong/wrangl/actions/workflows/docs.yml/badge.svg)](https://github.com/vzhong/wrangl/actions/workflows/docs.yml)
 
 Parallel data preprocessing for NLP and ML.
 See [docs here](https://www.victorzhong.com/wrangl).

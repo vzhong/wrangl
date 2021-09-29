@@ -1,7 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: Python application
+name: Docs
 
 on:
   push:
@@ -10,20 +7,25 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  docs:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    - name: Install dependencies
+    - name: Update pip
       run: |
         python -m pip install --upgrade pip
-        pip install -e .[dev]
-    - name: Run tests
+    - name: Install package
       run: |
-        python -m unittest discover tests
+        pip install -e .[dev]
+    - name: Build docs
+      run: |
+        env WRANGL_DOCS_HOST=https://github.com/vzhong/wrangl/blob/main/wrangl/ wdocs
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/build
