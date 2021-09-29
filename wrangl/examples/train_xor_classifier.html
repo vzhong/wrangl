@@ -175,7 +175,7 @@
         <span class="k">return</span> <span class="n">Accuracy</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">verbose_test</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">pool</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">([</span><span class="n">MyProcessor</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">num_procs</span><span class="p">)])</span>
     <span class="n">eval_loader</span> <span class="o">=</span> <span class="n">MyDataloader</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">cache_size</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -185,10 +185,11 @@
         <span class="n">model</span><span class="o">.</span><span class="n">run_train</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">eval_loader</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">load_checkpoint</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">test</span><span class="p">,</span> <span class="n">override_hparams</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
-        <span class="n">eval_preds</span><span class="p">,</span> <span class="n">eval_loss</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_preds</span><span class="p">(</span><span class="n">eval_loader</span><span class="p">,</span> <span class="n">compute_loss</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">eval_preds</span><span class="p">,</span> <span class="n">eval_loss</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_preds</span><span class="p">(</span><span class="n">eval_loader</span><span class="p">,</span> <span class="n">compute_loss</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose_test</span><span class="p">)</span>
         <span class="n">eval_metrics</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">()(</span><span class="n">eval_preds</span><span class="p">)</span>
         <span class="n">eval_metrics</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eval_loss</span>
-        <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">eval_metrics</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose_test</span><span class="p">:</span>
+            <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">eval_metrics</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">eval_metrics</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -576,12 +577,12 @@ parameters converted too when you call <code><a href="#MyModel.to">to</a></code>
 
         
             <span class="def">def</span>
-            <span class="name">main</span><span class="signature">(args)</span>:
+            <span class="name">main</span><span class="signature">(args, verbose_test=True)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">verbose_test</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">pool</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">([</span><span class="n">MyProcessor</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">num_procs</span><span class="p">)])</span>
     <span class="n">eval_loader</span> <span class="o">=</span> <span class="n">MyDataloader</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">cache_size</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -591,10 +592,11 @@ parameters converted too when you call <code><a href="#MyModel.to">to</a></code>
         <span class="n">model</span><span class="o">.</span><span class="n">run_train</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">eval_loader</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">load_checkpoint</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">test</span><span class="p">,</span> <span class="n">override_hparams</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
-        <span class="n">eval_preds</span><span class="p">,</span> <span class="n">eval_loss</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_preds</span><span class="p">(</span><span class="n">eval_loader</span><span class="p">,</span> <span class="n">compute_loss</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">eval_preds</span><span class="p">,</span> <span class="n">eval_loss</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_preds</span><span class="p">(</span><span class="n">eval_loader</span><span class="p">,</span> <span class="n">compute_loss</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose_test</span><span class="p">)</span>
         <span class="n">eval_metrics</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">()(</span><span class="n">eval_preds</span><span class="p">)</span>
         <span class="n">eval_metrics</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eval_loss</span>
-        <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">eval_metrics</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose_test</span><span class="p">:</span>
+            <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">eval_metrics</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">eval_metrics</span>
 </pre></div>
 
