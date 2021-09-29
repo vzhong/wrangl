@@ -60,10 +60,13 @@ class MyModel(SupervisedModel):
         return F.cross_entropy(out['scores'], y)
 
     def extract_pred(self, batch, out):
-        return [dict(y=i) for i in out['scores'].max(1)[1].tolist()]
+        return out['scores'].max(1)[1].tolist()
+
+    def extract_gold(self, batch):
+        return [ex['y'] for ex in batch]
 
     def get_metrics(self):
-        return Accuracy('y')
+        return Accuracy()
 
 
 def main(args, verbose_test=True):

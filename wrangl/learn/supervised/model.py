@@ -32,6 +32,12 @@ class SupervisedModel(BaseModel):
         """
         raise NotImplementedError()
 
+    def extract_gold(self, batch) -> List[Dict]:
+        """
+        Extracts label from input batch.
+        """
+        raise NotImplementedError()
+
     def compute_loss(self, batch, out) -> torch.Tensor:
         """
         Computes loss fro model output.
@@ -74,8 +80,8 @@ class SupervisedModel(BaseModel):
             batch = next(generator)
             batch_out = self(batch)
             batch_loss = self.compute_loss(batch, batch_out)
-            for ex, pred in zip(batch, self.extract_pred(batch, batch_out)):
-                train_preds.append((ex, pred))
+            for gold, pred in zip(self.extract_gold(batch), self.extract_pred(batch, batch_out)):
+                train_preds.append((gold, pred))
             train_loss += batch_loss.item()
 
             batch_loss.backward()
@@ -132,8 +138,8 @@ class SupervisedModel(BaseModel):
         with torch.no_grad():
             for batch in generator:
                 batch_out = self(batch)
-                for ex, pred in zip(batch, self.extract_pred(batch, batch_out)):
-                    preds.append((ex, pred))
+                for gold, pred in zip(self.extract_gold(batch), self.extract_pred(batch, batch_out)):
+                    preds.append((gold, pred))
                 if compute_loss:
                     loss += self.compute_loss(batch, batch_out).item()
                 num_steps += 1
