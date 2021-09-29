@@ -69,4 +69,5 @@ class TestTrainXorClassifier(unittest.TestCase):
         # do inference
         args.test = str(self.dout.joinpath('ckpt.tar'))
         eval_metrics = train_xor_classifier.main(args)
-        self.assertEqual(expect['eval'], eval_metrics)
+        for k, v in expect['eval'].items():
+            self.assertAlmostEqual(v, eval_metrics[k])
