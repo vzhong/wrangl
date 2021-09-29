@@ -37,7 +37,10 @@ See [examples](https://github.com/vzhong/wrangl/tree/main/wrangl/examples) for u
 Here are some common use cases:
 
 * process data in parallel
-  * [repeat string](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/preprocess_repeat_string.py)
+  * [repeat string with fixed dataset](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/preprocess_repeat_string_preloaded.py)
+  * [repeat string with generator dataset](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/preprocess_repeat_string_preloaded.py)
+  * [loading from SQL database](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/preprocess_sql_db.py)
+  * [loading from bzipped jsonl files](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/preprocess_jsonl_files.py)
   * [parse text using Stanza](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/preprocess_using_stanza.py)
 * train models
   * [train XOR classifier](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/train_xor_classifier.py)

@@ -7,13 +7,13 @@ from .dataloader import Dataloader
 
 class Fileloader(Dataloader):
 
-    def __init__(self, fnames: List[Union[str, Path]], pool: ray.util.ActorPool, cache_size: int = 1024):
+    def __init__(self, fnames: List[Union[str, Path]], pool: ray.util.ActorPool = None, cache_size: int = 1024):
         """
         Loads lines from input files.
 
         Args:
             fnames: list of text or `bz2` files to loader from.
-            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples.
+            pool: pool of `wrangl.data.loader.processor.Processor`s to process each example. If not specified, then no processing will be done.
             cache_size: how many examples to keep in the cache.
         """
         assert fnames

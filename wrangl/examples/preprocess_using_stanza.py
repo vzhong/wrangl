@@ -38,7 +38,6 @@ class MyProcessor(Processor):
 
 
 if __name__ == '__main__':
-    ray.init()
     tc = unittest.TestCase()
 
     zen = io.StringIO()

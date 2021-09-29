@@ -10,7 +10,7 @@ class Dataloader:
     def __init__(self, pool: ray.util.ActorPool = None, cache_size: int = 1024):
         """
         Args:
-            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples. If not specified, then no processing will be done.
+            pool: pool of `wrangl.data.loader.processor.Processor`s to process each example. If not specified, then no processing will be done.
             cache_size: how many examples to keep in the cache.
         """
         self.cache = Cache(pool, cache_size=cache_size)

@@ -24,7 +24,6 @@ def create_file(num_lines, start=0):
 
 
 def load_files():
-    ray.init()
     fnames, data = [], []
     for i in range(3):
         fname_i, data_i = create_file(4, start=i*100)

@@ -22,7 +22,6 @@ from torch import nn
 from torch.nn import functional as F
 from torch import multiprocessing as mp
 
-import gym
 import random
 
 from .core import environment

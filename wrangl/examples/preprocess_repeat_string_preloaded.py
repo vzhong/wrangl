@@ -1,27 +1,8 @@
 import ray
-from wrangl.data import Dataloader, Processor
+from wrangl.data import PreloadedDataloader, Processor
 
 
 strings = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-
-
-class MyDataloader(Dataloader):
-
-    def __init__(self, strings, pool: ray.util.ActorPool, cache_size: int = 1024):
-        super().__init__(pool, cache_size=cache_size)
-        self.current = 0
-        self.strings = strings
-
-    def reset(self):
-        self.current = 0
-
-    def load_next(self):
-        if self.current < len(self.strings):
-            ret = self.strings[self.current]
-            self.current += 1
-            return ret
-        else:
-            return None
 
 
 @ray.remote
@@ -32,7 +13,7 @@ class MyProcessor(Processor):
 
 
 def run_no_process():
-    loader = MyDataloader(strings, None, cache_size=5)
+    loader = PreloadedDataloader(strings, None, cache_size=5)
     out = []
     for batch in loader.batch(2):
         out.extend(batch)
@@ -41,7 +22,7 @@ def run_no_process():
 
 def run_ordered():
     pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
-    loader = MyDataloader(strings, pool, cache_size=5)
+    loader = PreloadedDataloader(strings, pool, cache_size=5)
     out = []
     for batch in loader.batch(2, ordered=True):
         out.extend(batch)
@@ -50,7 +31,7 @@ def run_ordered():
 
 def run_unordered():
     pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
-    loader = MyDataloader(strings, pool, cache_size=5)
+    loader = PreloadedDataloader(strings, pool, cache_size=5)
     out = []
     for batch in loader.batch(2, ordered=False):
         out.extend(batch)
