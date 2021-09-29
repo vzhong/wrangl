@@ -21,6 +21,7 @@ Here are some common use cases:
   * [parse text using Stanza](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/preprocess_using_stanza.py)
 * train models
   * [train XOR classifier](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/train_xor_classifier.py)
+  * [train CartPole using Monobeast](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/train_rl_cartpole.py)
 
 ## Additional utilities
 

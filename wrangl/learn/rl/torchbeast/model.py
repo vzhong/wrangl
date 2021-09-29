@@ -1,4 +1,3 @@
-import gym
 import json
 import torch
 import typing
