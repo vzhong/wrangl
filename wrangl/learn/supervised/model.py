@@ -80,7 +80,8 @@ class SupervisedModel(BaseModel):
 
             batch_loss.backward()
             optimizer.step()
-            bar.update(1)
+            if not self.hparams.silent:
+                bar.update(1)
             self.train_steps += 1
             num_steps += 1
 
@@ -100,11 +101,13 @@ class SupervisedModel(BaseModel):
                     best_eval_metric = key_eval_metric
 
                 self.logger.info('\n' + pprint.pformat(combined_metrics))
-                bar.set_description('L train {:.3g} eval {:.3g} | {} train {:.3g} eval {:.3g} best {:.3g}'.format(train_loss, eval_loss, key_metric_name, key_train_metric, key_eval_metric, best_eval_metric))
+                if not self.hparams.silent:
+                    bar.set_description('L train {:.3g} eval {:.3g} | {} train {:.3g} eval {:.3g} best {:.3g}'.format(train_loss, eval_loss, key_metric_name, key_train_metric, key_eval_metric, best_eval_metric))
                 self.train()
                 train_loss = num_steps = 0
                 train_preds.clear()
-        bar.close()
+        if not self.hparams.silent:
+            bar.close()
 
     def run_preds(self, eval_data: Dataloader, compute_loss: bool = False, verbose: bool = False) -> List[Dict]:
         """

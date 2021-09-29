@@ -28,7 +28,7 @@ class TestTrainXorClassifier(unittest.TestCase):
         return log
 
     def test_train_test(self):
-        args = self.parser.parse_args([])
+        args = self.parser.parse_args(['--silent'])
 
         # train from scratch
         train_xor_classifier.main(args)
@@ -40,12 +40,17 @@ class TestTrainXorClassifier(unittest.TestCase):
         self.assertTrue(self.dout.joinpath('train.log').exists())
 
         log = self.load_metrics_log()
-        self.assertDictEqual(dict(
+        expect = dict(
             train=dict(loss=0.4270490446686745, accuracy=1.0),
             eval=dict(loss=0.40561878346815344, accuracy=1.0),
             best=1.0,
             train_steps=1500,
-        ), log[-1])
+        )
+        for k in ['best', 'train_steps']:
+            self.assertEqual(expect[k], log[-1][k])
+        for split in ['train', 'eval']:
+            for k in ['loss', 'accuracy']:
+                self.assertAlmostEqual(expect[split][k], log[-1][split][k])
 
         # resume training
         args.num_train_steps = 2000
@@ -59,15 +64,23 @@ class TestTrainXorClassifier(unittest.TestCase):
             train_steps=2000,
         )
         log = self.load_metrics_log()
-        self.assertDictEqual(expect, log[-1])
+        for k in ['best', 'train_steps']:
+            self.assertEqual(expect[k], log[-1][k])
+        for split in ['train', 'eval']:
+            for k in ['loss', 'accuracy']:
+                self.assertAlmostEqual(expect[split][k], log[-1][split][k])
 
         # try training again
         train_xor_classifier.main(args)
         log = self.load_metrics_log()
-        self.assertDictEqual(expect, log[-1])
+        for k in ['best', 'train_steps']:
+            self.assertEqual(expect[k], log[-1][k])
+        for split in ['train', 'eval']:
+            for k in ['loss', 'accuracy']:
+                self.assertAlmostEqual(expect[split][k], log[-1][split][k])
 
         # do inference
         args.test = str(self.dout.joinpath('ckpt.tar'))
-        eval_metrics = train_xor_classifier.main(args)
+        eval_metrics = train_xor_classifier.main(args, verbose_test=False)
         for k, v in expect['eval'].items():
             self.assertAlmostEqual(v, eval_metrics[k])

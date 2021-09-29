@@ -66,7 +66,7 @@ class MyModel(SupervisedModel):
         return Accuracy('y')
 
 
-def main(args):
+def main(args, verbose_test=True):
     torch.manual_seed(1)
     pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(args.num_procs)])
     eval_loader = MyDataloader(pool, cache_size=args.cache_size, seed=1)
@@ -76,10 +76,11 @@ def main(args):
         model.run_train(train_loader, eval_loader)
     else:
         model = MyModel.load_checkpoint(args.test, override_hparams=args)
-        eval_preds, eval_loss = model.run_preds(eval_loader, compute_loss=True, verbose=True)
+        eval_preds, eval_loss = model.run_preds(eval_loader, compute_loss=True, verbose=verbose_test)
         eval_metrics = model.get_metrics()(eval_preds)
         eval_metrics['loss'] = eval_loss
-        pprint.pprint(eval_metrics)
+        if verbose_test:
+            pprint.pprint(eval_metrics)
         return eval_metrics
 
 if __name__ == '__main__':
