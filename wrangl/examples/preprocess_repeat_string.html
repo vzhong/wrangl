@@ -155,8 +155,6 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
-
     <span class="n">out</span> <span class="o">=</span> <span class="n">run_no_process</span><span class="p">()</span>
     <span class="k">assert</span> <span class="n">strings</span> <span class="o">==</span> <span class="n">out</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
@@ -230,7 +228,7 @@
             <div class="docstring"><h6 id="args">Args</h6>
 
 <ul>
-<li><strong>pool:</strong>  pool of <code><a href="../data/loader/processor.html#Processor">wrangl.data.loader.processor.Processor</a></code>s to process each examples. If not specified, then no processing will be done.</li>
+<li><strong>pool:</strong>  pool of <code><a href="../data/loader/processor.html#Processor">wrangl.data.loader.processor.Processor</a></code>s to process each example. If not specified, then no processing will be done.</li>
 <li><strong>cache_size:</strong>  how many examples to keep in the cache.</li>
 </ul>
 </div>

@@ -101,7 +101,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples. If not specified, then no processing will be done.</span>
+<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each example. If not specified, then no processing will be done.</span>
 <span class="sd">            cache_size: how many examples to keep in the cache.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">cache_size</span><span class="p">)</span>
@@ -180,7 +180,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples. If not specified, then no processing will be done.</span>
+<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each example. If not specified, then no processing will be done.</span>
 <span class="sd">            cache_size: how many examples to keep in the cache.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">cache_size</span><span class="p">)</span>
@@ -255,7 +255,7 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples. If not specified, then no processing will be done.</span>
+<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each example. If not specified, then no processing will be done.</span>
 <span class="sd">            cache_size: how many examples to keep in the cache.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">cache_size</span><span class="p">)</span>
@@ -266,7 +266,7 @@
             <div class="docstring"><h6 id="args">Args</h6>
 
 <ul>
-<li><strong>pool:</strong>  pool of <code><a href="processor.html#Processor">wrangl.data.loader.processor.Processor</a></code>s to process each examples. If not specified, then no processing will be done.</li>
+<li><strong>pool:</strong>  pool of <code><a href="processor.html#Processor">wrangl.data.loader.processor.Processor</a></code>s to process each example. If not specified, then no processing will be done.</li>
 <li><strong>cache_size:</strong>  how many examples to keep in the cache.</li>
 </ul>
 </div>

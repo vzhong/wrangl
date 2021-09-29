@@ -98,13 +98,13 @@
 
 <span class="k">class</span> <span class="nc">Fileloader</span><span class="p">(</span><span class="n">Dataloader</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fnames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]],</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fnames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]],</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads lines from input files.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fnames: list of text or `bz2` files to loader from.</span>
-<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples.</span>
+<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each example. If not specified, then no processing will be done.</span>
 <span class="sd">            cache_size: how many examples to keep in the cache.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">fnames</span>
@@ -153,13 +153,13 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Fileloader</span><span class="p">(</span><span class="n">Dataloader</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fnames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]],</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fnames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]],</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads lines from input files.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fnames: list of text or `bz2` files to loader from.</span>
-<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples.</span>
+<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each example. If not specified, then no processing will be done.</span>
 <span class="sd">            cache_size: how many examples to keep in the cache.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">fnames</span>
@@ -204,20 +204,20 @@
         
             <span class="name">Fileloader</span><span class="signature">(
     fnames: List[Union[str, pathlib.Path]],
-    pool: ray.util.actor_pool.ActorPool,
+    pool: ray.util.actor_pool.ActorPool = None,
     cache_size: int = 1024
 )</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fnames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]],</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fnames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]],</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads lines from input files.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fnames: list of text or `bz2` files to loader from.</span>
-<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each examples.</span>
+<span class="sd">            pool: pool of `wrangl.data.loader.processor.Processor`s to process each example. If not specified, then no processing will be done.</span>
 <span class="sd">            cache_size: how many examples to keep in the cache.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">fnames</span>
@@ -235,7 +235,7 @@
 
 <ul>
 <li><strong>fnames:</strong>  list of text or <code>bz2</code> files to loader from.</li>
-<li><strong>pool:</strong>  pool of <code><a href="processor.html#Processor">wrangl.data.loader.processor.Processor</a></code>s to process each examples.</li>
+<li><strong>pool:</strong>  pool of <code><a href="processor.html#Processor">wrangl.data.loader.processor.Processor</a></code>s to process each example. If not specified, then no processing will be done.</li>
 <li><strong>cache_size:</strong>  how many examples to keep in the cache.</li>
 </ul>
 </div>
