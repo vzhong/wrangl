@@ -79,6 +79,7 @@
         </nav>
     <main class="pdoc">
             <section>
+                        <a class="pdoc-button git-button" href="https://github.com/vzhong/wrangl/blob/main/wrangl/learn/rl/torchbeast/run_exp.py">Edit on GitHub</a>
                     <h1 class="modulename">
 <a href="./../../../../wrangl.html">wrangl</a><wbr>.<a href="./../../../learn.html">learn</a><wbr>.<a href="./../../rl.html">rl</a><wbr>.<a href="./../torchbeast.html">torchbeast</a><wbr>.run_exp    </h1>
 
@@ -404,8 +405,11 @@
 
     <span class="k">def</span> <span class="nf">val_checkpoint</span><span class="p">():</span>
         <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Testing checkpoint&#39;</span><span class="p">)</span>
-        <span class="n">test_result</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_flags</span><span class="p">,</span> <span class="n">eval_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="p">,</span> <span class="n">write_eval_result</span><span class="p">)</span>
+        <span class="n">test_result</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_flags</span><span class="p">,</span> <span class="n">flags</span><span class="o">.</span><span class="n">test_eps</span><span class="p">,</span> <span class="n">eval_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="p">,</span> <span class="n">write_eval_result</span><span class="p">)</span>
         <span class="n">test_result</span><span class="p">[</span><span class="s1">&#39;train_steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
+        <span class="n">write_eval_result</span><span class="p">(</span><span class="n">test_result</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Evaluating after </span><span class="si">{}</span><span class="s1"> steps:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">train_steps</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">test_result</span><span class="p">))</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
     <span class="n">timer</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span>
     <span class="k">try</span><span class="p">:</span>
@@ -424,8 +428,7 @@
 
             <span class="k">if</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">last_checkpoint_time</span> <span class="o">&gt;</span> <span class="n">flags</span><span class="o">.</span><span class="n">save_period_seconds</span><span class="p">:</span>
                 <span class="n">checkpoint</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">val_env</span><span class="p">:</span>  <span class="c1"># if we specified a val environment to run</span>
-                    <span class="n">val_checkpoint</span><span class="p">()</span>
+                <span class="n">val_checkpoint</span><span class="p">()</span>
                 <span class="n">last_checkpoint_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
 
             <span class="n">fps</span> <span class="o">=</span> <span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">-</span> <span class="n">start_step</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
@@ -455,6 +458,7 @@
     <span class="n">model</span><span class="o">.</span><span class="n">load_checkpoint</span><span class="p">(</span><span class="n">fresume</span><span class="p">,</span> <span class="n">override_hparams</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">hparams</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
+    <span class="n">env</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span><span class="n">eval_env</span><span class="p">)</span>
     <span class="n">observation</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">initial</span><span class="p">()</span>
     <span class="n">returns</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">won</span> <span class="o">=</span> <span class="p">[]</span>
@@ -502,8 +506,8 @@
             <span class="def">def</span>
             <span class="name">act</span><span class="signature">(
     i: int,
-    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7ff250a85fa0&gt;&gt;,
-    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7ff250a85fa0&gt;&gt;,
+    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fd2d8b66fd0&gt;&gt;,
+    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fd2d8b66fd0&gt;&gt;,
     model: torch.nn.modules.module.Module,
     buffers: Dict[str, List[torch.Tensor]],
     initial_agent_state_buffers,
@@ -580,8 +584,8 @@
         
             <span class="def">def</span>
             <span class="name">get_batch</span><span class="signature">(
-    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7ff250a85fa0&gt;&gt;,
-    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7ff250a85fa0&gt;&gt;,
+    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fd2d8b66fd0&gt;&gt;,
+    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fd2d8b66fd0&gt;&gt;,
     buffers: Dict[str, List[torch.Tensor]],
     initial_agent_state_buffers,
     flags,
@@ -891,8 +895,11 @@
 
     <span class="k">def</span> <span class="nf">val_checkpoint</span><span class="p">():</span>
         <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Testing checkpoint&#39;</span><span class="p">)</span>
-        <span class="n">test_result</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_flags</span><span class="p">,</span> <span class="n">eval_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="p">,</span> <span class="n">write_eval_result</span><span class="p">)</span>
+        <span class="n">test_result</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_flags</span><span class="p">,</span> <span class="n">flags</span><span class="o">.</span><span class="n">test_eps</span><span class="p">,</span> <span class="n">eval_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="p">,</span> <span class="n">write_eval_result</span><span class="p">)</span>
         <span class="n">test_result</span><span class="p">[</span><span class="s1">&#39;train_steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
+        <span class="n">write_eval_result</span><span class="p">(</span><span class="n">test_result</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Evaluating after </span><span class="si">{}</span><span class="s1"> steps:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">train_steps</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">test_result</span><span class="p">))</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
     <span class="n">timer</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span>
     <span class="k">try</span><span class="p">:</span>
@@ -911,8 +918,7 @@
 
             <span class="k">if</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">last_checkpoint_time</span> <span class="o">&gt;</span> <span class="n">flags</span><span class="o">.</span><span class="n">save_period_seconds</span><span class="p">:</span>
                 <span class="n">checkpoint</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">val_env</span><span class="p">:</span>  <span class="c1"># if we specified a val environment to run</span>
-                    <span class="n">val_checkpoint</span><span class="p">()</span>
+                <span class="n">val_checkpoint</span><span class="p">()</span>
                 <span class="n">last_checkpoint_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
 
             <span class="n">fps</span> <span class="o">=</span> <span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">-</span> <span class="n">start_step</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
@@ -964,6 +970,7 @@
     <span class="n">model</span><span class="o">.</span><span class="n">load_checkpoint</span><span class="p">(</span><span class="n">fresume</span><span class="p">,</span> <span class="n">override_hparams</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">hparams</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
+    <span class="n">env</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span><span class="n">eval_env</span><span class="p">)</span>
     <span class="n">observation</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">initial</span><span class="p">()</span>
     <span class="n">returns</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">won</span> <span class="o">=</span> <span class="p">[]</span>
