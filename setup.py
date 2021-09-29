@@ -24,11 +24,11 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='wrangl',
-    version='0.0.4',
+    version='0.0.5',
 
     python_requires='>3.7',
 
-    description='Ray-backed data preprocessing.',
+    description='Parallel data preprocessing for NLP and ML.',
     long_description=long_description,
     long_description_content_type='text/markdown',
 
