@@ -60,6 +60,9 @@
                                 <a class="function" href="#SupervisedModel.extract_pred">extract_pred</a>
                         </li>
                         <li>
+                                <a class="function" href="#SupervisedModel.extract_gold">extract_gold</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#SupervisedModel.compute_loss">compute_loss</a>
                         </li>
                         <li>
@@ -126,6 +129,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
+    <span class="k">def</span> <span class="nf">extract_gold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts label from input batch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
     <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes loss fro model output.</span>
@@ -168,8 +177,8 @@
             <span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
             <span class="n">batch_out</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
             <span class="n">batch_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">ex</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
-                <span class="n">train_preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ex</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">gold</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_gold</span><span class="p">(</span><span class="n">batch</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
+                <span class="n">train_preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">gold</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
             <span class="n">train_loss</span> <span class="o">+=</span> <span class="n">batch_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
             <span class="n">batch_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
@@ -226,8 +235,8 @@
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
                 <span class="n">batch_out</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">ex</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
-                    <span class="n">preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ex</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">gold</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_gold</span><span class="p">(</span><span class="n">batch</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
+                    <span class="n">preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">gold</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">compute_loss</span><span class="p">:</span>
                     <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
                 <span class="n">num_steps</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -278,6 +287,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
+    <span class="k">def</span> <span class="nf">extract_gold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts label from input batch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
     <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes loss fro model output.</span>
@@ -320,8 +335,8 @@
             <span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
             <span class="n">batch_out</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
             <span class="n">batch_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">ex</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
-                <span class="n">train_preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ex</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">gold</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_gold</span><span class="p">(</span><span class="n">batch</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
+                <span class="n">train_preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">gold</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
             <span class="n">train_loss</span> <span class="o">+=</span> <span class="n">batch_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
             <span class="n">batch_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
@@ -378,8 +393,8 @@
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
                 <span class="n">batch_out</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">ex</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
-                    <span class="n">preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ex</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">gold</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_gold</span><span class="p">(</span><span class="n">batch</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
+                    <span class="n">preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">gold</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">compute_loss</span><span class="p">:</span>
                     <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
                 <span class="n">num_steps</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -499,6 +514,30 @@ parameters converted too when you call <code><a href="#SupervisedModel.to">to</a
 
 
                             </div>
+                            <div id="SupervisedModel.extract_gold" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.extract_gold">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">extract_gold</span><span class="signature">(self, batch) -&gt; List[Dict]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extract_gold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts label from input batch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Extracts label from input batch.</p>
+</div>
+
+
+                            </div>
                             <div id="SupervisedModel.compute_loss" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#SupervisedModel.compute_loss">#&nbsp;&nbsp</a>
 
@@ -573,8 +612,8 @@ parameters converted too when you call <code><a href="#SupervisedModel.to">to</a
             <span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
             <span class="n">batch_out</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
             <span class="n">batch_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">ex</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
-                <span class="n">train_preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ex</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">gold</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_gold</span><span class="p">(</span><span class="n">batch</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
+                <span class="n">train_preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">gold</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
             <span class="n">train_loss</span> <span class="o">+=</span> <span class="n">batch_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
             <span class="n">batch_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
@@ -661,8 +700,8 @@ parameters converted too when you call <code><a href="#SupervisedModel.to">to</a
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
                 <span class="n">batch_out</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">ex</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
-                    <span class="n">preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ex</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">gold</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_gold</span><span class="p">(</span><span class="n">batch</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)):</span>
+                    <span class="n">preds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">gold</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">compute_loss</span><span class="p">:</span>
                     <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_out</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
                 <span class="n">num_steps</span> <span class="o">+=</span> <span class="mi">1</span>

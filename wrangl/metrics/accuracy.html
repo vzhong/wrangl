@@ -89,20 +89,11 @@
 
 <span class="k">class</span> <span class="nc">Accuracy</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            key: key to compute accuracy on.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
-
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">acc</span> <span class="o">=</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">ex</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
-            <span class="n">g</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
-            <span class="n">acc</span> <span class="o">+=</span> <span class="n">g</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="n">g</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
+            <span class="n">acc</span> <span class="o">+=</span> <span class="n">g</span> <span class="o">==</span> <span class="n">p</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">accuracy</span><span class="o">=</span><span class="p">(</span><span class="n">acc</span><span class="o">/</span><span class="n">total</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 
     <span class="k">def</span> <span class="nf">should_early_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">best_score</span><span class="p">):</span>
@@ -125,20 +116,11 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Accuracy</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            key: key to compute accuracy on.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
-
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">acc</span> <span class="o">=</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">ex</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
-            <span class="n">g</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
-            <span class="n">acc</span> <span class="o">+=</span> <span class="n">g</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="n">g</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
+            <span class="n">acc</span> <span class="o">+=</span> <span class="n">g</span> <span class="o">==</span> <span class="n">p</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">accuracy</span><span class="o">=</span><span class="p">(</span><span class="n">acc</span><span class="o">/</span><span class="n">total</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 
     <span class="k">def</span> <span class="nf">should_early_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">best_score</span><span class="p">):</span>
@@ -153,28 +135,11 @@
                                         <div class="attr function"><a class="headerlink" href="#Accuracy.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">Accuracy</span><span class="signature">(key: str)</span>
+            <span class="name">Accuracy</span><span class="signature">()</span>
     </div>
 
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            key: key to compute accuracy on.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><h6 id="args">Args</h6>
-
-<ul>
-<li><strong>key:</strong>  key to compute accuracy on.</li>
-</ul>
-</div>
-
+        
+    
 
                             </div>
                             <div id="Accuracy.forward" class="classattr">
@@ -189,11 +154,9 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">acc</span> <span class="o">=</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">ex</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
-            <span class="n">g</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
-            <span class="n">acc</span> <span class="o">+=</span> <span class="n">g</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="n">g</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
+            <span class="n">acc</span> <span class="o">+=</span> <span class="n">g</span> <span class="o">==</span> <span class="n">p</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">accuracy</span><span class="o">=</span><span class="p">(</span><span class="n">acc</span><span class="o">/</span><span class="n">total</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 </pre></div>
 
