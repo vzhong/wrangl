@@ -54,10 +54,7 @@
                                 <a class="function" href="#Accuracy.__init__">Accuracy</a>
                         </li>
                         <li>
-                                <a class="function" href="#Accuracy.forward">forward</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Accuracy.should_early_stop">should_early_stop</a>
+                                <a class="function" href="#Accuracy.single_forward">single_forward</a>
                         </li>
                 </ul>
 
@@ -84,20 +81,12 @@
                         <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">.metric</span> <span class="kn">import</span> <span class="n">Metric</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
 
 
 <span class="k">class</span> <span class="nc">Accuracy</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="n">acc</span> <span class="o">=</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
-            <span class="n">acc</span> <span class="o">+=</span> <span class="n">g</span> <span class="o">==</span> <span class="n">p</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">accuracy</span><span class="o">=</span><span class="p">(</span><span class="n">acc</span><span class="o">/</span><span class="n">total</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-
-    <span class="k">def</span> <span class="nf">should_early_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">best_score</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">should_early_stop</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">best_score</span><span class="p">,</span> <span class="n">larger_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">single_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gold</span><span class="p">,</span> <span class="n">pred</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">gold</span> <span class="o">==</span> <span class="n">pred</span>
 </pre></div>
 
         </details>
@@ -116,15 +105,8 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Accuracy</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="n">acc</span> <span class="o">=</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
-            <span class="n">acc</span> <span class="o">+=</span> <span class="n">g</span> <span class="o">==</span> <span class="n">p</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">accuracy</span><span class="o">=</span><span class="p">(</span><span class="n">acc</span><span class="o">/</span><span class="n">total</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-
-    <span class="k">def</span> <span class="nf">should_early_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">best_score</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">should_early_stop</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">best_score</span><span class="p">,</span> <span class="n">larger_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">single_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gold</span><span class="p">,</span> <span class="n">pred</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">gold</span> <span class="o">==</span> <span class="n">pred</span>
 </pre></div>
 
         </details>
@@ -142,60 +124,23 @@
     
 
                             </div>
-                            <div id="Accuracy.forward" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#Accuracy.forward">#&nbsp;&nbsp</a>
+                            <div id="Accuracy.single_forward" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Accuracy.single_forward">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">forward</span><span class="signature">(self, preds: List[Tuple[Dict, Dict]]) -&gt; dict</span>:
+            <span class="name">single_forward</span><span class="signature">(self, gold, pred)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="n">acc</span> <span class="o">=</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">:</span>
-            <span class="n">acc</span> <span class="o">+=</span> <span class="n">g</span> <span class="o">==</span> <span class="n">p</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">accuracy</span><span class="o">=</span><span class="p">(</span><span class="n">acc</span><span class="o">/</span><span class="n">total</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">single_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gold</span><span class="p">,</span> <span class="n">pred</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">gold</span> <span class="o">==</span> <span class="n">pred</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Computes score given predictions</p>
-</div>
-
-
-                            </div>
-                            <div id="Accuracy.should_early_stop" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#Accuracy.should_early_stop">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">should_early_stop</span><span class="signature">(self, score, best_score)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">should_early_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">best_score</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">should_early_stop</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">best_score</span><span class="p">,</span> <span class="n">larger_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><h6 id="args">Args</h6>
-
-<ul>
-<li><strong>score:</strong>  current score.</li>
-<li><strong>best_score:</strong>  previous best score.</li>
-<li><strong>larger_is_better:</strong>  whether a larger score is better.</li>
-</ul>
-
-<h6 id="return">Return</h6>
-
-<blockquote>
-  <p>whether a new best scores has been found.</p>
-</blockquote>
+            <div class="docstring"><p>Computes score given gold and prediction</p>
 </div>
 
 
@@ -204,7 +149,9 @@
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="metric.html#Metric">wrangl.metrics.metric.Metric</a></dt>
-                                <dd id="Accuracy.extract_key_metric" class="function"><a href="metric.html#Metric.extract_key_metric">extract_key_metric</a></dd>
+                                <dd id="Accuracy.forward" class="function"><a href="metric.html#Metric.forward">forward</a></dd>
+                <dd id="Accuracy.extract_key_metric" class="function"><a href="metric.html#Metric.extract_key_metric">extract_key_metric</a></dd>
+                <dd id="Accuracy.should_early_stop" class="function"><a href="metric.html#Metric.should_early_stop">should_early_stop</a></dd>
 
             </div>
                                 </dl>
