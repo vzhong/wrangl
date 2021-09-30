@@ -63,7 +63,7 @@ class MyModel(SupervisedModel):
         return out['scores'].max(1)[1].tolist()
 
     def extract_gold(self, batch):
-        return [ex['y'] for ex in batch]
+        return [ex['y'].item() for ex in batch]
 
     def get_metrics(self):
         return Accuracy()

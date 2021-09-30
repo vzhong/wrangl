@@ -1,13 +1,26 @@
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 
 
 class Metric:
 
-    def forward(self, preds: List[Tuple[Dict, Dict]]) -> dict:
+    def single_forward(self, gold, pred):
         """
-        Computes score given predictions
+        Computes score given gold and prediction
         """
         raise NotImplementedError()
+
+    def forward(self, preds: List[tuple]) -> dict:
+        """
+        Computes score given list of prediction tuples `(gold, pred)`.
+
+        Returns:
+            a dictionary entry of name to score.
+        """
+        score = total = 0
+        for gold, pred in preds:
+            score += self.single_forward(gold, pred)
+            total += 1
+        return {self.__class__.__name__.lower(): score/total}
 
     def __call__(self, *args, **kwargs):
         return self.forward(*args, **kwargs)

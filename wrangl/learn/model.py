@@ -34,6 +34,14 @@ class Model(torch.nn.Module):
         self.hparams = hparams
         self.train_steps = 0
         self._logger = None
+        self.device = torch.device('cpu')
+
+    def auto_device(self, cuda_device='cuda'):
+        """
+        Places model on GPU if available.
+        """
+        self.device = torch.device(cuda_device) if torch.cuda.is_available() else torch.device('cpu')
+        return self.to(self.device)
 
     @property
     def logger(self):
@@ -62,9 +70,11 @@ class Model(torch.nn.Module):
 
         return logger
 
-    def get_optimizer_scheduler(self) -> Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler._LRScheduler]:
+    def get_optimizer_scheduler(self, linear_scheduler=False) -> Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler._LRScheduler]:
         optimizer = torch.optim.AdamW(lr=self.hparams.learning_rate, params=self.parameters())
-        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda step: (self.hparams.num_train_steps - step) / self.hparams.num_train_steps)
+        scheduler = None
+        if linear_scheduler:
+            scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda step: (self.hparams.num_train_steps - step) / self.hparams.num_train_steps)
         return optimizer, scheduler
 
     def ensure_dout(self):
@@ -144,3 +154,15 @@ class Model(torch.nn.Module):
             train_steps=self.train_steps,
         )
         torch.save(d, dout.joinpath('ckpt.tar'))
+
+    @staticmethod
+    def shift_tokens_right(input_ids: torch.Tensor, pad_token_id: int):
+        """
+        Shift input ids one token to the right, and wrap the last non pad token (usually <eos>).
+        This is taken directly from modeling_bart.py
+        """
+        prev_output_tokens = input_ids.clone()
+        index_of_eos = (input_ids.ne(pad_token_id).sum(dim=1) - 1).unsqueeze(-1)
+        prev_output_tokens[:, 0] = input_ids.gather(1, index_of_eos).squeeze()
+        prev_output_tokens[:, 1:] = input_ids[:, :-1]
+        return prev_output_tokens
