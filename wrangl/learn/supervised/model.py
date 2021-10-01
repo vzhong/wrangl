@@ -5,7 +5,7 @@ import pprint
 from argparse import ArgumentParser
 from typing import List, Dict
 from ...data import Dataloader
-from ...metrics import Metric, Timer
+from ...metrics import Metric, RunningAverage
 from ..model import Model as BaseModel
 
 
@@ -56,7 +56,8 @@ class SupervisedModel(BaseModel):
         generator = train_data.batch(self.hparams.batch_size, ordered=self.hparams.order == 'ordered', timeout=self.hparams.timeout, auto_reset=True)
 
         metrics = self.get_metrics()
-        timer = Timer()
+        timer = RunningAverage()
+        losses = RunningAverage()
         optimizer, scheduler = self.get_optimizer_scheduler()
 
         train_loss = 0
@@ -74,29 +75,43 @@ class SupervisedModel(BaseModel):
             bar.update(self.train_steps)
         self.train()
 
+        train_loss_str = eval_loss_str = key_metric_name = key_train_metric_str = key_eval_metric_str = best_eval_metric_str = 'n/a'
+
         while self.train_steps < self.hparams.num_train_steps:
             optimizer.zero_grad()
 
             time_start = time.time()
             batch = next(generator)
             time_batch = time.time()
+            timer.record('batch', time_batch-time_start)
             batch_out = self(batch)
             time_forward = time.time()
-            timer.record('batch', time_batch-time_start)
             timer.record('forward', time_forward-time_batch)
             batch_loss = self.compute_loss(batch, batch_out)
+            time_loss = time.time()
+            timer.record('loss', time_loss-time_forward)
             for gold, pred in zip(self.extract_gold(batch), self.extract_pred(batch, batch_out)):
                 train_preds.append((gold, pred))
-            train_loss += batch_loss.item()
+            time_pred = time.time()
+            timer.record('pred', time_pred-time_loss)
 
+            train_loss += batch_loss.item()
             batch_loss.backward()
             optimizer.step()
             if scheduler:
                 scheduler.step()
-            if not self.hparams.silent:
-                bar.update(1)
+            time_optim = time.time()
+            timer.record('optim', time_optim-time_pred)
+
             self.train_steps += 1
             num_steps += 1
+
+            losses.record('train', batch_loss.item())
+            train_loss_str = '{:.3g}'.format(losses.avgs['train'])
+
+            if not self.hparams.silent:
+                bar.update(1)
+                bar.set_description('L tr {} ev {} | {} tr {} ev {} bst {} | bt {:.2g} fd {:.2g} ls {:.2g} op {:.2g}'.format(train_loss_str, eval_loss_str, key_metric_name, key_train_metric_str, key_eval_metric_str, best_eval_metric_str, timer.avgs['batch'], timer.avgs['forward'], timer.avgs['loss'], timer.avgs['optim']))
 
             if self.train_steps % self.hparams.eval_period == 0 or self.train_steps == self.hparams.num_train_steps:
                 train_loss /= num_steps
@@ -107,15 +122,18 @@ class SupervisedModel(BaseModel):
                 eval_metrics = metrics(eval_preds)
                 eval_metrics['loss'] = eval_loss
                 _, key_eval_metric = metrics.extract_key_metric(eval_metrics)
-                combined_metrics = dict(train=train_metrics, eval=eval_metrics, best=key_eval_metric, train_steps=self.train_steps, elapsed=timer.elapsed)
+                combined_metrics = dict(train=train_metrics, eval=eval_metrics, best=key_eval_metric, train_steps=self.train_steps, elapsed=timer.avgs)
 
                 if metrics.should_early_stop(key_eval_metric, best_eval_metric):
                     self.save_checkpoint(combined_metrics, optimizer_state=optimizer.state_dict(), scheduler_state=scheduler.state_dict() if scheduler else None, model_state=self.state_dict())
                     best_eval_metric = key_eval_metric
 
+                eval_loss_str = '{:.3g}'.format(eval_loss)
+                key_train_metric_str = '{:.3g}'.format(key_train_metric)
+                key_eval_metric_str = '{:.3g}'.format(key_eval_metric)
+                best_eval_metric_str = '{:.3g}'.format(best_eval_metric)
+
                 self.logger.info('\n' + pprint.pformat(combined_metrics))
-                if not self.hparams.silent:
-                    bar.set_description('L tr {:.3g} ev {:.3g} | {} tr {:.3g} ev {:.3g} bst {:.3g} | bat {:.3g} fwd {:.3g}'.format(train_loss, eval_loss, key_metric_name, key_train_metric, key_eval_metric, best_eval_metric, timer.elapsed['batch'], timer.elapsed['forward']))
                 self.train()
                 train_loss = num_steps = 0
                 train_preds.clear()

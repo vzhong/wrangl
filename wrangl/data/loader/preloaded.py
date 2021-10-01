@@ -25,6 +25,9 @@ class PreloadedDataloader(Dataloader):
         if self.shuffle_seed is not None:
             self.rng = random.Random(self.shuffle_seed)
 
+    def __len__(self):
+        return len(self.preloaded_data)
+
     def reset(self):
         super().reset()
         self.current_idx = 0

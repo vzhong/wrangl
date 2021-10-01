@@ -5,7 +5,7 @@ class Precision(Metric):
 
     @classmethod
     def single_forward(cls, gold: set, pred: set):
-        if not gold:
+        if not pred:
             return 0
         return len(pred.intersection(gold)) / len(pred)
 
@@ -23,8 +23,6 @@ class F1Score(Metric):
 
     @classmethod
     def single_forward(cls, gold: set, pred: set):
-        if not gold:
-            return 0
         precision = Precision.single_forward(gold, pred)
         recall = Recall.single_forward(gold, pred)
         denom = precision + recall
