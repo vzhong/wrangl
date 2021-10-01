@@ -41,6 +41,6 @@ def get_env_shapes(env):
 
 if __name__ == '__main__':
     torch.manual_seed(0)
-    parser = MyRLModel.get_parser(batch_size=10, num_actors=10, num_buffers=20, num_train_steps=int(1e6), print_period_second=2)
+    parser = MyRLModel.get_parser(batch_size=10, num_actors=10, num_buffers=20, num_train_steps=int(1e6), print_period_seconds=2, save_period_seconds=3)
     args = parser.parse_args()
     MyRLModel.run_train(args, create_env=create_env, create_eval_env=create_env, get_env_shapes=get_env_shapes)

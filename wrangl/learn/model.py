@@ -33,7 +33,6 @@ class Model(torch.nn.Module):
             hparams = self.get_parser().parse_args()
         self.hparams = hparams
         self.train_steps = 0
-        self._logger = None
         self.device = torch.device('cpu')
 
     def auto_device(self, cuda_device='cuda'):
@@ -45,28 +44,28 @@ class Model(torch.nn.Module):
 
     @property
     def logger(self):
-        if self._logger is None:
-            self._logger = self.get_logger()
-        return self._logger
+        return self.get_logger(self.hparams.dout)
 
-    def get_logger(self) -> logging.Logger:
+    @classmethod
+    def get_logger(cls, dout) -> logging.Logger:
         """
         Returns the default logger
         """
-        logger = logging.getLogger(self.__class__.__name__.lower())
-        logger.setLevel(logging.INFO)
+        logger = logging.getLogger(cls.__name__.lower())  # this returns a singleton
 
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s: %(message)s')
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.WARNING)
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
+        if not logger.hasHandlers():
+            logger.setLevel(logging.INFO)
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s: %(message)s')
+            ch = logging.StreamHandler()
+            ch.setLevel(logging.WARNING)
+            ch.setFormatter(formatter)
+            logger.addHandler(ch)
 
-        flog = pathlib.Path(self.hparams.dout).joinpath('train.log')
-        fh = logging.FileHandler(flog)
-        fh.setLevel(logging.INFO)
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
+            flog = pathlib.Path(dout).joinpath('train.log')
+            fh = logging.FileHandler(flog)
+            fh.setLevel(logging.INFO)
+            fh.setFormatter(formatter)
+            logger.addHandler(fh)
 
         return logger
 

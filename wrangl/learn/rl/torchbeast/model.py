@@ -26,8 +26,8 @@ class TorchbeastModel(BaseModel):
         parser.add_argument('--queue_timeout', default=defaults.get('queue_timeout', 1), type=int, metavar='S', help='Error timeout for queue.')
         parser.add_argument('--num_buffers', default=defaults.get('num_buffers', 2), type=int, metavar='N', help='Number of shared-memory buffers.')
         parser.add_argument('--num_threads', default=defaults.get('num_threads', 4), type=int, metavar='N', help='Number learner threads.')
-        parser.add_argument('--save_period_seconds', default=defaults.get('save_seconds', 5*60), type=int, metavar='N', help='How often to save.')
-        parser.add_argument('--print_period_seconds', default=defaults.get('print_seconds', 5), type=int, metavar='N', help='How often to print.')
+        parser.add_argument('--save_period_seconds', default=defaults.get('save_period_seconds', 5*60), type=int, metavar='N', help='How often to save.')
+        parser.add_argument('--print_period_seconds', default=defaults.get('print_period_seconds', 5), type=int, metavar='N', help='How often to print.')
         parser.add_argument('--test_eps', default=defaults.get('test_eps', 10), type=int, metavar='N', help='How many episodes to test.')
 
         # Loss settings.
@@ -57,15 +57,19 @@ class TorchbeastModel(BaseModel):
             the observation shapes should be a dictionary that maps from observation name to a tuple (`shape`, `dtype`).
         """
         dout = pathlib.Path(flags.dout)
-        flog = dout.joinpath('train.log.json')
+        flog = dout.joinpath('metrics.log.json')
+        fbest = dout.joinpath('metrics.best.json')
 
         def write_result(res, mode='train'):
             res['type'] = mode
             with flog.open('at') as f:
                 f.write(json.dumps(res) + '\n')
 
-        def write_eval_result(res):
+        def write_eval_result(res, new_best: bool):
             write_result(res, mode='eval')
+            if new_best:
+                with fbest.open('wt') as f:
+                    json.dump(res, f)
 
         return train(
             flags,

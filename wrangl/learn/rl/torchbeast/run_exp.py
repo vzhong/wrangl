@@ -252,6 +252,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
         actor_processes.append(actor)
 
     learner_model = create_model(flags, observation_shapes, num_actions).to(device=device)
+    logger = learner_model.get_logger(flags.dout)
 
     optimizer = torch.optim.RMSprop(
         learner_model.parameters(),
@@ -300,7 +301,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
             for actor in actor_processes:
                 actor.join(timeout=1)
         else:
-            model.logger.error('TERMINATING. You may exit with Ctrl+C')
+            logger.error('TERMINATING. You may exit with Ctrl+C')
             for p in actor_processes:
                 p.terminate()
                 p.kill()
@@ -314,13 +315,20 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
     test_flags = copy.deepcopy(flags)
     test_flags.resume = 'auto'
 
+    best = None
+
     def val_checkpoint():
-        model.logger.info('Testing checkpoint')
+        nonlocal best
+        logger.info('Testing checkpoint')
         test_result = test(test_flags, flags.test_eps, eval_env, get_env_shapes, create_model, write_eval_result)
         test_result['train_steps'] = model.train_steps
-        write_eval_result(test_result)
+        new_best = False
+        if best is None or test_result['mean_episode_return'] > best['mean_episode_return']:
+            best = test_result
+            new_best = True
+        write_eval_result(test_result, new_best=True)
         s = 'Evaluating after {} steps:\n{}'.format(model.train_steps, pprint.pformat(test_result))
-        model.logger.critical(s)
+        logger.critical(s)
 
     timer = timeit.default_timer
     try:
@@ -349,7 +357,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
                 mean_return = ''
             total_loss = stats.get('total_loss', float('inf'))
             s = 'After {} steps: loss {} @ {:.2f} fps. {} Stats:\n{}'.format(model.train_steps, total_loss, fps, mean_return, pprint.pformat(stats))
-            model.logger.critical(s)
+            logger.critical(s)
     except KeyboardInterrupt:
         return  # Try joining actors then quit.
     else:
@@ -400,7 +408,7 @@ def test(flags, num_eps, eval_env, get_env_shapes, create_model, write_eval_resu
 
     fps = steps / (time.time() - start_time)
     return{
-        'mean_episode_returns': sum(returns)/len(returns),
+        'mean_episode_return': sum(returns)/len(returns),
         'mean_win_rate': sum(won)/len(returns),
         'mean_episode_len': sum(ep_len)/len(ep_len),
         'mean_fps': fps,
