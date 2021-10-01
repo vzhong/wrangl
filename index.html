@@ -51,8 +51,9 @@
   <ul>
     <li><a href="#installation">Installation</a></li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#additional-utilities">Additional utilities</a></li>
+    <li><a href="#commandline-utilities">Commandline utilities</a></li>
     <li><a href="#run-tests">Run tests</a></li>
+    <li><a href="#generate-docs">Generate docs</a></li>
   </ul></li>
 </ul>
 
@@ -136,16 +137,27 @@ Here are some common use cases:</p>
 </ul></li>
 </ul>
 
-<h2 id="additional-utilities">Additional utilities</h2>
+<h2 id="commandline-utilities">Commandline utilities</h2>
 
-<p>Annotate data in commandline:</p>
+<p>Current supports:</p>
 
-<pre><code>wannotate -h
+<ul>
+<li>annotating text files</li>
+<li>plotting learning curves</li>
+<li>autodocumenting this package</li>
+</ul>
+
+<pre><code>wrangl -h
 </code></pre>
 
 <h2 id="run-tests">Run tests</h2>
 
 <pre><code>python -m unittest discover tests
+</code></pre>
+
+<h2 id="generate-docs">Generate docs</h2>
+
+<pre><code>wrangl autodoc
 </code></pre>
 </div>
 
@@ -155,7 +167,6 @@ Here are some common use cases:</p>
 <span class="sd">.. include:: ../README.md</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">.data</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.interactive</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">.learn</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="o">*</span>
 </pre></div>

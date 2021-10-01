@@ -114,6 +114,7 @@
 
 <span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">environment</span>
 <span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">vtrace</span>
+<span class="kn">from</span> <span class="nn">....metrics.running_avg</span> <span class="kn">import</span> <span class="n">RunningAverage</span>
 
 
 <span class="n">Buffers</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span>
@@ -340,6 +341,7 @@
         <span class="n">actor_processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span>
 
     <span class="n">learner_model</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">learner_model</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">dout</span><span class="p">)</span>
 
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">RMSprop</span><span class="p">(</span>
         <span class="n">learner_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
@@ -352,7 +354,7 @@
         <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">epoch</span> <span class="o">*</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span><span class="p">,</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_train_steps</span><span class="p">)</span> <span class="o">/</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_train_steps</span>
 
     <span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">LambdaLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">lr_lambda</span><span class="p">)</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">RunningAverage</span><span class="p">()</span>
 
     <span class="n">fresume</span> <span class="o">=</span> <span class="n">learner_model</span><span class="o">.</span><span class="n">get_fresume</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">fresume</span> <span class="ow">and</span> <span class="n">fresume</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -360,16 +362,15 @@
 
     <span class="k">def</span> <span class="nf">batch_and_learn</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()):</span>
         <span class="sd">&quot;&quot;&quot;Thread target for the learning process.&quot;&quot;&quot;</span>
-        <span class="k">nonlocal</span> <span class="n">stats</span>
+        <span class="k">nonlocal</span> <span class="n">metrics</span>
         <span class="k">while</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">&lt;</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_train_steps</span><span class="p">:</span>
             <span class="n">batch</span><span class="p">,</span> <span class="n">agent_state</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="n">free_queue</span><span class="p">,</span> <span class="n">full_queue</span><span class="p">,</span> <span class="n">buffers</span><span class="p">,</span> <span class="n">initial_agent_state_buffers</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-
-            <span class="n">stats</span> <span class="o">=</span> <span class="n">learn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">learner_model</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">agent_state</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">learn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">learner_model</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">agent_state</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">metrics</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
             <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
                 <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">+=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span>
-                <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;train_steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
-                <span class="n">write_result</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">):</span>
         <span class="n">free_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
@@ -388,7 +389,7 @@
             <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actor_processes</span><span class="p">:</span>
                 <span class="n">actor</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;TERMINATING. You may exit with Ctrl+C&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;TERMINATING. You may exit with Ctrl+C&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">actor_processes</span><span class="p">:</span>
                 <span class="n">p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
                 <span class="n">p</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
@@ -402,13 +403,20 @@
     <span class="n">test_flags</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
     <span class="n">test_flags</span><span class="o">.</span><span class="n">resume</span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span>
 
+    <span class="n">best</span> <span class="o">=</span> <span class="kc">None</span>
+
     <span class="k">def</span> <span class="nf">val_checkpoint</span><span class="p">():</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Testing checkpoint&#39;</span><span class="p">)</span>
+        <span class="k">nonlocal</span> <span class="n">best</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Testing checkpoint&#39;</span><span class="p">)</span>
         <span class="n">test_result</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_flags</span><span class="p">,</span> <span class="n">flags</span><span class="o">.</span><span class="n">test_eps</span><span class="p">,</span> <span class="n">eval_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="p">,</span> <span class="n">write_eval_result</span><span class="p">)</span>
         <span class="n">test_result</span><span class="p">[</span><span class="s1">&#39;train_steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
-        <span class="n">write_eval_result</span><span class="p">(</span><span class="n">test_result</span><span class="p">)</span>
+        <span class="n">new_best</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">best</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">test_result</span><span class="p">[</span><span class="s1">&#39;mean_episode_return&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">best</span><span class="p">[</span><span class="s1">&#39;mean_episode_return&#39;</span><span class="p">]:</span>
+            <span class="n">best</span> <span class="o">=</span> <span class="n">test_result</span>
+            <span class="n">new_best</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">write_eval_result</span><span class="p">(</span><span class="n">test_result</span><span class="p">,</span> <span class="n">new_best</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Evaluating after </span><span class="si">{}</span><span class="s1"> steps:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">train_steps</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">test_result</span><span class="p">))</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
     <span class="n">timer</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span>
     <span class="k">try</span><span class="p">:</span>
@@ -424,6 +432,9 @@
             <span class="n">start_step</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
             <span class="n">start_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">print_period_seconds</span><span class="p">)</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">avgs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;train_steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
+            <span class="n">write_result</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">last_checkpoint_time</span> <span class="o">&gt;</span> <span class="n">flags</span><span class="o">.</span><span class="n">save_period_seconds</span><span class="p">:</span>
                 <span class="n">checkpoint</span><span class="p">()</span>
@@ -437,7 +448,7 @@
                 <span class="n">mean_return</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="n">total_loss</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total_loss&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">))</span>
             <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;After </span><span class="si">{}</span><span class="s1"> steps: loss </span><span class="si">{}</span><span class="s1"> @ </span><span class="si">{:.2f}</span><span class="s1"> fps. </span><span class="si">{}</span><span class="s1"> Stats:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">train_steps</span><span class="p">,</span> <span class="n">total_loss</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">mean_return</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">stats</span><span class="p">))</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
         <span class="k">return</span>  <span class="c1"># Try joining actors then quit.</span>
     <span class="k">else</span><span class="p">:</span>
@@ -488,7 +499,7 @@
 
     <span class="n">fps</span> <span class="o">=</span> <span class="n">steps</span> <span class="o">/</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
     <span class="k">return</span><span class="p">{</span>
-        <span class="s1">&#39;mean_episode_returns&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">),</span>
+        <span class="s1">&#39;mean_episode_return&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">),</span>
         <span class="s1">&#39;mean_win_rate&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">won</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">),</span>
         <span class="s1">&#39;mean_episode_len&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ep_len</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">ep_len</span><span class="p">),</span>
         <span class="s1">&#39;mean_fps&#39;</span><span class="p">:</span> <span class="n">fps</span><span class="p">,</span>
@@ -505,8 +516,8 @@
             <span class="def">def</span>
             <span class="name">act</span><span class="signature">(
     i: int,
-    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f3d93b66310&gt;&gt;,
-    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f3d93b66310&gt;&gt;,
+    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f308804c310&gt;&gt;,
+    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f308804c310&gt;&gt;,
     model: torch.nn.modules.module.Module,
     buffers: Dict[str, List[torch.Tensor]],
     initial_agent_state_buffers,
@@ -583,8 +594,8 @@
         
             <span class="def">def</span>
             <span class="name">get_batch</span><span class="signature">(
-    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f3d93b66310&gt;&gt;,
-    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f3d93b66310&gt;&gt;,
+    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f308804c310&gt;&gt;,
+    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f308804c310&gt;&gt;,
     buffers: Dict[str, List[torch.Tensor]],
     initial_agent_state_buffers,
     flags,
@@ -830,6 +841,7 @@
         <span class="n">actor_processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span>
 
     <span class="n">learner_model</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">learner_model</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">dout</span><span class="p">)</span>
 
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">RMSprop</span><span class="p">(</span>
         <span class="n">learner_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
@@ -842,7 +854,7 @@
         <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">epoch</span> <span class="o">*</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span><span class="p">,</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_train_steps</span><span class="p">)</span> <span class="o">/</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_train_steps</span>
 
     <span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">LambdaLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">lr_lambda</span><span class="p">)</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">RunningAverage</span><span class="p">()</span>
 
     <span class="n">fresume</span> <span class="o">=</span> <span class="n">learner_model</span><span class="o">.</span><span class="n">get_fresume</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">fresume</span> <span class="ow">and</span> <span class="n">fresume</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -850,16 +862,15 @@
 
     <span class="k">def</span> <span class="nf">batch_and_learn</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()):</span>
         <span class="sd">&quot;&quot;&quot;Thread target for the learning process.&quot;&quot;&quot;</span>
-        <span class="k">nonlocal</span> <span class="n">stats</span>
+        <span class="k">nonlocal</span> <span class="n">metrics</span>
         <span class="k">while</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">&lt;</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_train_steps</span><span class="p">:</span>
             <span class="n">batch</span><span class="p">,</span> <span class="n">agent_state</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="n">free_queue</span><span class="p">,</span> <span class="n">full_queue</span><span class="p">,</span> <span class="n">buffers</span><span class="p">,</span> <span class="n">initial_agent_state_buffers</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-
-            <span class="n">stats</span> <span class="o">=</span> <span class="n">learn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">learner_model</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">agent_state</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">learn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">learner_model</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">agent_state</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">metrics</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
             <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
                 <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">+=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span>
-                <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;train_steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
-                <span class="n">write_result</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">):</span>
         <span class="n">free_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
@@ -878,7 +889,7 @@
             <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actor_processes</span><span class="p">:</span>
                 <span class="n">actor</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;TERMINATING. You may exit with Ctrl+C&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;TERMINATING. You may exit with Ctrl+C&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">actor_processes</span><span class="p">:</span>
                 <span class="n">p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
                 <span class="n">p</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
@@ -892,13 +903,20 @@
     <span class="n">test_flags</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
     <span class="n">test_flags</span><span class="o">.</span><span class="n">resume</span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span>
 
+    <span class="n">best</span> <span class="o">=</span> <span class="kc">None</span>
+
     <span class="k">def</span> <span class="nf">val_checkpoint</span><span class="p">():</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Testing checkpoint&#39;</span><span class="p">)</span>
+        <span class="k">nonlocal</span> <span class="n">best</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Testing checkpoint&#39;</span><span class="p">)</span>
         <span class="n">test_result</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_flags</span><span class="p">,</span> <span class="n">flags</span><span class="o">.</span><span class="n">test_eps</span><span class="p">,</span> <span class="n">eval_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="p">,</span> <span class="n">write_eval_result</span><span class="p">)</span>
         <span class="n">test_result</span><span class="p">[</span><span class="s1">&#39;train_steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
-        <span class="n">write_eval_result</span><span class="p">(</span><span class="n">test_result</span><span class="p">)</span>
+        <span class="n">new_best</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">best</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">test_result</span><span class="p">[</span><span class="s1">&#39;mean_episode_return&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">best</span><span class="p">[</span><span class="s1">&#39;mean_episode_return&#39;</span><span class="p">]:</span>
+            <span class="n">best</span> <span class="o">=</span> <span class="n">test_result</span>
+            <span class="n">new_best</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">write_eval_result</span><span class="p">(</span><span class="n">test_result</span><span class="p">,</span> <span class="n">new_best</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Evaluating after </span><span class="si">{}</span><span class="s1"> steps:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">train_steps</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">test_result</span><span class="p">))</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
     <span class="n">timer</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span>
     <span class="k">try</span><span class="p">:</span>
@@ -914,6 +932,9 @@
             <span class="n">start_step</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
             <span class="n">start_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">print_period_seconds</span><span class="p">)</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">avgs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;train_steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
+            <span class="n">write_result</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">last_checkpoint_time</span> <span class="o">&gt;</span> <span class="n">flags</span><span class="o">.</span><span class="n">save_period_seconds</span><span class="p">:</span>
                 <span class="n">checkpoint</span><span class="p">()</span>
@@ -927,7 +948,7 @@
                 <span class="n">mean_return</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="n">total_loss</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total_loss&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">))</span>
             <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;After </span><span class="si">{}</span><span class="s1"> steps: loss </span><span class="si">{}</span><span class="s1"> @ </span><span class="si">{:.2f}</span><span class="s1"> fps. </span><span class="si">{}</span><span class="s1"> Stats:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">train_steps</span><span class="p">,</span> <span class="n">total_loss</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">mean_return</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">stats</span><span class="p">))</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
         <span class="k">return</span>  <span class="c1"># Try joining actors then quit.</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1000,7 +1021,7 @@
 
     <span class="n">fps</span> <span class="o">=</span> <span class="n">steps</span> <span class="o">/</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
     <span class="k">return</span><span class="p">{</span>
-        <span class="s1">&#39;mean_episode_returns&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">),</span>
+        <span class="s1">&#39;mean_episode_return&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">),</span>
         <span class="s1">&#39;mean_win_rate&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">won</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">),</span>
         <span class="s1">&#39;mean_episode_len&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ep_len</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">ep_len</span><span class="p">),</span>
         <span class="s1">&#39;mean_fps&#39;</span><span class="p">:</span> <span class="n">fps</span><span class="p">,</span>
