@@ -4,3 +4,4 @@ py_cui
 torch
 plotille
 pandas
+pdoc
