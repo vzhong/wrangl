@@ -99,6 +99,6 @@ setup(
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
-        'console_scripts': ['wannotate=wrangl.interactive.annotator:annotate', 'wdocs=wrangl.interactive.docs:generate_docs'],
+        'console_scripts': ['wrangl=wrangl.interactive.cmd:main'],
     },
 )

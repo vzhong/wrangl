@@ -49,12 +49,16 @@ Here are some common use cases:
   * [train XOR classifier](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/train_xor_classifier.py)
   * [train CartPole using Monobeast](https://github.com/vzhong/wrangl/tree/main/wrangl/examples/train_rl_cartpole.py)
 
-## Additional utilities
+## Commandline utilities
 
-Annotate data in commandline:
+Current supports:
+
+- annotating text files
+- plotting learning curves
+- autodocumenting this package
 
 ```
-wannotate -h
+wrangl -h
 ```
 
 
@@ -62,4 +66,10 @@ wannotate -h
 
 ```
 python -m unittest discover tests
+```
+
+## Generate docs
+
+```
+wrangl autodoc
 ```

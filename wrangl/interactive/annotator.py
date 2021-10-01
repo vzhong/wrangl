@@ -1,6 +1,5 @@
 """
 Annotator class for annotating individual examples.
-You should run this with `wannotate -h`.
 """
 import os
 import py_cui
@@ -148,14 +147,15 @@ class Annotator:
         self.control.start()
 
 
-def annotate():
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+def add_parser_arguments(parser):
     parser.add_argument('files', nargs='+', help='files to annotate')
     parser.add_argument('--dout', default='annotation', help='output directory')
     parser.add_argument('--name', default='Annotator', help='output directory')
     parser.add_argument('--overwrite', action='store_true', help='overwrite existing results')
-    args = parser.parse_args()
+    return parser
 
+
+def main(args):
     if not os.path.isdir(args.dout):
         os.makedirs(args.dout)
 
