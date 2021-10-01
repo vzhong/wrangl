@@ -11,14 +11,20 @@ from datetime import date
 DOCDIR = Path(__file__).parent.parent.parent.joinpath('docs')
 
 
-def generate_docs():
-    host = os.environ.get('WRANGL_DOCS_HOST', None)
+def add_parser_arguments(parser):
+    parser.add_argument('--host', default=os.environ.get('WRANGL_DOCS_HOST'), help='where the docs will be hosted')
+    parser.add_argument('--format', default='google', help='doc format')
+    parser.add_argument('--logo', help='logo image')
+    parser.add_argument('--logo_link', help='logo link')
+
+
+def main(args):
     render.configure(
-        docformat='google',
-        edit_url_map=dict(wrangl=host) if host else None,
+        docformat=args.format,
+        edit_url_map=dict(wrangl=args.host) if args.host else None,
         footer_text='Copyright @{} by Victor Zhong'.format(date.today().year),
-        logo=None,
-        logo_link=None,
+        logo=args.logo,
+        logo_link=args.logo_link,
         math=True,
         search=True,
         show_source=True,
