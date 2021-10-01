@@ -26,6 +26,7 @@ import random
 
 from .core import environment
 from .core import vtrace
+from ....metrics.running_avg import RunningAverage
 
 
 Buffers = typing.Dict[str, typing.List[torch.Tensor]]
@@ -265,7 +266,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
         return 1 - min(epoch * T * B, flags.num_train_steps) / flags.num_train_steps
 
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
-    stats = {}
+    metrics = RunningAverage()
 
     fresume = learner_model.get_fresume()
     if fresume and fresume.exists():
@@ -273,16 +274,15 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
 
     def batch_and_learn(i, lock=threading.Lock()):
         """Thread target for the learning process."""
-        nonlocal stats
+        nonlocal metrics
         while model.train_steps < flags.num_train_steps:
             batch, agent_state = get_batch(free_queue, full_queue, buffers, initial_agent_state_buffers, flags, device)
-
-            stats = learn(model, learner_model, batch, agent_state, optimizer, scheduler, flags)
+            out = learn(model, learner_model, batch, agent_state, optimizer, scheduler, flags)
+            for k, v in out.items():
+                metrics.record(k, v)
 
             with lock:
                 model.train_steps += T * B
-                stats['train_steps'] = model.train_steps
-                write_result(stats)
 
     for m in range(flags.num_buffers):
         free_queue.put(m)
@@ -344,6 +344,9 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
             start_step = model.train_steps
             start_time = timer()
             time.sleep(flags.print_period_seconds)
+            stats = metrics.avgs.copy()
+            stats['train_steps'] = model.train_steps
+            write_result(stats)
 
             if timer() - last_checkpoint_time > flags.save_period_seconds:
                 checkpoint()

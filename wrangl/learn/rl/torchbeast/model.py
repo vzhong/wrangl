@@ -57,7 +57,7 @@ class TorchbeastModel(BaseModel):
             the observation shapes should be a dictionary that maps from observation name to a tuple (`shape`, `dtype`).
         """
         dout = pathlib.Path(flags.dout)
-        flog = dout.joinpath('metrics.log.json')
+        flog = dout.joinpath('metrics.log.jsonl')
         fbest = dout.joinpath('metrics.best.json')
 
         def write_result(res, mode='train'):

@@ -10,7 +10,9 @@ class RunningAverage:
         self.mix_rate = mix_rate
         self.avgs = defaultdict(lambda: None)
 
-    def record(self, name, value):
+    def record(self, name, value, ignore_nan=True):
+        if value != value:
+            return self.avgs[name]
         if name not in self.avgs:
             self.avgs[name] = value
         else:
