@@ -20,7 +20,7 @@ class Model(torch.nn.Module):
         parser.add_argument('--silent', action='store_true', help='do not print progress bars and logs.')
         parser.add_argument('--num_train_steps', default=defaults.get('num_train_steps', 5000), type=int, help='number of training steps.')
         parser.add_argument('--dout', default=defaults.get('dout', 'checkpoints/{}'.format(cls.__name__.lower())), help='where to save experiment.')
-        parser.add_argument('--resume', help='where to resume experiment from. If `"auto"` then resume from the default checkpoint.')
+        parser.add_argument('--resume', help='where to resume experiment from. If `auto` then resume from the default checkpoint.')
         return parser
 
     def __init__(self, hparams: Namespace = None):
@@ -122,7 +122,7 @@ class Model(torch.nn.Module):
         if scheduler is not None:
             scheduler.load_state_dict(d['scheduler_state'])
         model.train_steps = d['train_steps']
-        model.logger.info('Resuming from step {} with {}'.format(model.train_steps, fckpt))
+        model.logger.critical('Resuming from step {} with {}'.format(model.train_steps, fckpt))
         return model
 
     def save_checkpoint(self, metrics: dict = None, model_state: dict = None, optimizer_state: dict = None, scheduler_state: dict = None):
@@ -130,7 +130,7 @@ class Model(torch.nn.Module):
         Saves training state to checkpoint files.
         """
         dout = pathlib.Path(self.hparams.dout)
-        self.logger.info('Saving to {}'.format(dout.name))
+        self.logger.critical('Saving to {}'.format(dout.name))
         with dout.joinpath('hparams.json').open('wt') as f:
             json.dump(vars(self.hparams), f, indent=2)
         if metrics is not None:

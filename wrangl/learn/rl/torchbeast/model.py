@@ -4,7 +4,7 @@ import typing
 import pathlib
 from torch.nn import functional as F
 from ...model import Model as BaseModel
-from .run_exp import train, test
+from . import run_exp
 from argparse import ArgumentParser, Namespace
 
 
@@ -35,7 +35,7 @@ class TorchbeastModel(BaseModel):
         parser.add_argument('--baseline_cost', default=defaults.get('baseline_cost', 0.5), type=float, help='Baseline cost/multiplier.')
         parser.add_argument('--discounting', default=defaults.get('discounting', 0.99), type=float, help='Discounting factor.')
         parser.add_argument('--reward_clipping', default=defaults.get('reward_clipping', 'abs_one'), choices=['abs_one', 'soft_asymmetric', 'none'], help='Reward clipping.')
-    
+
         # Optimizer settings.
         parser.add_argument('--alpha', default=defaults.get('alpha', 0.99), type=float, help='RMSProp smoothing constant.')
         parser.add_argument('--momentum', default=defaults.get('momentum', 0), type=float, help='RMSProp momentum.')
@@ -43,7 +43,7 @@ class TorchbeastModel(BaseModel):
         return parser
 
     @classmethod
-    def run_train(cls, flags: Namespace, create_env: typing.Callable, create_eval_env: typing.Callable, get_env_shapes: typing.Callable):
+    def run_train(cls, flags: Namespace, create_env: typing.Callable, create_eval_env: typing.Callable, get_env_shapes: typing.Callable, verbose_eval: bool = False):
         """
         Runs Monobeast training.
 
@@ -52,6 +52,7 @@ class TorchbeastModel(BaseModel):
             create_env: function with signature `f(flags)` that creates training gym environment.
             create_eval_env: function with signature `f(flags)` that creates evaluation gym environment.
             get_env_shapes: function with signature `f(env)` that returns a tuple of the observation shapes and the number of actions.
+            verbose_eval: print progress bar during evaluation.
 
         Note:
             the observation shapes should be a dictionary that maps from observation name to a tuple (`shape`, `dtype`).
@@ -71,7 +72,10 @@ class TorchbeastModel(BaseModel):
                 with fbest.open('wt') as f:
                     json.dump(res, f)
 
-        return train(
+        # debug one step
+        run_exp.debug_step(flags, create_env, get_env_shapes, create_model=cls)
+
+        return run_exp.train(
             flags,
             create_env=create_env,
             create_eval_env=create_eval_env,
@@ -79,18 +83,52 @@ class TorchbeastModel(BaseModel):
             create_model=cls,
             write_result=write_result,
             write_eval_result=write_eval_result,
+            verbose_eval=verbose_eval,
         )
 
-    def __init__(self, hparams, observation_shapes: dict, num_actions: int):
+    @classmethod
+    def run_test(cls, flags: Namespace, num_eps: int, create_env: typing.Callable, get_env_shapes: typing.Callable, verbose: bool = True):
+        """
+        Runs Monobeast training.
+
+        Args:
+            flags: training arguments.
+            num_eps: number of evaluation episodes.
+            create_env: function with signature `f(flags)` that creates training gym environment.
+            get_env_shapes: function with signature `f(env)` that returns a tuple of the observation shapes and the number of actions.
+            verbose: print progress bar during evaluation.
+
+        Note:
+            the observation shapes should be a dictionary that maps from observation name to a tuple (`shape`, `dtype`).
+        """
+        return run_exp.test(
+            flags,
+            num_eps=num_eps,
+            eval_env=create_env(flags),
+            get_env_shapes=get_env_shapes,
+            create_model=cls,
+            verbose=verbose,
+        )
+
+    def __init__(self, hparams, observation_shapes: dict, num_actions: int, **env_kwargs):
         super().__init__(hparams)
         self.observation_shapes = observation_shapes
         self.num_actions = num_actions
+        self.state_rnn = self.make_state_rnn()
+
+    def make_state_rnn(self):
+        return None
 
     def initial_state(self, batch_size=1):
         """
         Returns tuple of initial model state
         """
-        return tuple()
+        if self.state_rnn is None:
+            return tuple()
+        return tuple(
+            torch.zeros(self.state_rnn.num_layers, batch_size, self.state_rnn.hidden_size).to(self.device)
+            for _ in range(2)
+        )
 
     def forward(self, obs: typing.Dict[str, torch.Tensor], prev_state: typing.Tuple) -> typing.Tuple[typing.Dict[str, torch.Tensor], tuple]:
         """
@@ -101,15 +139,40 @@ class TorchbeastModel(BaseModel):
             prev_state: memory from last time step.
 
         Note:
-            all input shapes are (T, B, *shapes), where T is the `unroll_length` and B is the `batch_size`.
+            all input shapes are `(T, B, *shapes)`, where T is the `unroll_length` and B is the `batch_size`.
             the return arguments should also be in this format.
+            Torchbeast will add a `done` field indicate which of the `(T, B)` steps are done.
 
         Returns:
             a dictionary of tensors containing `polic_logits`, `baseline` value estimate, and `action`.
             the next model state.
-            
         """
         raise NotImplementedError()
+
+    def compute_state(self, rep: torch.Tensor, core_state, done: torch.Tensor):
+        """
+        Updates state using a state rnn.
+
+        Args:
+            rep: RNN inputs of shape `(T, B, *dfeats)`.
+            core_state: previous state.
+            done: tensor indicate which steps are done.
+        """
+        assert self.state_rnn is not None
+        T, B, *_ = rep.size()
+        core_input = rep.view(T, B, -1)
+        core_output_list = []
+        notdone = (~done).float()
+        for inp, nd in zip(core_input.unbind(), notdone.unbind()):
+            # Reset core state to zero whenever an episode ended.
+            # Make `done` broadcastable with (num_layers, B, hidden_size)
+            # states:
+            nd = nd.view(1, -1, 1)
+            core_state = tuple(nd * s for s in core_state)
+            output, core_state = self.state_rnn(inp.unsqueeze(0), core_state)
+            core_output_list.append(output)
+        core_output = torch.flatten(torch.cat(core_output_list), 0, 1)
+        return core_output, core_state
 
     @staticmethod
     def compute_baseline_loss(advantages):

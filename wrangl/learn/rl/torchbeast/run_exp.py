@@ -1,17 +1,11 @@
-import argparse
-import pathlib
 import logging
 import os
 import sys
 import tqdm
-import importlib
 import copy
-import json
-from pathlib import Path
 
 import threading
 import time
-import timeit
 import traceback
 import pprint
 import typing
@@ -185,6 +179,13 @@ def learn(actor_model,
         optimizer.zero_grad()
         model.zero_grad()
         total_loss.backward()
+        total_norm = 0
+        for p in model.parameters():
+            if p.grad is not None:
+                param_norm = p.grad.detach().data.norm(2)
+                total_norm += param_norm.item() ** 2
+        total_norm = total_norm ** 0.5
+        stats['grad_norm'] = total_norm
         nn.utils.clip_grad_norm_(model.parameters(), 40.0)
         optimizer.step()
         scheduler.step()
@@ -207,7 +208,11 @@ def create_buffers(observation_shapes, num_actions, flags) -> Buffers:
         action=dict(size=(T + 1,), dtype=torch.int64),
     )
     for k, (shape, dtype) in observation_shapes.items():
-        specs[k] = dict(size=(T + 1, *shape), dtype=dtype)
+        try:
+            specs[k] = dict(size=(T + 1, *shape), dtype=dtype)
+        except Exception as e:
+            logging.error('Error: Could not create buffer for {} {} {}'.format(k, shape, dtype))
+            raise e
     buffers: Buffers = {key: [] for key in specs}
     for _ in range(flags.num_buffers):
         for key in buffers:
@@ -215,19 +220,30 @@ def create_buffers(observation_shapes, num_actions, flags) -> Buffers:
     return buffers
 
 
-def train(flags, create_env, create_eval_env, get_env_shapes, create_model, write_result, write_eval_result, device=None):  # pylint: disable=too-many-branches, too-many-statements
-    assert os.environ['OMP_NUM_THREADS'] == '1', 'Must run with OMP_NUM_THREADS=1'
+def debug_step(flags, create_env, get_env_shapes, create_model):
+    env = create_env(flags)
+    observation_shapes, num_actions, env_kwargs = get_env_shapes(env)
+    model = create_model(flags, observation_shapes, num_actions, **env_kwargs)
+    env = environment.Environment(env)
+    env_output = env.initial()
+    agent_state = model.initial_state(batch_size=1)
+    agent_output, unused_state = model(env_output, agent_state)
+    return env_output, agent_output
+
+
+def train(flags, create_env, create_eval_env, get_env_shapes, create_model, write_result, write_eval_result, verbose_eval=False, device=None):  # pylint: disable=too-many-branches, too-many-statements
+    torch.set_num_threads(1)
     if device is None:
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     T = flags.unroll_length
     B = flags.batch_size
-    dout = pathlib.Path(flags.dout)
 
     env = create_env(flags)
-    observation_shapes, num_actions = get_env_shapes(env)
-    model = create_model(flags, observation_shapes, num_actions)
+    observation_shapes, num_actions, env_kwargs = get_env_shapes(env)
+    model = create_model(flags, observation_shapes, num_actions, **env_kwargs)
     model.ensure_dout()
+    logger = model.get_logger(flags.dout)
     buffers = create_buffers(observation_shapes, num_actions, flags)
 
     model.share_memory()
@@ -245,6 +261,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
     free_queue = ctx.SimpleQueue()
     full_queue = ctx.SimpleQueue()
 
+    logger.critical('launching actor processes')
     for i in range(flags.num_actors):
         actor = ctx.Process(
             target=act,
@@ -252,8 +269,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
         actor.start()
         actor_processes.append(actor)
 
-    learner_model = create_model(flags, observation_shapes, num_actions).to(device=device)
-    logger = learner_model.get_logger(flags.dout)
+    learner_model = create_model(flags, observation_shapes, num_actions, **env_kwargs).to(device=device)
 
     optimizer = torch.optim.RMSprop(
         learner_model.parameters(),
@@ -267,6 +283,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
 
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
     metrics = RunningAverage()
+    time_tracker = RunningAverage()
 
     fresume = learner_model.get_fresume()
     if fresume and fresume.exists():
@@ -274,16 +291,21 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
 
     def batch_and_learn(i, lock=threading.Lock()):
         """Thread target for the learning process."""
-        nonlocal metrics
-        while model.train_steps < flags.num_train_steps:
+        nonlocal metrics, time_tracker
+        while learner_model.train_steps < flags.num_train_steps:
+            t_start = time.time()
             batch, agent_state = get_batch(free_queue, full_queue, buffers, initial_agent_state_buffers, flags, device)
+            t_batch = time.time()
             out = learn(model, learner_model, batch, agent_state, optimizer, scheduler, flags)
-            for k, v in out.items():
-                metrics.record(k, v)
-
+            t_learn = time.time()
             with lock:
-                model.train_steps += T * B
+                time_tracker.record('t_batch', t_batch-t_start)
+                time_tracker.record('t_learn', t_learn-t_batch)
+                for k, v in out.items():
+                    metrics.record(k, v)
+                learner_model.train_steps += T * B
 
+    logger.critical('launching learner threads')
     for m in range(flags.num_buffers):
         free_queue.put(m)
 
@@ -291,17 +313,16 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
     for i in range(flags.num_threads):
         thread = threading.Thread(
             target=batch_and_learn, name='batch-and-learn-%d' % i, args=(i,))
+        thread.daemon = True
         thread.start()
         threads.append(thread)
 
     def terminate(status=1):
         for _ in range(flags.num_actors):
             free_queue.put(None)
-        if status == 0:
-            for actor in actor_processes:
-                actor.join(timeout=1)
-        else:
-            logger.error('TERMINATING. You may exit with Ctrl+C')
+        for actor in actor_processes:
+            actor.join(timeout=1)
+        if status != 0:
             for p in actor_processes:
                 p.terminate()
                 p.kill()
@@ -320,20 +341,19 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
     def val_checkpoint():
         nonlocal best
         logger.info('Testing checkpoint')
-        test_result = test(test_flags, flags.test_eps, eval_env, get_env_shapes, create_model, write_eval_result)
-        test_result['train_steps'] = model.train_steps
+        test_result = test(test_flags, flags.test_eps, eval_env, get_env_shapes, create_model, verbose=verbose_eval)
+        test_result['train_steps'] = learner_model.train_steps
         new_best = False
         if best is None or test_result['mean_episode_return'] > best['mean_episode_return']:
             best = test_result
             new_best = True
-        write_eval_result(test_result, new_best=True)
-        s = 'Evaluating after {} steps:\n{}'.format(model.train_steps, pprint.pformat(test_result))
+        write_eval_result(test_result, new_best=new_best)
+        s = 'Evaluating after {} steps:\n{}'.format(learner_model.train_steps, pprint.pformat(test_result))
         logger.critical(s)
 
-    timer = timeit.default_timer
     try:
-        last_checkpoint_time = timer()
-        while model.train_steps < flags.num_train_steps:
+        last_checkpoint_time = time.time()
+        while learner_model.train_steps < flags.num_train_steps:
             for t in threads:
                 if not t.is_alive():
                     terminate()
@@ -341,41 +361,42 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
                 if not p.is_alive():
                     terminate()
 
-            start_step = model.train_steps
-            start_time = timer()
+            start_step = learner_model.train_steps
+            start_time = time.time()
             time.sleep(flags.print_period_seconds)
             stats = metrics.avgs.copy()
-            stats['train_steps'] = model.train_steps
+            stats.update(time_tracker.avgs.copy())
+            stats['train_steps'] = learner_model.train_steps
             write_result(stats)
 
-            if timer() - last_checkpoint_time > flags.save_period_seconds:
+            if time.time() - last_checkpoint_time > flags.save_period_seconds:
                 checkpoint()
                 val_checkpoint()
-                last_checkpoint_time = timer()
+                last_checkpoint_time = time.time()
 
-            fps = (model.train_steps - start_step) / (timer() - start_time)
+            fps = (learner_model.train_steps - start_step) / (time.time() - start_time)
             if stats.get('episode_returns', None):
                 mean_return = 'Return per episode: %.1f. ' % stats['mean_episode_return']
             else:
                 mean_return = ''
             total_loss = stats.get('total_loss', float('inf'))
-            s = 'After {} steps: loss {} @ {:.2f} fps. {} Stats:\n{}'.format(model.train_steps, total_loss, fps, mean_return, pprint.pformat(stats))
+            s = 'After {} steps: loss {} @ {:.2f} fps. {} Stats:\n{}'.format(learner_model.train_steps, total_loss, fps, mean_return, pprint.pformat(stats))
             logger.critical(s)
     except KeyboardInterrupt:
         return  # Try joining actors then quit.
     else:
         for thread in threads:
             thread.join()
-        logging.info('Learning finished after %d steps.', model.train_steps)
+        logging.critical('Learning finished after %d steps.', learner_model.train_steps)
     finally:
         terminate(status=0)
 
     checkpoint()
 
 
-def test(flags, num_eps, eval_env, get_env_shapes, create_model, write_eval_result):
-    observation_shapes, num_actions = get_env_shapes(eval_env)
-    model = create_model(flags, observation_shapes, num_actions)
+def test(flags, num_eps, eval_env, get_env_shapes, create_model, verbose=False):
+    observation_shapes, num_actions, env_kwargs = get_env_shapes(eval_env)
+    model = create_model(flags, observation_shapes, num_actions, **env_kwargs)
     fresume = model.get_fresume()
     model.load_checkpoint(fresume, override_hparams=model.hparams, model=model)
     model.eval()
@@ -390,6 +411,9 @@ def test(flags, num_eps, eval_env, get_env_shapes, create_model, write_eval_resu
     agent_output, unused_state = model(observation, agent_state)
     start_time = time.time()
 
+    if verbose:
+        bar = tqdm.tqdm(total=num_eps)
+
     while len(won) < num_eps:
         done = False
         steps = 0
@@ -402,12 +426,18 @@ def test(flags, num_eps, eval_env, get_env_shapes, create_model, write_eval_resu
             entropy.append(e.mean(0).item())
 
             steps += 1
+            if verbose:
+                bar.update(1)
+
             done = observation['done'].item()
             if observation['done'].item():
                 returns.append(observation['episode_return'].item())
                 won.append(observation['reward'][0][0].item() > 0.5)
                 ep_len.append(steps)
                 agent_state = model.initial_state(batch_size=1)
+
+        if verbose:
+            bar.close()
 
     fps = steps / (time.time() - start_time)
     return{

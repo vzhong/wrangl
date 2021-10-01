@@ -1,10 +1,8 @@
 import typing
 import pathlib
-import argparse
 import plotille
 import pandas as pd
 import ujson as json
-import collections
 
 
 def add_parser_arguments(parser):
@@ -54,7 +52,6 @@ def load_rl(dlogs: typing.List[pathlib.Path]):
         log = []
         with dlog.joinpath('metrics.log.jsonl').open('rt') as f:
             for line in f:
-                print(line)
                 log.append(json.loads(line))
         ret.append((name, log))
     return ret
@@ -82,17 +79,17 @@ def main(args):
     for exp, log in logs:
         if log:
             if args.curves in {'train', 'both'}:
-                df = pd.DataFrame([e for e in log if e['type'] == 'train'])
+                df = pd.DataFrame([e for e in log if e['type'] == 'train' and e[args.x] is not None and e.get(args.y) is not None])
                 fig.plot(
-                    X=df[args.x], 
+                    X=df[args.x],
                     Y=df[args.y].rolling(args.window, min_periods=1).mean(),
                     label='train {}'.format(exp),
                     **kwargs
                 )
             if args.curves in {'eval', 'both'}:
-                df = pd.DataFrame([e for e in log if e['type'] == 'eval'])
+                df = pd.DataFrame([e for e in log if e['type'] == 'eval' and e[args.x] is not None and e.get(args.y) is not None])
                 fig.plot(
-                    X=df[args.x], 
+                    X=df[args.x],
                     Y=df[args.y].rolling(args.window, min_periods=1).mean(),
                     label='eval {}'.format(exp),
                     **kwargs

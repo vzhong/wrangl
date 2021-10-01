@@ -18,9 +18,8 @@ class MyRLModel(TorchbeastModel):
         self.policy = nn.Linear(200, num_actions)
         self.baseline = nn.Linear(200, 1)
 
-
     def forward(self, obs, core):
-        inp = obs['obs']  # T, B, dim
+        inp = obs['obs'].float()  # T, B, dim
         rep = self.rep(inp)
         policy = self.policy(rep)
         out = dict(
@@ -36,7 +35,7 @@ def create_env(flags):
 
 
 def get_env_shapes(env):
-    return dict(obs=(env.observation_space.shape, torch.float)), env.action_space.n
+    return dict(obs=(env.observation_space.shape, torch.float)), env.action_space.n, {}
 
 
 if __name__ == '__main__':
