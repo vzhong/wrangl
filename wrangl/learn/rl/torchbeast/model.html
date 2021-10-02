@@ -60,10 +60,19 @@
                                 <a class="function" href="#TorchbeastModel.run_train">run_train</a>
                         </li>
                         <li>
+                                <a class="function" href="#TorchbeastModel.run_test">run_test</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TorchbeastModel.make_state_rnn">make_state_rnn</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#TorchbeastModel.initial_state">initial_state</a>
                         </li>
                         <li>
                                 <a class="function" href="#TorchbeastModel.forward">forward</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TorchbeastModel.compute_state">compute_state</a>
                         </li>
                         <li>
                                 <a class="function" href="#TorchbeastModel.compute_baseline_loss">compute_baseline_loss</a>
@@ -107,7 +116,7 @@
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 <span class="kn">from</span> <span class="nn">...model</span> <span class="kn">import</span> <span class="n">Model</span> <span class="k">as</span> <span class="n">BaseModel</span>
-<span class="kn">from</span> <span class="nn">.run_exp</span> <span class="kn">import</span> <span class="n">train</span><span class="p">,</span> <span class="n">test</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">run_exp</span>
 <span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">Namespace</span>
 
 
@@ -138,7 +147,7 @@
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--baseline_cost&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;baseline_cost&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Baseline cost/multiplier.&#39;</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--discounting&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;discounting&#39;</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Discounting factor.&#39;</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--reward_clipping&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reward_clipping&#39;</span><span class="p">,</span> <span class="s1">&#39;abs_one&#39;</span><span class="p">),</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;abs_one&#39;</span><span class="p">,</span> <span class="s1">&#39;soft_asymmetric&#39;</span><span class="p">,</span> <span class="s1">&#39;none&#39;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Reward clipping.&#39;</span><span class="p">)</span>
-    
+
         <span class="c1"># Optimizer settings.</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--alpha&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;RMSProp smoothing constant.&#39;</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--momentum&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;momentum&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;RMSProp momentum.&#39;</span><span class="p">)</span>
@@ -146,7 +155,7 @@
         <span class="k">return</span> <span class="n">parser</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">run_train</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">create_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">create_eval_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_train</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">create_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">create_eval_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">verbose_eval</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs Monobeast training.</span>
 
@@ -155,6 +164,7 @@
 <span class="sd">            create_env: function with signature `f(flags)` that creates training gym environment.</span>
 <span class="sd">            create_eval_env: function with signature `f(flags)` that creates evaluation gym environment.</span>
 <span class="sd">            get_env_shapes: function with signature `f(env)` that returns a tuple of the observation shapes and the number of actions.</span>
+<span class="sd">            verbose_eval: print progress bar during evaluation.</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            the observation shapes should be a dictionary that maps from observation name to a tuple (`shape`, `dtype`).</span>
@@ -174,7 +184,10 @@
                 <span class="k">with</span> <span class="n">fbest</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">train</span><span class="p">(</span>
+        <span class="c1"># debug one step</span>
+        <span class="n">run_exp</span><span class="o">.</span><span class="n">debug_step</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">create_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="o">=</span><span class="bp">cls</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">run_exp</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
             <span class="n">flags</span><span class="p">,</span>
             <span class="n">create_env</span><span class="o">=</span><span class="n">create_env</span><span class="p">,</span>
             <span class="n">create_eval_env</span><span class="o">=</span><span class="n">create_eval_env</span><span class="p">,</span>
@@ -182,18 +195,52 @@
             <span class="n">create_model</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span>
             <span class="n">write_result</span><span class="o">=</span><span class="n">write_result</span><span class="p">,</span>
             <span class="n">write_eval_result</span><span class="o">=</span><span class="n">write_eval_result</span><span class="p">,</span>
+            <span class="n">verbose_eval</span><span class="o">=</span><span class="n">verbose_eval</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">num_eps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">create_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs Monobeast training.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            flags: training arguments.</span>
+<span class="sd">            num_eps: number of evaluation episodes.</span>
+<span class="sd">            create_env: function with signature `f(flags)` that creates training gym environment.</span>
+<span class="sd">            get_env_shapes: function with signature `f(env)` that returns a tuple of the observation shapes and the number of actions.</span>
+<span class="sd">            verbose: print progress bar during evaluation.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            the observation shapes should be a dictionary that maps from observation name to a tuple (`shape`, `dtype`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">run_exp</span><span class="o">.</span><span class="n">test</span><span class="p">(</span>
+            <span class="n">flags</span><span class="p">,</span>
+            <span class="n">num_eps</span><span class="o">=</span><span class="n">num_eps</span><span class="p">,</span>
+            <span class="n">eval_env</span><span class="o">=</span><span class="n">create_env</span><span class="p">(</span><span class="n">flags</span><span class="p">),</span>
+            <span class="n">get_env_shapes</span><span class="o">=</span><span class="n">get_env_shapes</span><span class="p">,</span>
+            <span class="n">create_model</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">env_kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">hparams</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_shapes</span> <span class="o">=</span> <span class="n">observation_shapes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_actions</span> <span class="o">=</span> <span class="n">num_actions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_state_rnn</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">make_state_rnn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">initial_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns tuple of initial model state</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">tuple</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span><span class="o">.</span><span class="n">num_layers</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">prev_state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -204,15 +251,40 @@
 <span class="sd">            prev_state: memory from last time step.</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            all input shapes are (T, B, *shapes), where T is the `unroll_length` and B is the `batch_size`.</span>
+<span class="sd">            all input shapes are `(T, B, *shapes)`, where T is the `unroll_length` and B is the `batch_size`.</span>
 <span class="sd">            the return arguments should also be in this format.</span>
+<span class="sd">            Torchbeast will add a `done` field indicate which of the `(T, B)` steps are done.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            a dictionary of tensors containing `polic_logits`, `baseline` value estimate, and `action`.</span>
 <span class="sd">            the next model state.</span>
-<span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">compute_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rep</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">core_state</span><span class="p">,</span> <span class="n">done</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates state using a state rnn.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rep: RNN inputs of shape `(T, B, *dfeats)`.</span>
+<span class="sd">            core_state: previous state.</span>
+<span class="sd">            done: tensor indicate which steps are done.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">T</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">rep</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="n">core_input</span> <span class="o">=</span> <span class="n">rep</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">core_output_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">notdone</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">done</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">inp</span><span class="p">,</span> <span class="n">nd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">core_input</span><span class="o">.</span><span class="n">unbind</span><span class="p">(),</span> <span class="n">notdone</span><span class="o">.</span><span class="n">unbind</span><span class="p">()):</span>
+            <span class="c1"># Reset core state to zero whenever an episode ended.</span>
+            <span class="c1"># Make `done` broadcastable with (num_layers, B, hidden_size)</span>
+            <span class="c1"># states:</span>
+            <span class="n">nd</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">core_state</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">nd</span> <span class="o">*</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">core_state</span><span class="p">)</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">core_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">core_state</span><span class="p">)</span>
+            <span class="n">core_output_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">core_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">core_output_list</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">core_output</span><span class="p">,</span> <span class="n">core_state</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">compute_baseline_loss</span><span class="p">(</span><span class="n">advantages</span><span class="p">):</span>
@@ -291,7 +363,7 @@
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--baseline_cost&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;baseline_cost&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Baseline cost/multiplier.&#39;</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--discounting&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;discounting&#39;</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Discounting factor.&#39;</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--reward_clipping&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reward_clipping&#39;</span><span class="p">,</span> <span class="s1">&#39;abs_one&#39;</span><span class="p">),</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;abs_one&#39;</span><span class="p">,</span> <span class="s1">&#39;soft_asymmetric&#39;</span><span class="p">,</span> <span class="s1">&#39;none&#39;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Reward clipping.&#39;</span><span class="p">)</span>
-    
+
         <span class="c1"># Optimizer settings.</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--alpha&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;RMSProp smoothing constant.&#39;</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--momentum&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;momentum&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;RMSProp momentum.&#39;</span><span class="p">)</span>
@@ -299,7 +371,7 @@
         <span class="k">return</span> <span class="n">parser</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">run_train</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">create_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">create_eval_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_train</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">create_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">create_eval_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">verbose_eval</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs Monobeast training.</span>
 
@@ -308,6 +380,7 @@
 <span class="sd">            create_env: function with signature `f(flags)` that creates training gym environment.</span>
 <span class="sd">            create_eval_env: function with signature `f(flags)` that creates evaluation gym environment.</span>
 <span class="sd">            get_env_shapes: function with signature `f(env)` that returns a tuple of the observation shapes and the number of actions.</span>
+<span class="sd">            verbose_eval: print progress bar during evaluation.</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            the observation shapes should be a dictionary that maps from observation name to a tuple (`shape`, `dtype`).</span>
@@ -327,7 +400,10 @@
                 <span class="k">with</span> <span class="n">fbest</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">train</span><span class="p">(</span>
+        <span class="c1"># debug one step</span>
+        <span class="n">run_exp</span><span class="o">.</span><span class="n">debug_step</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">create_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="o">=</span><span class="bp">cls</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">run_exp</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
             <span class="n">flags</span><span class="p">,</span>
             <span class="n">create_env</span><span class="o">=</span><span class="n">create_env</span><span class="p">,</span>
             <span class="n">create_eval_env</span><span class="o">=</span><span class="n">create_eval_env</span><span class="p">,</span>
@@ -335,18 +411,52 @@
             <span class="n">create_model</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span>
             <span class="n">write_result</span><span class="o">=</span><span class="n">write_result</span><span class="p">,</span>
             <span class="n">write_eval_result</span><span class="o">=</span><span class="n">write_eval_result</span><span class="p">,</span>
+            <span class="n">verbose_eval</span><span class="o">=</span><span class="n">verbose_eval</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">num_eps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">create_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs Monobeast training.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            flags: training arguments.</span>
+<span class="sd">            num_eps: number of evaluation episodes.</span>
+<span class="sd">            create_env: function with signature `f(flags)` that creates training gym environment.</span>
+<span class="sd">            get_env_shapes: function with signature `f(env)` that returns a tuple of the observation shapes and the number of actions.</span>
+<span class="sd">            verbose: print progress bar during evaluation.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            the observation shapes should be a dictionary that maps from observation name to a tuple (`shape`, `dtype`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">run_exp</span><span class="o">.</span><span class="n">test</span><span class="p">(</span>
+            <span class="n">flags</span><span class="p">,</span>
+            <span class="n">num_eps</span><span class="o">=</span><span class="n">num_eps</span><span class="p">,</span>
+            <span class="n">eval_env</span><span class="o">=</span><span class="n">create_env</span><span class="p">(</span><span class="n">flags</span><span class="p">),</span>
+            <span class="n">get_env_shapes</span><span class="o">=</span><span class="n">get_env_shapes</span><span class="p">,</span>
+            <span class="n">create_model</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">env_kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">hparams</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_shapes</span> <span class="o">=</span> <span class="n">observation_shapes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_actions</span> <span class="o">=</span> <span class="n">num_actions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_state_rnn</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">make_state_rnn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">initial_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns tuple of initial model state</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">tuple</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span><span class="o">.</span><span class="n">num_layers</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">prev_state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -357,15 +467,40 @@
 <span class="sd">            prev_state: memory from last time step.</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            all input shapes are (T, B, *shapes), where T is the `unroll_length` and B is the `batch_size`.</span>
+<span class="sd">            all input shapes are `(T, B, *shapes)`, where T is the `unroll_length` and B is the `batch_size`.</span>
 <span class="sd">            the return arguments should also be in this format.</span>
+<span class="sd">            Torchbeast will add a `done` field indicate which of the `(T, B)` steps are done.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            a dictionary of tensors containing `polic_logits`, `baseline` value estimate, and `action`.</span>
 <span class="sd">            the next model state.</span>
-<span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">compute_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rep</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">core_state</span><span class="p">,</span> <span class="n">done</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates state using a state rnn.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rep: RNN inputs of shape `(T, B, *dfeats)`.</span>
+<span class="sd">            core_state: previous state.</span>
+<span class="sd">            done: tensor indicate which steps are done.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">T</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">rep</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="n">core_input</span> <span class="o">=</span> <span class="n">rep</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">core_output_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">notdone</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">done</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">inp</span><span class="p">,</span> <span class="n">nd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">core_input</span><span class="o">.</span><span class="n">unbind</span><span class="p">(),</span> <span class="n">notdone</span><span class="o">.</span><span class="n">unbind</span><span class="p">()):</span>
+            <span class="c1"># Reset core state to zero whenever an episode ended.</span>
+            <span class="c1"># Make `done` broadcastable with (num_layers, B, hidden_size)</span>
+            <span class="c1"># states:</span>
+            <span class="n">nd</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">core_state</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">nd</span> <span class="o">*</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">core_state</span><span class="p">)</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">core_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">core_state</span><span class="p">)</span>
+            <span class="n">core_output_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">core_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">core_output_list</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">core_output</span><span class="p">,</span> <span class="n">core_state</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">compute_baseline_loss</span><span class="p">(</span><span class="n">advantages</span><span class="p">):</span>
@@ -416,15 +551,16 @@
                                         <div class="attr function"><a class="headerlink" href="#TorchbeastModel.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">TorchbeastModel</span><span class="signature">(hparams, observation_shapes: dict, num_actions: int)</span>
+            <span class="name">TorchbeastModel</span><span class="signature">(hparams, observation_shapes: dict, num_actions: int, **env_kwargs)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">env_kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">hparams</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_shapes</span> <span class="o">=</span> <span class="n">observation_shapes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_actions</span> <span class="o">=</span> <span class="n">num_actions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_state_rnn</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -468,7 +604,7 @@
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--baseline_cost&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;baseline_cost&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Baseline cost/multiplier.&#39;</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--discounting&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;discounting&#39;</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Discounting factor.&#39;</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--reward_clipping&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reward_clipping&#39;</span><span class="p">,</span> <span class="s1">&#39;abs_one&#39;</span><span class="p">),</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;abs_one&#39;</span><span class="p">,</span> <span class="s1">&#39;soft_asymmetric&#39;</span><span class="p">,</span> <span class="s1">&#39;none&#39;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Reward clipping.&#39;</span><span class="p">)</span>
-    
+
         <span class="c1"># Optimizer settings.</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--alpha&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;RMSProp smoothing constant.&#39;</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--momentum&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;momentum&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;RMSProp momentum.&#39;</span><span class="p">)</span>
@@ -494,14 +630,15 @@
     flags: argparse.Namespace,
     create_env: Callable,
     create_eval_env: Callable,
-    get_env_shapes: Callable
+    get_env_shapes: Callable,
+    verbose_eval: bool = False
 )</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">run_train</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">create_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">create_eval_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_train</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">create_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">create_eval_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">verbose_eval</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs Monobeast training.</span>
 
@@ -510,6 +647,7 @@
 <span class="sd">            create_env: function with signature `f(flags)` that creates training gym environment.</span>
 <span class="sd">            create_eval_env: function with signature `f(flags)` that creates evaluation gym environment.</span>
 <span class="sd">            get_env_shapes: function with signature `f(env)` that returns a tuple of the observation shapes and the number of actions.</span>
+<span class="sd">            verbose_eval: print progress bar during evaluation.</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            the observation shapes should be a dictionary that maps from observation name to a tuple (`shape`, `dtype`).</span>
@@ -529,7 +667,10 @@
                 <span class="k">with</span> <span class="n">fbest</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">train</span><span class="p">(</span>
+        <span class="c1"># debug one step</span>
+        <span class="n">run_exp</span><span class="o">.</span><span class="n">debug_step</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">create_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="o">=</span><span class="bp">cls</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">run_exp</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
             <span class="n">flags</span><span class="p">,</span>
             <span class="n">create_env</span><span class="o">=</span><span class="n">create_env</span><span class="p">,</span>
             <span class="n">create_eval_env</span><span class="o">=</span><span class="n">create_eval_env</span><span class="p">,</span>
@@ -537,6 +678,7 @@
             <span class="n">create_model</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span>
             <span class="n">write_result</span><span class="o">=</span><span class="n">write_result</span><span class="p">,</span>
             <span class="n">write_eval_result</span><span class="o">=</span><span class="n">write_eval_result</span><span class="p">,</span>
+            <span class="n">verbose_eval</span><span class="o">=</span><span class="n">verbose_eval</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -551,6 +693,7 @@
 <li><strong>create_env:</strong>  function with signature <code>f(flags)</code> that creates training gym environment.</li>
 <li><strong>create_eval_env:</strong>  function with signature <code>f(flags)</code> that creates evaluation gym environment.</li>
 <li><strong>get_env_shapes:</strong>  function with signature <code>f(env)</code> that returns a tuple of the observation shapes and the number of actions.</li>
+<li><strong>verbose_eval:</strong>  print progress bar during evaluation.</li>
 </ul>
 
 <h6 id="note">Note</h6>
@@ -560,6 +703,91 @@
 </blockquote>
 </div>
 
+
+                            </div>
+                            <div id="TorchbeastModel.run_test" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TorchbeastModel.run_test">#&nbsp;&nbsp</a>
+
+                <div class="decorator">@classmethod</div>
+
+            <span class="def">def</span>
+            <span class="name">run_test</span><span class="signature">(
+    cls,
+    flags: argparse.Namespace,
+    num_eps: int,
+    create_env: Callable,
+    get_env_shapes: Callable,
+    verbose: bool = True
+)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">num_eps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">create_env</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs Monobeast training.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            flags: training arguments.</span>
+<span class="sd">            num_eps: number of evaluation episodes.</span>
+<span class="sd">            create_env: function with signature `f(flags)` that creates training gym environment.</span>
+<span class="sd">            get_env_shapes: function with signature `f(env)` that returns a tuple of the observation shapes and the number of actions.</span>
+<span class="sd">            verbose: print progress bar during evaluation.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            the observation shapes should be a dictionary that maps from observation name to a tuple (`shape`, `dtype`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">run_exp</span><span class="o">.</span><span class="n">test</span><span class="p">(</span>
+            <span class="n">flags</span><span class="p">,</span>
+            <span class="n">num_eps</span><span class="o">=</span><span class="n">num_eps</span><span class="p">,</span>
+            <span class="n">eval_env</span><span class="o">=</span><span class="n">create_env</span><span class="p">(</span><span class="n">flags</span><span class="p">),</span>
+            <span class="n">get_env_shapes</span><span class="o">=</span><span class="n">get_env_shapes</span><span class="p">,</span>
+            <span class="n">create_model</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Runs Monobeast training.</p>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>flags:</strong>  training arguments.</li>
+<li><strong>num_eps:</strong>  number of evaluation episodes.</li>
+<li><strong>create_env:</strong>  function with signature <code>f(flags)</code> that creates training gym environment.</li>
+<li><strong>get_env_shapes:</strong>  function with signature <code>f(env)</code> that returns a tuple of the observation shapes and the number of actions.</li>
+<li><strong>verbose:</strong>  print progress bar during evaluation.</li>
+</ul>
+
+<h6 id="note">Note</h6>
+
+<blockquote>
+  <p>the observation shapes should be a dictionary that maps from observation name to a tuple (<code>shape</code>, <code>dtype</code>).</p>
+</blockquote>
+</div>
+
+
+                            </div>
+                            <div id="TorchbeastModel.make_state_rnn" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TorchbeastModel.make_state_rnn">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">make_state_rnn</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">make_state_rnn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+
+        </details>
+
+    
 
                             </div>
                             <div id="TorchbeastModel.initial_state" class="classattr">
@@ -576,7 +804,12 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns tuple of initial model state</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">tuple</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span><span class="o">.</span><span class="n">num_layers</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -609,13 +842,13 @@
 <span class="sd">            prev_state: memory from last time step.</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            all input shapes are (T, B, *shapes), where T is the `unroll_length` and B is the `batch_size`.</span>
+<span class="sd">            all input shapes are `(T, B, *shapes)`, where T is the `unroll_length` and B is the `batch_size`.</span>
 <span class="sd">            the return arguments should also be in this format.</span>
+<span class="sd">            Torchbeast will add a `done` field indicate which of the `(T, B)` steps are done.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            a dictionary of tensors containing `polic_logits`, `baseline` value estimate, and `action`.</span>
 <span class="sd">            the next model state.</span>
-<span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 </pre></div>
@@ -634,8 +867,9 @@
 <h6 id="note">Note</h6>
 
 <blockquote>
-  <p>all input shapes are (T, B, *shapes), where T is the <code>unroll_length</code> and B is the <code>batch_size</code>.
-  the return arguments should also be in this format.</p>
+  <p>all input shapes are <code>(T, B, *shapes)</code>, where T is the <code>unroll_length</code> and B is the <code>batch_size</code>.
+  the return arguments should also be in this format.
+  Torchbeast will add a <code>done</code> field indicate which of the <code>(T, B)</code> steps are done.</p>
 </blockquote>
 
 <h6 id="returns">Returns</h6>
@@ -644,6 +878,57 @@
   <p>a dictionary of tensors containing <code>polic_logits</code>, <code>baseline</code> value estimate, and <code>action</code>.
   the next model state.</p>
 </blockquote>
+</div>
+
+
+                            </div>
+                            <div id="TorchbeastModel.compute_state" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TorchbeastModel.compute_state">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">compute_state</span><span class="signature">(self, rep: torch.Tensor, core_state, done: torch.Tensor)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">compute_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rep</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">core_state</span><span class="p">,</span> <span class="n">done</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates state using a state rnn.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rep: RNN inputs of shape `(T, B, *dfeats)`.</span>
+<span class="sd">            core_state: previous state.</span>
+<span class="sd">            done: tensor indicate which steps are done.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">T</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">rep</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="n">core_input</span> <span class="o">=</span> <span class="n">rep</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">core_output_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">notdone</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">done</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">inp</span><span class="p">,</span> <span class="n">nd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">core_input</span><span class="o">.</span><span class="n">unbind</span><span class="p">(),</span> <span class="n">notdone</span><span class="o">.</span><span class="n">unbind</span><span class="p">()):</span>
+            <span class="c1"># Reset core state to zero whenever an episode ended.</span>
+            <span class="c1"># Make `done` broadcastable with (num_layers, B, hidden_size)</span>
+            <span class="c1"># states:</span>
+            <span class="n">nd</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">core_state</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">nd</span> <span class="o">*</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">core_state</span><span class="p">)</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">core_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_rnn</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">core_state</span><span class="p">)</span>
+            <span class="n">core_output_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">core_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">core_output_list</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">core_output</span><span class="p">,</span> <span class="n">core_state</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Updates state using a state rnn.</p>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>rep:</strong>  RNN inputs of shape <code>(T, B, *dfeats)</code>.</li>
+<li><strong>core_state:</strong>  previous state.</li>
+<li><strong>done:</strong>  tensor indicate which steps are done.</li>
+</ul>
 </div>
 
 
