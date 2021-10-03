@@ -26,6 +26,13 @@ from ....metrics.running_avg import RunningAverage
 Buffers = typing.Dict[str, typing.List[torch.Tensor]]
 
 
+def get_num_buffer(flags):
+    if flags.num_buffers == 'auto':
+        return flags.num_actors * 2
+    else:
+        return int(flags.num_buffers)
+
+
 def act(i: int, free_queue: mp.SimpleQueue, full_queue: mp.SimpleQueue,
         model: torch.nn.Module, buffers: Buffers, initial_agent_state_buffers, flags, create_env):
     try:
@@ -192,6 +199,7 @@ def learn(actor_model,
 
         # Interestingly, this doesn't require moving off cuda first?
         actor_model.load_state_dict(model.state_dict())
+        actor_model.train_steps = model.train_steps
         return stats
 
 
@@ -214,7 +222,7 @@ def create_buffers(observation_shapes, num_actions, flags) -> Buffers:
             logging.error('Error: Could not create buffer for {} {} {}'.format(k, shape, dtype))
             raise e
     buffers: Buffers = {key: [] for key in specs}
-    for _ in range(flags.num_buffers):
+    for _ in range(get_num_buffer(flags)):
         for key in buffers:
             buffers[key].append(torch.empty(**specs[key]).share_memory_())
     return buffers
@@ -224,10 +232,14 @@ def debug_step(flags, create_env, get_env_shapes, create_model):
     env = create_env(flags)
     observation_shapes, num_actions, env_kwargs = get_env_shapes(env)
     model = create_model(flags, observation_shapes, num_actions, **env_kwargs)
+    # debug agent step
     env = environment.Environment(env)
     env_output = env.initial()
     agent_state = model.initial_state(batch_size=1)
-    agent_output, unused_state = model(env_output, agent_state)
+    agent_output, agent_state = model(env_output, agent_state)
+    # debug environment step
+    observation = env.step(agent_output['action'])
+    agent_outputs, agent_state = model(observation, agent_state)
     return env_output, agent_output
 
 
@@ -250,7 +262,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
 
     # Add initial RNN state.
     initial_agent_state_buffers = []
-    for _ in range(flags.num_buffers):
+    for _ in range(get_num_buffer(flags)):
         state = model.initial_state(batch_size=1)
         for t in state:
             t.share_memory_()
@@ -270,18 +282,8 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
         actor_processes.append(actor)
 
     learner_model = create_model(flags, observation_shapes, num_actions, **env_kwargs).to(device=device)
+    optimizer, scheduler = learner_model.get_optimizer_scheduler()
 
-    optimizer = torch.optim.RMSprop(
-        learner_model.parameters(),
-        lr=flags.learning_rate,
-        momentum=flags.momentum,
-        eps=flags.epsilon,
-        alpha=flags.alpha)
-
-    def lr_lambda(epoch):
-        return 1 - min(epoch * T * B, flags.num_train_steps) / flags.num_train_steps
-
-    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
     metrics = RunningAverage()
     time_tracker = RunningAverage()
 
@@ -306,7 +308,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
                 learner_model.train_steps += T * B
 
     logger.critical('launching learner threads')
-    for m in range(flags.num_buffers):
+    for m in range(get_num_buffer(flags)):
         free_queue.put(m)
 
     threads = []
@@ -329,7 +331,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
             sys.exit(status)
 
     def checkpoint():
-        model.save_checkpoint(metrics=None, optimizer_state=optimizer.state_dict(), scheduler_state=scheduler.state_dict(), model_state=model.state_dict())
+        learner_model.save_checkpoint(metrics=None, optimizer_state=optimizer.state_dict(), scheduler_state=scheduler.state_dict(), model_state=model.state_dict())
 
     eval_env = create_eval_env(flags)
 
@@ -348,7 +350,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
             best = test_result
             new_best = True
         write_eval_result(test_result, new_best=new_best)
-        s = 'Evaluating after {} steps:\n{}'.format(learner_model.train_steps, pprint.pformat(test_result))
+        s = 'Evaluating after {} steps:\n{}'.format(test_result['train_steps'], pprint.pformat(test_result))
         logger.critical(s)
 
     try:

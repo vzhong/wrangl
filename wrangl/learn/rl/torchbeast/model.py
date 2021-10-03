@@ -18,20 +18,22 @@ class TorchbeastModel(BaseModel):
 
     @classmethod
     def get_parser(cls, **defaults) -> ArgumentParser:
+        if 'learning_rate' not in defaults:
+            defaults['learning_rate'] = 0.0005
         parser = super().get_parser(**defaults)
 
         # Training settings.
-        parser.add_argument('--num_actors', default=defaults.get('num_actors', 1), type=int, metavar='N', help='Number of actors.')
-        parser.add_argument('--unroll_length', default=defaults.get('unroll_length', 36), type=int, metavar='T', help='The unroll length (time dimension; default: 64).')
-        parser.add_argument('--queue_timeout', default=defaults.get('queue_timeout', 1), type=int, metavar='S', help='Error timeout for queue.')
-        parser.add_argument('--num_buffers', default=defaults.get('num_buffers', 2), type=int, metavar='N', help='Number of shared-memory buffers.')
-        parser.add_argument('--num_threads', default=defaults.get('num_threads', 4), type=int, metavar='N', help='Number learner threads.')
+        parser.add_argument('--num_actors', default=defaults.get('num_actors', 1), type=int, help='Number of actors.')
+        parser.add_argument('--unroll_length', default=defaults.get('unroll_length', 24), type=int, help='The unroll length (time dimension).')
+        parser.add_argument('--queue_timeout', default=defaults.get('queue_timeout', 1), type=int, help='Error timeout for queue.')
+        parser.add_argument('--num_buffers', default=defaults.get('num_buffers', 'auto'), help='Number of shared-memory buffers.')
+        parser.add_argument('--num_threads', default=defaults.get('num_threads', 4), type=int, help='Number learner threads.')
         parser.add_argument('--save_period_seconds', default=defaults.get('save_period_seconds', 5*60), type=int, metavar='N', help='How often to save.')
         parser.add_argument('--print_period_seconds', default=defaults.get('print_period_seconds', 5), type=int, metavar='N', help='How often to print.')
-        parser.add_argument('--test_eps', default=defaults.get('test_eps', 10), type=int, metavar='N', help='How many episodes to test.')
+        parser.add_argument('--test_eps', default=defaults.get('test_eps', 100), type=int, help='How many episodes to test.')
 
         # Loss settings.
-        parser.add_argument('--entropy_cost', default=defaults.get('entropy_cost', 0.05), type=float, help='Entropy cost/multiplier.')
+        parser.add_argument('--entropy_cost', default=defaults.get('entropy_cost', 0.005), type=float, help='Entropy cost/multiplier.')
         parser.add_argument('--baseline_cost', default=defaults.get('baseline_cost', 0.5), type=float, help='Baseline cost/multiplier.')
         parser.add_argument('--discounting', default=defaults.get('discounting', 0.99), type=float, help='Discounting factor.')
         parser.add_argument('--reward_clipping', default=defaults.get('reward_clipping', 'abs_one'), choices=['abs_one', 'soft_asymmetric', 'none'], help='Reward clipping.')
@@ -116,6 +118,21 @@ class TorchbeastModel(BaseModel):
         self.num_actions = num_actions
         self.state_rnn = self.make_state_rnn()
 
+    def get_optimizer_scheduler(self):
+        optimizer = torch.optim.RMSprop(
+            self.parameters(),
+            lr=self.hparams.learning_rate,
+            momentum=self.hparams.momentum,
+            eps=self.hparams.epsilon,
+            alpha=self.hparams.alpha)
+
+        def lr_lambda(step):
+            ran = self.hparams.batch_size * self.hparams.unroll_length
+            return 1 - min(ran, self.hparams.num_train_steps) / self.hparams.num_train_steps
+
+        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
+        return optimizer, scheduler
+
     def make_state_rnn(self):
         return None
 
@@ -154,12 +171,12 @@ class TorchbeastModel(BaseModel):
         Updates state using a state rnn.
 
         Args:
-            rep: RNN inputs of shape `(T, B, *dfeats)`.
+            rep: RNN inputs of shape `(TB, *dfeats)`.
             core_state: previous state.
             done: tensor indicate which steps are done.
         """
         assert self.state_rnn is not None
-        T, B, *_ = rep.size()
+        T, B = done.size()
         core_input = rep.view(T, B, -1)
         core_output_list = []
         notdone = (~done).float()

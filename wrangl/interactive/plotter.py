@@ -1,5 +1,6 @@
 import typing
 import pathlib
+import logging
 import plotille
 import pandas as pd
 import ujson as json
@@ -12,6 +13,7 @@ def add_parser_arguments(parser):
     parser.add_argument('--window', help='smoothing window', type=int, default=1)
     parser.add_argument('--width', help='plot width', type=int, default=60)
     parser.add_argument('--height', help='plot height', type=int, default=10)
+    parser.add_argument('-n', '--path_parts', help='how many last folders to use as name', type=int, default=2)
     parser.add_argument('-x', help='x axis', default='auto')
     parser.add_argument('-y', help='y axis', default='auto')
 
@@ -26,11 +28,15 @@ def detect_log_type(dlogs):
         return NotImplementedError('Unknown log type in {}'.format(dlog))
 
 
-def load_supervised(dlogs: typing.List[pathlib.Path]):
+def load_supervised(dlogs: typing.List[pathlib.Path], n: int = 2):
     ret = []
     for dlog in dlogs:
-        name = '/'.join(dlog.parts[-2:])
-        with dlog.joinpath('metrics.log.json').open('rt') as f:
+        name = '/'.join(dlog.parts[-n:])
+        flog = dlog.joinpath('metrics.log.json')
+        if not flog.exists():
+            logging.error('Could not find {}'.format(flog))
+            continue
+        with flog.open('rt') as f:
             raw_log = json.load(f)
         log = []
         for entry in raw_log:
@@ -45,12 +51,16 @@ def load_supervised(dlogs: typing.List[pathlib.Path]):
     return ret
 
 
-def load_rl(dlogs: typing.List[pathlib.Path]):
+def load_rl(dlogs: typing.List[pathlib.Path], n: int = 2):
     ret = []
     for dlog in dlogs:
-        name = '/'.join(dlog.parts[-2:])
+        name = '/'.join(dlog.parts[-n:])
         log = []
-        with dlog.joinpath('metrics.log.jsonl').open('rt') as f:
+        flog = dlog.joinpath('metrics.log.jsonl')
+        if not flog.exists():
+            logging.error('Could not find {}'.format(flog))
+            continue
+        with flog.open('rt') as f:
             for line in f:
                 log.append(json.loads(line))
         ret.append((name, log))
@@ -64,11 +74,11 @@ def main(args):
     if args.x == 'auto':
         args.x = 'train_steps'
     if args.type == 'supervised':
-        logs = load_supervised(args.dlogs)
+        logs = load_supervised(args.dlogs, n=args.path_parts)
         if args.y == 'auto':
             args.y = 'loss'
     elif args.type == 'rl':
-        logs = load_rl(args.dlogs)
+        logs = load_rl(args.dlogs, n=args.path_parts)
         if args.y == 'auto':
             args.y = 'mean_episode_return'
     else:
