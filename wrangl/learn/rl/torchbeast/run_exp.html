@@ -48,6 +48,9 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
+                    <a class="function" href="#get_num_buffer">get_num_buffer</a>
+            </li>
+            <li>
                     <a class="function" href="#act">act</a>
             </li>
             <li>
@@ -115,6 +118,13 @@
 
 
 <span class="n">Buffers</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span>
+
+
+<span class="k">def</span> <span class="nf">get_num_buffer</span><span class="p">(</span><span class="n">flags</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_actors</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">free_queue</span><span class="p">:</span> <span class="n">mp</span><span class="o">.</span><span class="n">SimpleQueue</span><span class="p">,</span> <span class="n">full_queue</span><span class="p">:</span> <span class="n">mp</span><span class="o">.</span><span class="n">SimpleQueue</span><span class="p">,</span>
@@ -283,6 +293,7 @@
 
         <span class="c1"># Interestingly, this doesn&#39;t require moving off cuda first?</span>
         <span class="n">actor_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+        <span class="n">actor_model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
         <span class="k">return</span> <span class="n">stats</span>
 
 
@@ -305,7 +316,7 @@
             <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error: Could not create buffer for </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">))</span>
             <span class="k">raise</span> <span class="n">e</span>
     <span class="n">buffers</span><span class="p">:</span> <span class="n">Buffers</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">}</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">get_num_buffer</span><span class="p">(</span><span class="n">flags</span><span class="p">)):</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">buffers</span><span class="p">:</span>
             <span class="n">buffers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="o">**</span><span class="n">specs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">.</span><span class="n">share_memory_</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">buffers</span>
@@ -315,10 +326,14 @@
     <span class="n">env</span> <span class="o">=</span> <span class="n">create_env</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
     <span class="n">observation_shapes</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">,</span> <span class="n">env_kwargs</span> <span class="o">=</span> <span class="n">get_env_shapes</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">,</span> <span class="o">**</span><span class="n">env_kwargs</span><span class="p">)</span>
+    <span class="c1"># debug agent step</span>
     <span class="n">env</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
     <span class="n">env_output</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">initial</span><span class="p">()</span>
     <span class="n">agent_state</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">initial_state</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">agent_output</span><span class="p">,</span> <span class="n">unused_state</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">env_output</span><span class="p">,</span> <span class="n">agent_state</span><span class="p">)</span>
+    <span class="n">agent_output</span><span class="p">,</span> <span class="n">agent_state</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">env_output</span><span class="p">,</span> <span class="n">agent_state</span><span class="p">)</span>
+    <span class="c1"># debug environment step</span>
+    <span class="n">observation</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">agent_output</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">])</span>
+    <span class="n">agent_outputs</span><span class="p">,</span> <span class="n">agent_state</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">observation</span><span class="p">,</span> <span class="n">agent_state</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">env_output</span><span class="p">,</span> <span class="n">agent_output</span>
 
 
@@ -341,7 +356,7 @@
 
     <span class="c1"># Add initial RNN state.</span>
     <span class="n">initial_agent_state_buffers</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">get_num_buffer</span><span class="p">(</span><span class="n">flags</span><span class="p">)):</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">initial_state</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
             <span class="n">t</span><span class="o">.</span><span class="n">share_memory_</span><span class="p">()</span>
@@ -361,18 +376,8 @@
         <span class="n">actor_processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span>
 
     <span class="n">learner_model</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">,</span> <span class="o">**</span><span class="n">env_kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span> <span class="o">=</span> <span class="n">learner_model</span><span class="o">.</span><span class="n">get_optimizer_scheduler</span><span class="p">()</span>
 
-    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">RMSprop</span><span class="p">(</span>
-        <span class="n">learner_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
-        <span class="n">lr</span><span class="o">=</span><span class="n">flags</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">,</span>
-        <span class="n">momentum</span><span class="o">=</span><span class="n">flags</span><span class="o">.</span><span class="n">momentum</span><span class="p">,</span>
-        <span class="n">eps</span><span class="o">=</span><span class="n">flags</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="o">=</span><span class="n">flags</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">lr_lambda</span><span class="p">(</span><span class="n">epoch</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">epoch</span> <span class="o">*</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span><span class="p">,</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_train_steps</span><span class="p">)</span> <span class="o">/</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_train_steps</span>
-
-    <span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">LambdaLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">lr_lambda</span><span class="p">)</span>
     <span class="n">metrics</span> <span class="o">=</span> <span class="n">RunningAverage</span><span class="p">()</span>
     <span class="n">time_tracker</span> <span class="o">=</span> <span class="n">RunningAverage</span><span class="p">()</span>
 
@@ -397,7 +402,7 @@
                 <span class="n">learner_model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">+=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;launching learner threads&#39;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">get_num_buffer</span><span class="p">(</span><span class="n">flags</span><span class="p">)):</span>
         <span class="n">free_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
 
     <span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
@@ -420,7 +425,7 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">checkpoint</span><span class="p">():</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">optimizer_state</span><span class="o">=</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">scheduler_state</span><span class="o">=</span><span class="n">scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">model_state</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+        <span class="n">learner_model</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">optimizer_state</span><span class="o">=</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">scheduler_state</span><span class="o">=</span><span class="n">scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">model_state</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
 
     <span class="n">eval_env</span> <span class="o">=</span> <span class="n">create_eval_env</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
 
@@ -439,7 +444,7 @@
             <span class="n">best</span> <span class="o">=</span> <span class="n">test_result</span>
             <span class="n">new_best</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">write_eval_result</span><span class="p">(</span><span class="n">test_result</span><span class="p">,</span> <span class="n">new_best</span><span class="o">=</span><span class="n">new_best</span><span class="p">)</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Evaluating after </span><span class="si">{}</span><span class="s1"> steps:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">learner_model</span><span class="o">.</span><span class="n">train_steps</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">test_result</span><span class="p">))</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Evaluating after </span><span class="si">{}</span><span class="s1"> steps:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">test_result</span><span class="p">[</span><span class="s1">&#39;train_steps&#39;</span><span class="p">],</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">test_result</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
@@ -542,6 +547,28 @@
         </details>
 
             </section>
+                <section id="get_num_buffer">
+                            <div class="attr function"><a class="headerlink" href="#get_num_buffer">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_num_buffer</span><span class="signature">(flags)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_num_buffer</span><span class="p">(</span><span class="n">flags</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_actors</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                </section>
                 <section id="act">
                             <div class="attr function"><a class="headerlink" href="#act">#&nbsp;&nbsp</a>
 
@@ -549,8 +576,8 @@
             <span class="def">def</span>
             <span class="name">act</span><span class="signature">(
     i: int,
-    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fb5cb3f4310&gt;&gt;,
-    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fb5cb3f4310&gt;&gt;,
+    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f1d3afbf310&gt;&gt;,
+    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f1d3afbf310&gt;&gt;,
     model: torch.nn.modules.module.Module,
     buffers: Dict[str, List[torch.Tensor]],
     initial_agent_state_buffers,
@@ -627,8 +654,8 @@
         
             <span class="def">def</span>
             <span class="name">get_batch</span><span class="signature">(
-    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fb5cb3f4310&gt;&gt;,
-    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fb5cb3f4310&gt;&gt;,
+    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f1d3afbf310&gt;&gt;,
+    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f1d3afbf310&gt;&gt;,
     buffers: Dict[str, List[torch.Tensor]],
     initial_agent_state_buffers,
     flags,
@@ -774,6 +801,7 @@
 
         <span class="c1"># Interestingly, this doesn&#39;t require moving off cuda first?</span>
         <span class="n">actor_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+        <span class="n">actor_model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_steps</span>
         <span class="k">return</span> <span class="n">stats</span>
 </pre></div>
 
@@ -817,7 +845,7 @@
             <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error: Could not create buffer for </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">))</span>
             <span class="k">raise</span> <span class="n">e</span>
     <span class="n">buffers</span><span class="p">:</span> <span class="n">Buffers</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">}</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">get_num_buffer</span><span class="p">(</span><span class="n">flags</span><span class="p">)):</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">buffers</span><span class="p">:</span>
             <span class="n">buffers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="o">**</span><span class="n">specs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">.</span><span class="n">share_memory_</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">buffers</span>
@@ -842,10 +870,14 @@
     <span class="n">env</span> <span class="o">=</span> <span class="n">create_env</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
     <span class="n">observation_shapes</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">,</span> <span class="n">env_kwargs</span> <span class="o">=</span> <span class="n">get_env_shapes</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">,</span> <span class="o">**</span><span class="n">env_kwargs</span><span class="p">)</span>
+    <span class="c1"># debug agent step</span>
     <span class="n">env</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
     <span class="n">env_output</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">initial</span><span class="p">()</span>
     <span class="n">agent_state</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">initial_state</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">agent_output</span><span class="p">,</span> <span class="n">unused_state</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">env_output</span><span class="p">,</span> <span class="n">agent_state</span><span class="p">)</span>
+    <span class="n">agent_output</span><span class="p">,</span> <span class="n">agent_state</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">env_output</span><span class="p">,</span> <span class="n">agent_state</span><span class="p">)</span>
+    <span class="c1"># debug environment step</span>
+    <span class="n">observation</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">agent_output</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">])</span>
+    <span class="n">agent_outputs</span><span class="p">,</span> <span class="n">agent_state</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">observation</span><span class="p">,</span> <span class="n">agent_state</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">env_output</span><span class="p">,</span> <span class="n">agent_output</span>
 </pre></div>
 
@@ -893,7 +925,7 @@
 
     <span class="c1"># Add initial RNN state.</span>
     <span class="n">initial_agent_state_buffers</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">get_num_buffer</span><span class="p">(</span><span class="n">flags</span><span class="p">)):</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">initial_state</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
             <span class="n">t</span><span class="o">.</span><span class="n">share_memory_</span><span class="p">()</span>
@@ -913,18 +945,8 @@
         <span class="n">actor_processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span>
 
     <span class="n">learner_model</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">observation_shapes</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">,</span> <span class="o">**</span><span class="n">env_kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span> <span class="o">=</span> <span class="n">learner_model</span><span class="o">.</span><span class="n">get_optimizer_scheduler</span><span class="p">()</span>
 
-    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">RMSprop</span><span class="p">(</span>
-        <span class="n">learner_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
-        <span class="n">lr</span><span class="o">=</span><span class="n">flags</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">,</span>
-        <span class="n">momentum</span><span class="o">=</span><span class="n">flags</span><span class="o">.</span><span class="n">momentum</span><span class="p">,</span>
-        <span class="n">eps</span><span class="o">=</span><span class="n">flags</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="o">=</span><span class="n">flags</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">lr_lambda</span><span class="p">(</span><span class="n">epoch</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">epoch</span> <span class="o">*</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span><span class="p">,</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_train_steps</span><span class="p">)</span> <span class="o">/</span> <span class="n">flags</span><span class="o">.</span><span class="n">num_train_steps</span>
-
-    <span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">LambdaLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">lr_lambda</span><span class="p">)</span>
     <span class="n">metrics</span> <span class="o">=</span> <span class="n">RunningAverage</span><span class="p">()</span>
     <span class="n">time_tracker</span> <span class="o">=</span> <span class="n">RunningAverage</span><span class="p">()</span>
 
@@ -949,7 +971,7 @@
                 <span class="n">learner_model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">+=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;launching learner threads&#39;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">flags</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">get_num_buffer</span><span class="p">(</span><span class="n">flags</span><span class="p">)):</span>
         <span class="n">free_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
 
     <span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
@@ -972,7 +994,7 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">checkpoint</span><span class="p">():</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">optimizer_state</span><span class="o">=</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">scheduler_state</span><span class="o">=</span><span class="n">scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">model_state</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+        <span class="n">learner_model</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">optimizer_state</span><span class="o">=</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">scheduler_state</span><span class="o">=</span><span class="n">scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">model_state</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
 
     <span class="n">eval_env</span> <span class="o">=</span> <span class="n">create_eval_env</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
 
@@ -991,7 +1013,7 @@
             <span class="n">best</span> <span class="o">=</span> <span class="n">test_result</span>
             <span class="n">new_best</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">write_eval_result</span><span class="p">(</span><span class="n">test_result</span><span class="p">,</span> <span class="n">new_best</span><span class="o">=</span><span class="n">new_best</span><span class="p">)</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Evaluating after </span><span class="si">{}</span><span class="s1"> steps:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">learner_model</span><span class="o">.</span><span class="n">train_steps</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">test_result</span><span class="p">))</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Evaluating after </span><span class="si">{}</span><span class="s1"> steps:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">test_result</span><span class="p">[</span><span class="s1">&#39;train_steps&#39;</span><span class="p">],</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">test_result</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
