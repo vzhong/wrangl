@@ -244,12 +244,8 @@ def debug_step(flags, create_env, get_env_shapes, create_model):
 
 
 def train(flags, create_env, create_eval_env, get_env_shapes, create_model, write_result, write_eval_result, verbose_eval=False, device=None):  # pylint: disable=too-many-branches, too-many-statements
-    torch.set_num_threads(1)
     if device is None:
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
-    T = flags.unroll_length
-    B = flags.batch_size
 
     env = create_env(flags)
     observation_shapes, num_actions, env_kwargs = get_env_shapes(env)
