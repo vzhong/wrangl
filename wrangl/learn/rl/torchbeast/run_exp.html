@@ -399,7 +399,7 @@
                 <span class="n">time_tracker</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="s1">&#39;t_learn&#39;</span><span class="p">,</span> <span class="n">t_learn</span><span class="o">-</span><span class="n">t_batch</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">metrics</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-                <span class="n">learner_model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">+=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span>
+                <span class="n">learner_model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;launching learner threads&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">get_num_buffer</span><span class="p">(</span><span class="n">flags</span><span class="p">)):</span>
@@ -576,8 +576,8 @@
             <span class="def">def</span>
             <span class="name">act</span><span class="signature">(
     i: int,
-    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f1d3afbf310&gt;&gt;,
-    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f1d3afbf310&gt;&gt;,
+    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fe8e7774310&gt;&gt;,
+    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fe8e7774310&gt;&gt;,
     model: torch.nn.modules.module.Module,
     buffers: Dict[str, List[torch.Tensor]],
     initial_agent_state_buffers,
@@ -654,8 +654,8 @@
         
             <span class="def">def</span>
             <span class="name">get_batch</span><span class="signature">(
-    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f1d3afbf310&gt;&gt;,
-    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f1d3afbf310&gt;&gt;,
+    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fe8e7774310&gt;&gt;,
+    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fe8e7774310&gt;&gt;,
     buffers: Dict[str, List[torch.Tensor]],
     initial_agent_state_buffers,
     flags,
@@ -968,7 +968,7 @@
                 <span class="n">time_tracker</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="s1">&#39;t_learn&#39;</span><span class="p">,</span> <span class="n">t_learn</span><span class="o">-</span><span class="n">t_batch</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">metrics</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-                <span class="n">learner_model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">+=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">B</span>
+                <span class="n">learner_model</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;launching learner threads&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">get_num_buffer</span><span class="p">(</span><span class="n">flags</span><span class="p">)):</span>
