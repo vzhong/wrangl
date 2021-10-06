@@ -372,7 +372,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
                 val_checkpoint()
                 last_checkpoint_time = time.time()
 
-            fps = (learner_model.train_steps - start_step) / (time.time() - start_time)
+            fps = (learner_model.train_steps - start_step) / (time.time() - start_time) * flags.batch_size * flags.unroll_length
             if stats.get('episode_returns', None):
                 mean_return = 'Return per episode: %.1f. ' % stats['mean_episode_return']
             else:
