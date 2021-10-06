@@ -1,3 +1,5 @@
+import os
+os.environ['OMP_NUM_THREADS'] = '1'
 import gym
 import torch
 import pprint
@@ -42,10 +44,6 @@ class RTFMEasy(gym.Env):
         obs = self.rtfm_env.reset()
         self.steps_taken = 0
         return self.reformat(obs)
-
-    def render(self):
-        term = X.Terminal()
-        term.featurize(self.rtfm_env)
 
     def step(self, action):
         obs, reward, done, info = self.rtfm_env.step(action)
@@ -102,12 +100,10 @@ class MyRTFMModel(TorchbeastModel):
 
     @classmethod
     def get_parser(cls):
-        parser = super().get_parser(num_actors=32, num_buffers=64, batch_size=32, num_train_steps=int(1e8), print_period_seconds=60, save_period_seconds=60*5)
+        parser = super().get_parser(num_actors=30, batch_size=20, unroll_length=80, num_train_steps=int(1e8), print_period_seconds=60, save_period_seconds=60*5)
         parser.add_argument('--demb', type=int, default=30)
-        parser.add_argument('--drnn', type=int, default=100)
+        parser.add_argument('--drnn', type=int, default=200)
         parser.add_argument('--drep', type=int, default=400)
-        parser.add_argument('--num_heads', type=int, default=4)
-        parser.add_argument('--num_layers', type=int, default=8)
         parser.add_argument('--stateful', action='store_true')
         parser.add_argument('--test', action='store_true')
         return parser
