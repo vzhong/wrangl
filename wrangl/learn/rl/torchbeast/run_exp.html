@@ -338,12 +338,8 @@
 
 
 <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">create_env</span><span class="p">,</span> <span class="n">create_eval_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="p">,</span> <span class="n">write_result</span><span class="p">,</span> <span class="n">write_eval_result</span><span class="p">,</span> <span class="n">verbose_eval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pylint: disable=too-many-branches, too-many-statements</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
-
-    <span class="n">T</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">unroll_length</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">batch_size</span>
 
     <span class="n">env</span> <span class="o">=</span> <span class="n">create_env</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
     <span class="n">observation_shapes</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">,</span> <span class="n">env_kwargs</span> <span class="o">=</span> <span class="n">get_env_shapes</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
@@ -576,8 +572,8 @@
             <span class="def">def</span>
             <span class="name">act</span><span class="signature">(
     i: int,
-    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fe8e7774310&gt;&gt;,
-    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fe8e7774310&gt;&gt;,
+    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f9f2d4d0310&gt;&gt;,
+    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f9f2d4d0310&gt;&gt;,
     model: torch.nn.modules.module.Module,
     buffers: Dict[str, List[torch.Tensor]],
     initial_agent_state_buffers,
@@ -654,8 +650,8 @@
         
             <span class="def">def</span>
             <span class="name">get_batch</span><span class="signature">(
-    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fe8e7774310&gt;&gt;,
-    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7fe8e7774310&gt;&gt;,
+    free_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f9f2d4d0310&gt;&gt;,
+    full_queue: &lt;bound method BaseContext.SimpleQueue of &lt;multiprocessing.context.DefaultContext object at 0x7f9f2d4d0310&gt;&gt;,
     buffers: Dict[str, List[torch.Tensor]],
     initial_agent_state_buffers,
     flags,
@@ -907,12 +903,8 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">create_env</span><span class="p">,</span> <span class="n">create_eval_env</span><span class="p">,</span> <span class="n">get_env_shapes</span><span class="p">,</span> <span class="n">create_model</span><span class="p">,</span> <span class="n">write_result</span><span class="p">,</span> <span class="n">write_eval_result</span><span class="p">,</span> <span class="n">verbose_eval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pylint: disable=too-many-branches, too-many-statements</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
-
-    <span class="n">T</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">unroll_length</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">batch_size</span>
 
     <span class="n">env</span> <span class="o">=</span> <span class="n">create_env</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
     <span class="n">observation_shapes</span><span class="p">,</span> <span class="n">num_actions</span><span class="p">,</span> <span class="n">env_kwargs</span> <span class="o">=</span> <span class="n">get_env_shapes</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
