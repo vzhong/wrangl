@@ -305,7 +305,7 @@ def train(flags, create_env, create_eval_env, get_env_shapes, create_model, writ
                 time_tracker.record('t_learn', t_learn-t_batch)
                 for k, v in out.items():
                     metrics.record(k, v)
-                learner_model.train_steps += T * B
+                learner_model.train_steps += 1
 
     logger.critical('launching learner threads')
     for m in range(get_num_buffer(flags)):

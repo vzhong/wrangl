@@ -65,6 +65,7 @@ class TorchbeastModel(BaseModel):
 
         def write_result(res, mode='train'):
             res['type'] = mode
+            res['frames'] = res['train_steps'] * flags.unroll_length * flags.batch_size
             with flog.open('at') as f:
                 f.write(json.dumps(res) + '\n')
 
@@ -127,8 +128,7 @@ class TorchbeastModel(BaseModel):
             alpha=self.hparams.alpha)
 
         def lr_lambda(step):
-            ran = self.hparams.batch_size * self.hparams.unroll_length
-            return 1 - min(ran, self.hparams.num_train_steps) / self.hparams.num_train_steps
+            return 1 - min(step, self.hparams.num_train_steps) / self.hparams.num_train_steps
 
         scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
         return optimizer, scheduler
