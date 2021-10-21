@@ -1,65 +1,14 @@
 import os
 os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 import gym
 import torch
 import pprint
 from torch import nn
 from torch.nn import functional as F
 from torch.nn.utils import rnn as rnn_utils
-from rtfm.tasks import GroupsSimpleStationary, GroupsSimpleStationaryDev
-from rtfm import featurizer as X
+from silg import envs
 from wrangl.learn import TorchbeastModel
-
-
-class RTFMEasy(gym.Env):
-
-    TEXT_FIELDS = ['wiki', 'task', 'inv']
-    RTFM_ENV = GroupsSimpleStationary
-
-    def __init__(self, featurizer=X.Concat([X.Text(), X.ValidMoves(), X.Position(), X.RelativePosition()]), room_shape=(6, 6), max_name=8, max_inv=8, max_wiki=80, max_task=40, max_text=80, partially_observable=False, max_placement=1, shuffle_wiki=False, time_penalty=-0.02):
-        self.rtfm_env = self.RTFM_ENV(
-            room_shape=room_shape, featurizer=featurizer, partially_observable=partially_observable, max_placement=max_placement, max_name=max_name, max_inv=max_inv, max_wiki=max_wiki, max_task=max_task, time_penalty=time_penalty, shuffle_wiki=shuffle_wiki
-        )
-        self.vocab = self.rtfm_env.vocab
-        self.steps_taken = 0
-        self.max_steps = 80
-        self.height, self.width = room_shape
-        self.max_text = max_text
-        self.max_grid = self.height * self.width * max_name
-        self.num_actions = len(self.rtfm_env.action_space)
-        self.observation_shapes = {
-            'name': ((self.height, self.width, max_placement, max_name), torch.long),
-            'name_len': ((self.height, self.width, max_placement), torch.long),
-            'wiki': ((max_wiki, ), torch.long),
-            'wiki_len': ((1, ), torch.long),
-            'inv': ((max_inv, ), torch.long),
-            'inv_len': ((1, ), torch.long),
-            'task': ((max_task, ), torch.long),
-            'task_len': ((1, ), torch.long),
-            'rel_pos': ((self.height, self.width, 2), torch.float),
-            'valid': ((len(self.rtfm_env.action_space), ), torch.float),  # a 1-0 vector that is a mask for valid actions, should be the same length as `self.action_space`
-        }
-
-    def reset(self):
-        obs = self.rtfm_env.reset()
-        self.steps_taken = 0
-        return self.reformat(obs)
-
-    def step(self, action):
-        obs, reward, done, info = self.rtfm_env.step(action)
-        self.steps_taken += 1
-        if self.steps_taken > self.max_steps and reward < 1:
-            done = True
-            reward = -1
-        return self.reformat(obs), reward, done, info
-
-    def reformat(self, obs):
-        del obs['position']
-        return obs
-
-
-class RTFMEasyDev(RTFMEasy):
-    RTFM_ENV = GroupsSimpleStationaryDev
 
 
 class DoubleFILM(nn.Module):
@@ -292,7 +241,10 @@ def get_env_shapes(env):
         padding_idx=env.vocab.word2index('pad'),
         text_fields=env.TEXT_FIELDS,
     )
-    return env.observation_shapes, env.num_actions, additional
+    observation_shapes = {}
+    for k, v in env.observation_space.items():
+        observation_shapes[k] = v, torch.long
+    return observation_shapes, len(env.action_space), additional
 
 
 if __name__ == '__main__':
@@ -300,7 +252,7 @@ if __name__ == '__main__':
     parser = MyRTFMModel.get_parser()
     args = parser.parse_args()
     if not args.test:
-        MyRTFMModel.run_train(args, create_env=lambda flags: RTFMEasy(), create_eval_env=lambda flags: RTFMEasyDev(), get_env_shapes=get_env_shapes)
+        MyRTFMModel.run_train(args, create_env=lambda flags: gym.make('silg:rtfm_train_s1-v0'), create_eval_env=lambda flags: gym.make('silg:rtfm_test_s1-v0'), get_env_shapes=get_env_shapes)
     print('Evaluating...')
-    res = MyRTFMModel.run_test(args, num_eps=100, create_env=lambda flags: RTFMEasyDev(), get_env_shapes=get_env_shapes, verbose=True)
+    res = MyRTFMModel.run_test(args, num_eps=100, create_env=lambda flags: gym.make('silg:rtfm_test_s1-v0'), get_env_shapes=get_env_shapes, verbose=True)
     pprint.pprint(res)
