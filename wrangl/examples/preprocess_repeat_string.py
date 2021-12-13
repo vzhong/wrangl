@@ -1,27 +1,13 @@
 import ray
-from wrangl.data import Dataloader, Processor
+from wrangl.data import IterableDataset, Processor
 
 
-strings = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+class MyDataset(IterableDataset):
 
+    strings = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
 
-class MyDataloader(Dataloader):
-
-    def __init__(self, strings, pool: ray.util.ActorPool, cache_size: int = 1024):
-        super().__init__(pool, cache_size=cache_size)
-        self.current = 0
-        self.strings = strings
-
-    def reset(self):
-        self.current = 0
-
-    def load_next(self):
-        if self.current < len(self.strings):
-            ret = self.strings[self.current]
-            self.current += 1
-            return ret
-        else:
-            return None
+    def __init__(self, pool: ray.util.ActorPool, cache_size: int = 1024, shuffle: bool = False, timeout: int = 10):
+        super().__init__(self.strings, pool, cache_size, shuffle, timeout)
 
 
 @ray.remote
@@ -32,41 +18,35 @@ class MyProcessor(Processor):
 
 
 def run_no_process():
-    loader = MyDataloader(strings, None, cache_size=5)
     out = []
-    for batch in loader.batch(2):
-        out.extend(batch)
+    for s in MyDataset.strings:
+        out.append(s * 10)
     return out
 
 
 def run_ordered():
     pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
-    loader = MyDataloader(strings, pool, cache_size=5)
-    out = []
-    for batch in loader.batch(2, ordered=True):
-        out.extend(batch)
-    return out
+    d = MyDataset(pool, cache_size=5, shuffle=False)
+    return list(d)
 
 
 def run_unordered():
     pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
-    loader = MyDataloader(strings, pool, cache_size=5)
-    out = []
-    for batch in loader.batch(2, ordered=False):
-        out.extend(batch)
-    return out
+    d = MyDataset(pool, cache_size=5, shuffle=True)
+    return list(d)
 
 
 if __name__ == '__main__':
-    out = run_no_process()
-    assert strings == out
-    print(out)
+    expect = [s * 10 for s in MyDataset.strings]
 
-    out = run_ordered()
-    expect = [s * 10 for s in strings]
+    out = run_no_process()
     assert expect == out
     print(out)
 
-    expect = [s * 10 for s in strings]
+    out = run_ordered()
+    assert expect == out
+    print(out)
+
+    out = run_unordered()
     assert set(expect) == set(out)
     print(out)

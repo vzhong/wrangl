@@ -2,7 +2,7 @@ import os
 import ray
 import sqlite3
 import tempfile
-from wrangl.data import SQLDBloader, Processor
+from wrangl.data import SQLDataset, Processor
 
 
 @ray.remote
@@ -34,10 +34,8 @@ def load_db():
 
     try:
         pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
-        loader = SQLDBloader(fname, query, pool, cache_size=5)
-        output = []
-        for batch in loader.batch(2):
-            output.extend(batch)
+        loader = SQLDataset(fname, query, pool, cache_size=5)
+        output = list(loader)
     finally:
         os.remove(fname)
     return data, output

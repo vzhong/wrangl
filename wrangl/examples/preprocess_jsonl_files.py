@@ -3,7 +3,7 @@ import ray
 import bz2
 import tempfile
 import ujson as json
-from wrangl.data import Fileloader, Processor
+from wrangl.data import FileDataset, Processor
 
 
 @ray.remote
@@ -32,10 +32,8 @@ def load_files():
 
     try:
         pool = ray.util.ActorPool([MyProcessor.remote() for _ in range(3)])
-        loader = Fileloader(fnames, pool, cache_size=5)
-        output = []
-        for batch in loader.batch(2):
-            output.extend(batch)
+        loader = FileDataset(fnames, pool, cache_size=5)
+        output = list(loader)
     finally:
         for f in fnames:
             os.remove(f)
