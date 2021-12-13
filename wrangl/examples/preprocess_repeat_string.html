@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 8.0.0" />
+    <meta name="generator" content="pdoc 8.0.1" />
     <title>wrangl.examples.preprocess_repeat_string API documentation</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2264%22%20height%3D%2264%22%20viewBox%3D%2244.5%202.5%2015%2015%22%3E%3Cpath%20d%3D%22M49.351%2021.041c-.233-.721-.546-2.408-.772-4.076-.042-.09-.067-.187-.046-.288-.166-1.347-.277-2.625-.241-3.351-1.378-1.008-2.271-2.586-2.271-4.362%200-.976.272-1.935.788-2.774.057-.094.122-.18.184-.268-.033-.167-.052-.339-.052-.516%200-1.477%201.202-2.679%202.679-2.679.791%200%201.496.352%201.987.9a6.3%206.3%200%200%201%201.001.029c.492-.564%201.207-.929%202.012-.929%201.477%200%202.679%201.202%202.679%202.679a2.65%202.65%200%200%201-.269%201.148c.383.747.595%201.572.595%202.41%200%202.311-1.507%204.29-3.635%205.107.037.699.147%202.27.423%203.294l.137.461c.156%202.136-4.612%205.166-5.199%203.215zm.127-4.919a4.78%204.78%200%200%200%20.775-.584c-.172-.115-.505-.254-.88-.378zm.331%202.302l.828-.502c-.202-.143-.576-.328-.984-.49zm.45%202.157l.701-.403c-.214-.115-.536-.249-.891-.376l.19.779zM49.13%204.141c0%20.152.123.276.276.276s.275-.124.275-.276-.123-.276-.276-.276-.275.124-.275.276zm.735-.389a1.15%201.15%200%200%201%20.314.783%201.16%201.16%200%200%201-1.162%201.162c-.457%200-.842-.27-1.032-.653-.026.117-.042.238-.042.362a1.68%201.68%200%200%200%201.679%201.679%201.68%201.68%200%200%200%201.679-1.679c0-.843-.626-1.535-1.436-1.654zm3.076%201.654a1.68%201.68%200%200%200%201.679%201.679%201.68%201.68%200%200%200%201.679-1.679c0-.037-.009-.072-.011-.109-.21.3-.541.508-.935.508a1.16%201.16%200%200%201-1.162-1.162%201.14%201.14%200%200%201%20.474-.912c-.015%200-.03-.005-.045-.005-.926.001-1.679.754-1.679%201.68zm1.861-1.265c0%20.152.123.276.276.276s.275-.124.275-.276-.123-.276-.276-.276-.275.124-.275.276zm1.823%204.823c0-.52-.103-1.035-.288-1.52-.466.394-1.06.64-1.717.64-1.144%200-2.116-.725-2.499-1.738-.383%201.012-1.355%201.738-2.499%201.738-.867%200-1.631-.421-2.121-1.062-.307.605-.478%201.267-.478%201.942%200%202.486%202.153%204.51%204.801%204.51s4.801-2.023%204.801-4.51zm-3.032%209.156l-.146-.492c-.276-1.02-.395-2.457-.444-3.268a6.11%206.11%200%200%201-1.18.115%206.01%206.01%200%200%201-2.536-.562l.006.175c.802.215%201.848.612%202.021%201.25.079.295-.021.601-.274.837l-.598.501c.667.304%201.243.698%201.311%201.179.02.144.022.507-.393.787l-.564.365c1.285.521%201.361.96%201.381%201.126.018.142.011.496-.427.746l-.854.489c.064-1.19%201.985-2.585%202.697-3.248zM49.34%209.925c0-.667%201-.667%201%200%200%20.653.818%201.205%201.787%201.205s1.787-.552%201.787-1.205c0-.667%201-.667%201%200%200%201.216-1.25%202.205-2.787%202.205s-2.787-.989-2.787-2.205zm-.887-7.633c-.093.077-.205.114-.317.114a.5.5%200%200%201-.318-.886L49.183.397a.5.5%200%200%201%20.703.068.5.5%200%200%201-.069.703zm7.661-.065c-.086%200-.173-.022-.253-.068l-1.523-.893c-.575-.337-.069-1.2.506-.863l1.523.892a.5.5%200%200%201%20.179.685c-.094.158-.261.247-.432.247z%22%20fill%3D%22%233bb300%22/%3E%3C/svg%3E"/>
 
@@ -48,16 +48,16 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
-                    <a class="class" href="#MyDataloader">MyDataloader</a>
+                    <a class="class" href="#MyDataset">MyDataset</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#MyDataloader.__init__">MyDataloader</a>
+                                <a class="function" href="#MyDataset.__init__">MyDataset</a>
                         </li>
                         <li>
-                                <a class="function" href="#MyDataloader.reset">reset</a>
+                                <a class="variable" href="#MyDataset.strings">strings</a>
                         </li>
                         <li>
-                                <a class="function" href="#MyDataloader.load_next">load_next</a>
+                                <a class="function" href="#MyDataset.reinforce_type">reinforce_type</a>
                         </li>
                 </ul>
 
@@ -96,29 +96,15 @@
                         <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">wrangl.data</span> <span class="kn">import</span> <span class="n">Dataloader</span><span class="p">,</span> <span class="n">Processor</span>
+<span class="kn">from</span> <span class="nn">wrangl.data</span> <span class="kn">import</span> <span class="n">IterableDataset</span><span class="p">,</span> <span class="n">Processor</span>
 
 
-<span class="n">strings</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">]</span>
+<span class="k">class</span> <span class="nc">MyDataset</span><span class="p">(</span><span class="n">IterableDataset</span><span class="p">):</span>
 
+    <span class="n">strings</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">]</span>
 
-<span class="k">class</span> <span class="nc">MyDataloader</span><span class="p">(</span><span class="n">Dataloader</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">cache_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">strings</span> <span class="o">=</span> <span class="n">strings</span>
-
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
-
-    <span class="k">def</span> <span class="nf">load_next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strings</span><span class="p">):</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strings</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">return</span> <span class="n">ret</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strings</span><span class="p">,</span> <span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
@@ -129,42 +115,36 @@
 
 
 <span class="k">def</span> <span class="nf">run_no_process</span><span class="p">():</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">MyDataloader</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">loader</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">MyDataset</span><span class="o">.</span><span class="n">strings</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span>
 
 
 <span class="k">def</span> <span class="nf">run_ordered</span><span class="p">():</span>
     <span class="n">pool</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">([</span><span class="n">MyProcessor</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">MyDataloader</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">loader</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">run_unordered</span><span class="p">():</span>
     <span class="n">pool</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">([</span><span class="n">MyProcessor</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">MyDataloader</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">loader</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">run_no_process</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="n">strings</span> <span class="o">==</span> <span class="n">out</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">expect</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="o">*</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">MyDataset</span><span class="o">.</span><span class="n">strings</span><span class="p">]</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="n">run_ordered</span><span class="p">()</span>
-    <span class="n">expect</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="o">*</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">strings</span><span class="p">]</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">run_no_process</span><span class="p">()</span>
     <span class="k">assert</span> <span class="n">expect</span> <span class="o">==</span> <span class="n">out</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
-    <span class="n">expect</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="o">*</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">strings</span><span class="p">]</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">run_ordered</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">expect</span> <span class="o">==</span> <span class="n">out</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">run_unordered</span><span class="p">()</span>
     <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">expect</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 </pre></div>
@@ -172,118 +152,108 @@
         </details>
 
             </section>
-                <section id="MyDataloader">
+                <section id="MyDataset">
                                 <div class="attr class">
-        <a class="headerlink" href="#MyDataloader">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#MyDataset">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">MyDataloader</span><wbr>(<span class="base"><a href="../data/loader/dataloader.html#Dataloader">wrangl.data.loader.dataloader.Dataloader</a></span>):
+        <span class="name">MyDataset</span><wbr>(<span class="base">torch.utils.data.dataset.Dataset[+T_co]</span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">MyDataloader</span><span class="p">(</span><span class="n">Dataloader</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">MyDataset</span><span class="p">(</span><span class="n">IterableDataset</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">cache_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">strings</span> <span class="o">=</span> <span class="n">strings</span>
+    <span class="n">strings</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
-
-    <span class="k">def</span> <span class="nf">load_next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strings</span><span class="p">):</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strings</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">return</span> <span class="n">ret</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strings</span><span class="p">,</span> <span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>A generic dataloader that processes examples in parallel.</p>
+            <div class="docstring"><p>A generic torch.utils.data.IterableDataset that processes examples in parallel.</p>
 </div>
 
 
-                            <div id="MyDataloader.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#MyDataloader.__init__">#&nbsp;&nbsp</a>
+                            <div id="MyDataset.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#MyDataset.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">MyDataloader</span><span class="signature">(strings, pool: ray.util.actor_pool.ActorPool, cache_size: int = 1024)</span>
+            <span class="name">MyDataset</span><span class="signature">(
+    pool: ray.util.actor_pool.ActorPool,
+    cache_size: int = 1024,
+    shuffle: bool = False,
+    timeout: int = 10
+)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="n">cache_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">strings</span> <span class="o">=</span> <span class="n">strings</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strings</span><span class="p">,</span> <span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><h6 id="args">Args</h6>
+            <div class="docstring"><p>Processes list of examples.</p>
+
+<h6 id="args">Args</h6>
 
 <ul>
-<li><strong>pool:</strong>  pool of <code><a href="../data/loader/processor.html#Processor">wrangl.data.loader.processor.Processor</a></code>s to process each example. If not specified, then no processing will be done.</li>
+<li><strong>iterable:</strong>  list of examples to process.</li>
+<li><strong>pool:</strong>  pool of <code><a href="../data.html#loader.processor.Processor">wrangl.data.loader.processor.Processor</a></code>s to process each example. If not specified, then no processing will be done.</li>
 <li><strong>cache_size:</strong>  how many examples to keep in the cache.</li>
+<li><strong>shuffle:</strong>  pseudo random order (local shuffling within cache).</li>
+<li><strong>timeout:</strong>  processor timeout.</li>
 </ul>
 </div>
 
 
                             </div>
-                            <div id="MyDataloader.reset" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#MyDataloader.reset">#&nbsp;&nbsp</a>
+                            <div id="MyDataset.strings" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#MyDataset.strings">#&nbsp;&nbsp</a>
 
-        
-            <span class="def">def</span>
-            <span class="name">reset</span><span class="signature">(self)</span>:
+        <span class="name">strings</span><span class="default_value"> = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;, &#39;e&#39;, &#39;f&#39;, &#39;g&#39;]</span>
     </div>
 
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Resets the loader to load examples from scratch.</p>
-</div>
-
+    
 
                             </div>
-                            <div id="MyDataloader.load_next" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#MyDataloader.load_next">#&nbsp;&nbsp</a>
+                            <div id="MyDataset.reinforce_type" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#MyDataset.reinforce_type">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">load_next</span><span class="signature">(self)</span>:
+            <span class="name">reinforce_type</span><span class="signature">(self, expected_type)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">load_next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strings</span><span class="p">):</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strings</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">return</span> <span class="n">ret</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">reinforce_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reinforce the type for DataPipe instance. And the &#39;expected_type&#39; is required</span>
+<span class="sd">    to be a subtype of the original type hint to restrict the type requirement</span>
+<span class="sd">    of DataPipe instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expected_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">expected_type</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">expected_type</span><span class="p">]</span>
+    <span class="n">_type_check</span><span class="p">(</span><span class="n">expected_type</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;&#39;expected_type&#39; must be a type&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">issubtype</span><span class="p">(</span><span class="n">expected_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">param</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected &#39;expected_type&#39; as subtype of </span><span class="si">{}</span><span class="s2">, but found </span><span class="si">{}</span><span class="s2">&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">_type_repr</span><span class="p">(</span><span class="n">expected_type</span><span class="p">)))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">_DataPipeType</span><span class="p">(</span><span class="n">expected_type</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Loads unprocessed examples.</p>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>The next example. Otherwise returns <code>None</code> if there are no more examples to load.</p>
-</blockquote>
+            <div class="docstring"><p>Reinforce the type for DataPipe instance. And the 'expected_type' is required
+to be a subtype of the original type hint to restrict the type requirement
+of DataPipe instance.</p>
 </div>
 
 
@@ -291,9 +261,28 @@
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
-                                    <div><dt><a href="../data/loader/dataloader.html#Dataloader">wrangl.data.loader.dataloader.Dataloader</a></dt>
-                                <dd id="MyDataloader.batch" class="function"><a href="../data/loader/dataloader.html#Dataloader.batch">batch</a></dd>
-                <dd id="MyDataloader.close" class="function"><a href="../data/loader/dataloader.html#Dataloader.close">close</a></dd>
+                                    <div><dt><a href="../data/dataset.html#IterableDataset">wrangl.data.dataset.IterableDataset</a></dt>
+                                <dd id="MyDataset.iterate_unprocessed" class="function"><a href="../data/dataset.html#IterableDataset.iterate_unprocessed">iterate_unprocessed</a></dd>
+
+            </div>
+            <div><dt><a href="../data/dataset.html#Dataset">wrangl.data.dataset.Dataset</a></dt>
+                                <dd id="MyDataset.add" class="function"><a href="../data/dataset.html#Dataset.add">add</a></dd>
+                <dd id="MyDataset.cache_is_full" class="function"><a href="../data/dataset.html#Dataset.cache_is_full">cache_is_full</a></dd>
+                <dd id="MyDataset.cache_is_empty" class="function"><a href="../data/dataset.html#Dataset.cache_is_empty">cache_is_empty</a></dd>
+                <dd id="MyDataset.pop" class="function"><a href="../data/dataset.html#Dataset.pop">pop</a></dd>
+                <dd id="MyDataset.close" class="function"><a href="../data/dataset.html#Dataset.close">close</a></dd>
+
+            </div>
+            <div><dt>torch.utils.data.dataset.IterableDataset</dt>
+                                <dd id="MyDataset.functions" class="variable">functions</dd>
+                <dd id="MyDataset.reduce_ex_hook" class="variable">reduce_ex_hook</dd>
+                <dd id="MyDataset.set_reduce_ex_hook" class="function">set_reduce_ex_hook</dd>
+                <dd id="MyDataset.type" class="variable">type</dd>
+
+            </div>
+            <div><dt>torch.utils.data.dataset.Dataset</dt>
+                                <dd id="MyDataset.register_function" class="function">register_function</dd>
+                <dd id="MyDataset.register_datapipe_as_function" class="function">register_datapipe_as_function</dd>
 
             </div>
                                 </dl>
@@ -319,10 +308,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">run_no_process</span><span class="p">():</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">MyDataloader</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">loader</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">MyDataset</span><span class="o">.</span><span class="n">strings</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span>
 </pre></div>
 
@@ -343,11 +331,8 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">run_ordered</span><span class="p">():</span>
     <span class="n">pool</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">([</span><span class="n">MyProcessor</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">MyDataloader</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">loader</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -367,11 +352,8 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">run_unordered</span><span class="p">():</span>
     <span class="n">pool</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ActorPool</span><span class="p">([</span><span class="n">MyProcessor</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">MyDataloader</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">loader</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 </pre></div>
 
         </details>
