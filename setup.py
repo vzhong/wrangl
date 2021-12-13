@@ -79,6 +79,7 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
+        'learn': ['pytorch_lightning', 'wandb', 'hydra-submitit-launcher'],
         'dev': ['check-manifest', 'pdoc', 'twine'],
         'test': ['coverage', 'nose'],
     },
