@@ -24,7 +24,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='wrangl',
-    version='0.0.5',
+    version='0.0.6',
 
     python_requires='>3.7',
 
