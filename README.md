@@ -50,7 +50,6 @@ Here are some common use cases:
 
 Current supports:
 
-- annotating text files
 - plotting learning curves
 - autodocumenting this package
 

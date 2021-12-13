@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from . import annotator, plotter, docs
+from . import plotter, docs
 import unittest
 
 
@@ -7,7 +7,6 @@ def main():
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     subs = parser.add_subparsers(title='command', dest='cmd')
 
-    annotator.add_parser_arguments(subs.add_parser('annotate'))
     plotter.add_parser_arguments(subs.add_parser('plot'))
     docs.add_parser_arguments(subs.add_parser('autodoc'))
 
@@ -16,9 +15,7 @@ def main():
 
     args = parser.parse_args()
 
-    if args.cmd == 'annotate':
-        annotator.main(args)
-    elif args.cmd == 'plot':
+    if args.cmd == 'plot':
         plotter.main(args)
     elif args.cmd == 'autodoc':
         docs.main(args)
