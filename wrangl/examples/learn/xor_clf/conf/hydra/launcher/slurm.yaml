@@ -2,13 +2,13 @@
 submitit_folder: '${savedir}/submitit'
 timeout_min: 4320
 cpus_per_task: 8
-gpus_per_node: 1
+gpus_per_node: 0
 tasks_per_node: 1
 mem_gb: 64
 nodes: 1
 name: '${project}'
 _target_: hydra_plugins.hydra_submitit_launcher.submitit_launcher.SlurmLauncher
-partition: 'YOUR_SLURM_PARTITION'
+partition: null
 comment: null
 constraint: null
 exclude: null

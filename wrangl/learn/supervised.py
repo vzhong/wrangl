@@ -1,12 +1,15 @@
 import os
+import json
 import torch
 import random
 import logging
-import importlib
+import importlib.util
 import pytorch_lightning as pl
 from typing import List
 from torch.optim import Adam
+from omegaconf import OmegaConf
 from torch.utils.data import DataLoader
+from hydra.utils import get_original_cwd
 from .callbacks import WandbTableCallback
 from .metrics import Accuracy
 from pytorch_lightning import callbacks as C
@@ -17,7 +20,11 @@ class SupervisedModel(pl.LightningModule):
 
     @classmethod
     def load_model_class(cls, model_name):
-        Model = importlib.import_module('model.{}'.format(model_name)).Model
+        fname = os.path.join(get_original_cwd(), 'model', '{}.py'.format(model_name))
+        spec = importlib.util.spec_from_file_location(model_name, fname)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        Model = module.Model
         return Model
 
     def __init__(self, cfg):
@@ -92,9 +99,10 @@ class SupervisedModel(pl.LightningModule):
     def run_train_test(cls, cfg, train_dataset, eval_dataset):
         logger = logging.getLogger(name='{}:train_test'.format(cls.__name__))
         pl.utilities.seed.seed_everything(seed=cfg.seed, workers=True)
+        dout = os.getcwd()
 
         checkpoint = C.ModelCheckpoint(
-            dirpath=cfg.savedir,
+            dirpath=dout,
             monitor=cfg.early_stopping.monitor,
             mode=cfg.early_stopping.mode,
             filename='{epoch:02d}-{' + cfg.early_stopping.monitor + ':.4f}',
@@ -107,6 +115,9 @@ class SupervisedModel(pl.LightningModule):
         train_logger = None
         if cfg.wandb.enable:
             train_logger = WandbLogger(project=cfg.wandb.project, name=cfg.wandb.name, entity=cfg.wandb.entity)
+
+        fconfig = os.path.join(os.getcwd(), 'config.yaml')
+        OmegaConf.save(config=cfg, f=fconfig)
 
         model = cls(cfg)
 
@@ -129,13 +140,13 @@ class SupervisedModel(pl.LightningModule):
             auto_scale_batch_size=False,
             auto_select_gpus=cfg.gpus > 0,
             benchmark=True,
-            default_root_dir=cfg.savedir,
+            default_root_dir=dout,
             gradient_clip_val=cfg.grad_clip_norm,
             gradient_clip_algorithm='norm',
             log_every_n_steps=cfg.log_every_n_steps,
             val_check_interval=1 if cfg.debug else cfg.val_check_interval,
             limit_val_batches=cfg.limit_val_batches,
-            weights_save_path=os.path.join(cfg.savedir, 'weights'),
+            weights_save_path=os.path.join(dout, 'weights'),
             max_steps=cfg.max_steps,
             logger=train_logger,
             callbacks=[checkpoint] + model.get_callbacks(),
@@ -143,7 +154,7 @@ class SupervisedModel(pl.LightningModule):
         if not cfg.test_only:
             ckpt_path = None
             if cfg.autoresume:
-                ckpt_path = os.path.join(cfg.savedir, 'last.ckpt')
+                ckpt_path = os.path.join(dout, 'last.ckpt')
                 if not os.path.isfile(ckpt_path):
                     ckpt_path = None
             trainer.fit(model, train_loader, eval_loader, ckpt_path=ckpt_path)

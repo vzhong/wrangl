@@ -1,8 +1,9 @@
+defaults:
+  - override hydra/launcher: local.yaml
+
 ##########
 # launcher
 ##########
-defaults:
-  - override hydra/launcher: local  # use local launcher, alternatively use slurm
 hydra:
   run:
     dir: '${savedir}'

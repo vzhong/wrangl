@@ -61,8 +61,12 @@ def load_rl(dlogs: typing.List[pathlib.Path], n: int = 2):
             logging.error('Could not find {}'.format(flog))
             continue
         with flog.open('rt') as f:
-            for line in f:
-                log.append(json.loads(line))
+            for i, line in enumerate(f):
+                try:
+                    log.append(json.loads(line))
+                except Exception as e:
+                    print('Could not load line {}: {}'.format(i+1, line))
+                    raise e
         ret.append((name, log))
     return ret
 
