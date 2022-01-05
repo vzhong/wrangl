@@ -1,5 +1,4 @@
 import os
-import json
 import torch
 import random
 import logging
@@ -75,6 +74,8 @@ class SupervisedModel(pl.LightningModule):
         out = self.forward(feat, batch)
         loss = self.compute_loss(out, feat, batch)
         self.log('loss', loss)
+        perplexity = torch.exp(loss)
+        self.log('ppl', perplexity)
         return loss
 
     def validation_step(self, batch, batch_id, split='val'):
