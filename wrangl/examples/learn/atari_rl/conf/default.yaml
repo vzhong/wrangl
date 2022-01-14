@@ -7,7 +7,7 @@ defaults:
 name: '${model}-${suffix}'
 suffix: 'default'
 model: 'mymodel'
-project: 'wrangle-example-atari-rl'
+project: 'wrangl-example-atari-rl'
 peer: 0
 
 ##########
