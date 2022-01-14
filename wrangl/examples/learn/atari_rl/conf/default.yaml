@@ -7,7 +7,7 @@ defaults:
 name: '${model}-${suffix}'
 suffix: 'default'
 model: 'mymodel'
-project: 'wrangle-example-nethack-rl'
+project: 'wrangle-example-atari-rl'
 peer: 0
 
 ##########
@@ -59,7 +59,7 @@ discounting: 0.99
 entity: null
 entropy_cost: 0.0006
 env:
-  name: "ALE/Pong-v5"  # See https://brosa.ca/blog/ale-release-v0.7
+  name: "ALE/Breakout-v5"  # See https://brosa.ca/blog/ale-release-v0.7
   repeat_action_probability: 0.0  # Sticky action probability
   num_action_repeats: 4
   noop_max: 30

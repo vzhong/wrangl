@@ -6,3 +6,4 @@ pandas
 pdoc
 wandb
 hydra-core
+pytorch_lightning
