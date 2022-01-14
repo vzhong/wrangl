@@ -11,7 +11,7 @@ model:
   use_local_conv: false
   use_grid_attn: false
   field_attn: false
-  stateful: true
+  stateful: false
   num_film: 5
   demb: 100
   drnn: 200
@@ -22,11 +22,6 @@ env:
   time_penalty: -0.02
 project: 'wrangl-example-silg-rl'
 peer: 0
-
-##########
-# model params 
-##########
-dhid: 300
 
 ##########
 # launcher
@@ -59,8 +54,7 @@ localdir: "${savedir}/peers/${peer}"
 local_name: "${name}-${peer}"
 ckpt_path: '${savedir}/latest.ckpt'
 debug: false
-collate_fn: 'auto'  # use 'ignore' to pass an identity collate and define featurize instead
-max_steps: 50_000_000
+max_steps: 100_000_000
 autoresume: false
 
 device: 'cuda:0'
@@ -69,9 +63,7 @@ baseline_cost: 0.5
 batch_size: 8
 connect: 127.0.0.1:4431
 discounting: 0.99
-entity: null
-entropy_cost: 0.0006
-fixup_init: true
+entropy_cost: 0.05
 grad_clip_norm: 40
 log_fmt: "[%(levelname)s:${name} %(module)s:%(lineno)d %(asctime)s] %(message)s"
 log_interval: 10
@@ -79,13 +71,11 @@ checkpoint_interval: 600
 num_actor_batches: 2
 num_actor_cpus: 4
 optimizer:
-  learning_rate: 0.0006
-  beta_1: 0.9  # PyTorch default: 0.9
-  beta_2: 0.999  # PyTorch default: 0.999
-  epsilon: 1e-8  # PyTorch default: 1e-08
-state_counter: none
+  learning_rate: 0.0005
+  alpha: 0.99
+  momentum: 0
+  epsilon: 0.01  # PyTorch default: 1e-08
 unroll_length: 20
-use_lstm: false
 virtual_batch_size: 32
 reward_clip: 1.0
 warmup: 0

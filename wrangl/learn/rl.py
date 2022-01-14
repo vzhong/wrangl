@@ -2,7 +2,6 @@
 # Adapted from https://github.com/facebookresearch/moolib
 import copy
 import dataclasses
-import getpass
 import logging
 import os
 import pprint
@@ -83,10 +82,11 @@ class MoolibVtrace:
 
     @classmethod
     def create_optimizer(cls, model, FLAGS):
-        return torch.optim.Adam(
+        return torch.optim.RMSprop(
             model.parameters(),
             lr=FLAGS.optimizer.learning_rate,
-            betas=(FLAGS.optimizer.beta_1, FLAGS.optimizer.beta_2),
+            alpha=FLAGS.optimizer.alpha,
+            momentum=FLAGS.optimizer.momentum,
             eps=FLAGS.optimizer.epsilon,
         )
 
@@ -209,11 +209,7 @@ class MoolibVtrace:
         logging.info("flags:\n%s\n", pprint.pformat(dict(FLAGS)))
         logging.info("savedir: %s", FLAGS.savedir)
 
-        train_id = "%s/%s/%s" % (
-            FLAGS.entity if FLAGS.entity is not None else getpass.getuser(),
-            FLAGS.project,
-            FLAGS.name,
-        )
+        train_id = "%s/%s/%s" % (FLAGS.wandb.entity, FLAGS.wandb.project, FLAGS.wandb.name)
 
         logging.info("train_id: %s", train_id)
 
@@ -245,10 +241,10 @@ class MoolibVtrace:
 
         if FLAGS.wandb.enable:
             wandb.init(
-                project=str(FLAGS.project),
+                project=str(FLAGS.wandb.project),
                 config=omegaconf.OmegaConf.to_container(FLAGS),
-                entity=FLAGS.entity,
-                name=FLAGS.name,
+                entity=FLAGS.wandb.entity,
+                name=FLAGS.wandb.name,
             )
 
         env_states = [
