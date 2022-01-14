@@ -4,3 +4,5 @@ torch
 plotille
 pandas
 pdoc
+wandb
+hydra-core
