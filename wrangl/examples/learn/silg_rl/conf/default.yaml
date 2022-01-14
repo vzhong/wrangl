@@ -1,0 +1,91 @@
+defaults:
+  - override hydra/launcher: local.yaml
+
+##########
+# naming
+##########
+name: '${model.name}-${suffix}'
+suffix: 'default'
+model:
+  name: 'multi'
+  use_local_conv: false
+  use_grid_attn: false
+  field_attn: false
+  stateful: true
+  num_film: 5
+  demb: 100
+  drnn: 200
+  drep: 400
+
+env:
+  name: 'silg:rtfm_train_s1-v0'
+  time_penalty: -0.02
+project: 'wrangle-example-atari-rl'
+peer: 0
+
+##########
+# model params 
+##########
+dhid: 300
+
+##########
+# launcher
+##########
+hydra:
+  job:
+    name: '${name}'
+    env_set:
+      OMP_NUM_THREADS: '1'
+      RAY_OBJECT_STORE_ALLOW_SLOW_STORAGE: '1'
+  run:
+    dir: '${savedir}'
+  sweep:
+    dir: '${savedir}/sweep'
+
+##########
+# wandb
+##########
+wandb:  # wandb settings
+  enable: false
+  project: '${project}'
+  name: '${name}'
+  entity: '${oc.env:USER}'
+
+##########
+# training
+##########
+savedir: '${oc.env:PWD}/saves/${name}'
+localdir: "${savedir}/peers/${peer}"
+local_name: "${name}-${peer}"
+ckpt_path: '${savedir}/latest.ckpt'
+debug: false
+collate_fn: 'auto'  # use 'ignore' to pass an identity collate and define featurize instead
+max_steps: 50_000_000
+autoresume: false
+
+device: 'cuda:0'
+actor_batch_size: 32
+baseline_cost: 0.5
+batch_size: 8
+connect: 127.0.0.1:4431
+discounting: 0.99
+entity: null
+entropy_cost: 0.0006
+fixup_init: true
+grad_clip_norm: 40
+log_fmt: "[%(levelname)s:${name} %(module)s:%(lineno)d %(asctime)s] %(message)s"
+log_interval: 10
+checkpoint_interval: 600
+num_actor_batches: 2
+num_actor_cpus: 4
+optimizer:
+  learning_rate: 0.0006
+  beta_1: 0.9  # PyTorch default: 0.9
+  beta_2: 0.999  # PyTorch default: 0.999
+  epsilon: 1e-8  # PyTorch default: 1e-08
+state_counter: none
+unroll_length: 20
+use_lstm: false
+virtual_batch_size: 32
+reward_clip: 1.0
+warmup: 0
