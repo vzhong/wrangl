@@ -7,7 +7,7 @@ class Model(Base):
 
     def __init__(self, flags, env):
         super().__init__(flags, env)
-        self.id_emb = nn.Embedding(env.num_seg_ids, flags.demb)
+        self.id_emb = nn.Embedding(env.num_seg_ids, flags.model.demb)
         self.core_trans = nn.Linear(self.drep, 64)
 
     def encode_cell(self, inputs):

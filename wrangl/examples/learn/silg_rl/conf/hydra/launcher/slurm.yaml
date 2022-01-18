@@ -2,7 +2,7 @@
 submitit_folder: '${savedir}/submitit'
 timeout_min: 4320
 cpus_per_task: 8
-gpus_per_node: 0
+gpus_per_node: 1
 tasks_per_node: 1
 mem_gb: 64
 nodes: 1

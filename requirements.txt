@@ -6,4 +6,5 @@ pandas
 pdoc
 wandb
 hydra-core
+hydra-submitit-launcher
 pytorch_lightning

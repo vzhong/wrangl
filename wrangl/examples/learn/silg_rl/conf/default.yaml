@@ -4,7 +4,7 @@ defaults:
 ##########
 # naming
 ##########
-name: '${model.name}-${suffix}'
+name: '${env.name}-${model.name}-${suffix}'
 suffix: 'default'
 model:
   name: 'multi'
@@ -54,28 +54,28 @@ localdir: "${savedir}/peers/${peer}"
 local_name: "${name}-${peer}"
 ckpt_path: '${savedir}/latest.ckpt'
 debug: false
-max_steps: 100_000_000
+max_steps: 1_000_000_000
 autoresume: false
 
 device: 'cuda:0'
-actor_batch_size: 32
+actor_batch_size: 256
 baseline_cost: 0.5
-batch_size: 8
-connect: 127.0.0.1:4431
+batch_size: 128
+connect: '100.97.69.72:4431'
 discounting: 0.99
-entropy_cost: 0.05
+entropy_cost: 0.005
 grad_clip_norm: 40
 log_fmt: "[%(levelname)s:${name} %(module)s:%(lineno)d %(asctime)s] %(message)s"
 log_interval: 10
 checkpoint_interval: 600
 num_actor_batches: 2
-num_actor_cpus: 4
+num_actor_cpus: 10
 optimizer:
   learning_rate: 0.0005
   alpha: 0.99
   momentum: 0
   epsilon: 0.01  # PyTorch default: 1e-08
 unroll_length: 20
-virtual_batch_size: 32
+virtual_batch_size: 128
 reward_clip: 1.0
 warmup: 0
