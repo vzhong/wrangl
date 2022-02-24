@@ -100,7 +100,7 @@ class SupervisedModel(pl.LightningModule):
     def run_train_test(cls, cfg, train_dataset, eval_dataset):
         logger = logging.getLogger(name='{}:train_test'.format(cls.__name__))
         pl.utilities.seed.seed_everything(seed=cfg.seed, workers=True)
-        dout = os.getcwd()
+        dout = cfg.savedir
 
         checkpoint = C.ModelCheckpoint(
             dirpath=dout,

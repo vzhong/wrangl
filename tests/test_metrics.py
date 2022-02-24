@@ -1,31 +1,21 @@
 import unittest
-from wrangl import metrics as M
+from wrangl.learn import metrics as M
 
 
 class TestMetrics(unittest.TestCase):
 
     def test_accuracy(self):
         m = M.Accuracy()
-        self.assertTrue(m.single_forward('foo', 'foo'))
-        self.assertFalse(m.single_forward('foo', 'bar'))
-        self.assertDictEqual(dict(accuracy=0.5), m.forward([('foo', 'foo'), ('foo', 'bar')]))
-
-    def test_precision(self):
-        m = M.Precision()
-        self.assertEqual(0.25, m.single_forward({1, 2}, {2, 4, 5, 6}))
-        self.assertEqual(1, m.single_forward({1, 2, 4, 5}, {1, 4}))
-        self.assertDictEqual(dict(precision=1.25/2), m.forward([({1, 2}, {2, 4, 5, 6}), ({1, 2, 4, 5}, {1, 4})]))
-
-    def test_recall(self):
-        m = M.Recall()
-        self.assertEqual(0.5, m.single_forward({1, 2}, {2, 4, 5, 6}))
-        self.assertEqual(0.5, m.single_forward({1, 2, 4, 5}, {1, 4}))
-        self.assertDictEqual(dict(recall=0.5), m.forward([({1, 2}, {2, 4, 5, 6}), ({1, 2, 4, 5}, {1, 4})]))
+        self.assertDictEqual(dict(acc=True), m.compute_one('foo', 'foo'))
+        self.assertDictEqual(dict(acc=False), m.compute_one('bar', 'foo'))
+        self.assertDictEqual(dict(acc=0.5), m(['foo', 'foo'], ['foo', 'bar']))
 
     def test_f1(self):
-        m = M.F1Score()
-        a = 2*0.5*0.25/0.75
-        b = 2*0.5/1.5
-        self.assertEqual(a, m.single_forward({1, 2}, {2, 4, 5, 6}))
-        self.assertEqual(b, m.single_forward({1, 2, 4, 5}, {1, 4}))
-        self.assertDictEqual(dict(f1score=(a+b)/2), m.forward([({1, 2}, {2, 4, 5, 6}), ({1, 2, 4, 5}, {1, 4})]))
+        m = M.SetF1()
+        ax = {2, 4, 5, 6}, {1, 2}
+        bx = {1, 4}, {1, 2, 4, 5}
+        ay = dict(precision=1/4, recall=1/2, f1=2*0.25*0.5/(0.25+0.5))
+        by = dict(precision=2/2, recall=2/4, f1=2*1*0.5/(1+0.5))
+        self.assertDictEqual(ay, m.compute_one(*ax))
+        self.assertDictEqual(by, m.compute_one(*bx))
+        self.assertDictEqual({k: (ay[k]+by[k])/2 for k in ay.keys()}, m([ax[0], bx[0]], [ax[1], bx[1]]))
