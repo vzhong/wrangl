@@ -51,6 +51,7 @@ max_steps: 50_000_000
 autoresume: false
 
 device: 'cuda:0'
+strategy: null
 actor_batch_size: 32
 baseline_cost: 0.5
 batch_size: 8

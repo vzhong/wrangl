@@ -69,13 +69,21 @@ class SupervisedModel(pl.LightningModule):
     def infer(self, feat, batch):
         return self.forward(feat, batch)
 
+    def infer_batch_size(self, batch):
+        if isinstance(batch, list):
+            return len(batch)
+        if isinstance(batch, dict):
+            first_key = list(batch.keys())[0]
+            return len(batch[first_key])
+        return None
+
     def training_step(self, batch, batch_id):
         feat = self.featurize(batch)
         out = self.forward(feat, batch)
         loss = self.compute_loss(out, feat, batch)
-        self.log('loss', loss)
+        self.log('loss', loss, batch_size=self.infer_batch_size(batch))
         perplexity = torch.exp(loss)
-        self.log('ppl', perplexity)
+        self.log('ppl', perplexity, batch_size=self.infer_batch_size(batch))
         return loss
 
     def validation_step(self, batch, batch_id, split='val'):
@@ -88,7 +96,7 @@ class SupervisedModel(pl.LightningModule):
 
         metrics = self.compute_metrics(pred, gold)
         for k, v in metrics.items():
-            self.log('{}_{}'.format(split, k), v)
+            self.log('{}_{}'.format(split, k), v, batch_size=self.infer_batch_size(batch))
 
         # for logging to wandb
         sample_ids = list(range(len(context)))
@@ -97,7 +105,8 @@ class SupervisedModel(pl.LightningModule):
         self.pred_samples = [(context[i], pred[i], gold[i]) for i in sample_ids]
 
     @classmethod
-    def run_train_test(cls, cfg, train_dataset, eval_dataset):
+    def run_train_test(cls, cfg, train_dataset, eval_dataset, model_kwargs=None):
+        model_kwargs = model_kwargs or {}
         logger = logging.getLogger(name='{}:train_test'.format(cls.__name__))
         pl.utilities.seed.seed_everything(seed=cfg.seed, workers=True)
         dout = os.getcwd()
@@ -120,7 +129,7 @@ class SupervisedModel(pl.LightningModule):
         fconfig = os.path.join(os.getcwd(), 'config.yaml')
         OmegaConf.save(config=cfg, f=fconfig)
 
-        model = cls(cfg)
+        model = cls(cfg, **model_kwargs)
 
         logger.info('Loading data')
         if cfg.collate_fn == 'auto':
@@ -135,7 +144,7 @@ class SupervisedModel(pl.LightningModule):
 
         trainer = pl.Trainer(
             precision=cfg.precision,
-            strategy='dp',
+            strategy=cfg.strategy,
             gpus=cfg.gpus,
             auto_lr_find=False,
             auto_scale_batch_size=False,
