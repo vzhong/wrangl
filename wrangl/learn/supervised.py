@@ -107,9 +107,10 @@ class SupervisedModel(pl.LightningModule):
     @classmethod
     def run_train_test(cls, cfg, train_dataset, eval_dataset, model_kwargs=None):
         model_kwargs = model_kwargs or {}
-        logger = logging.getLogger(name='{}:train_test'.format(cls.__name__))
         pl.utilities.seed.seed_everything(seed=cfg.seed, workers=True)
         dout = cfg.savedir
+
+        logger = logging.getLogger(name='{}:train_test'.format(cls.__name__))
 
         checkpoint = C.ModelCheckpoint(
             dirpath=dout,
@@ -124,9 +125,9 @@ class SupervisedModel(pl.LightningModule):
 
         train_logger = None
         if cfg.wandb.enable:
-            train_logger = WandbLogger(project=cfg.wandb.project, name=cfg.wandb.name, entity=cfg.wandb.entity)
+            train_logger = WandbLogger(project=cfg.wandb.project, name=cfg.wandb.name, entity=cfg.wandb.entity, save_dir=dout)
 
-        fconfig = os.path.join(os.getcwd(), 'config.yaml')
+        fconfig = os.path.join(dout, 'config.yaml')
         OmegaConf.save(config=cfg, f=fconfig)
 
         model = cls(cfg, **model_kwargs)
