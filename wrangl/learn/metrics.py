@@ -1,13 +1,25 @@
-class Accuracy:
+from collections import defaultdict
+
+
+class Metric:
 
     def compute_one(self, pred, gold):
-        return pred == gold
+        """Computes metrics for one example"""
+        raise NotImplementedError()
 
     def __call__(self, pred, gold):
-        metrics = dict(acc=[])
+        metrics = defaultdict(list)
         for pi, gi in zip(pred, gold):
-            metrics['acc'].append(self.compute_one(pi, gi))
+            m = self.compute_one(pi, gi)
+            for k, v in m.items():
+                metrics[k].append(v)
         return {k: sum(v)/len(v) for k, v in metrics.items()}
+
+
+class Accuracy(Metric):
+
+    def compute_one(self, pred, gold):
+        return {'acc': pred == gold}
 
 
 class SetF1:
@@ -16,7 +28,8 @@ class SetF1:
         common = pred.intersection(gold)
         precision = len(common) / max(1, len(pred))
         recall = len(common) / max(1, len(gold))
-        f1 = precision * recall * 2 / max(1, precision + recall)
+        denom = precision + recall
+        f1 = (precision * recall * 2 / denom) if denom > 0 else 0
         return dict(f1=f1, precision=precision, recall=recall)
 
     def __call__(self, pred, gold, ignore_empty=False):

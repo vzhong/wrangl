@@ -25,7 +25,7 @@ hydra:
       OMP_NUM_THREADS: '1'
       RAY_OBJECT_STORE_ALLOW_SLOW_STORAGE: '1'
   run:
-    dir: '${savedir}'
+    dir: '${oc.env:PWD}'
   sweep:
     dir: '${savedir}/sweep'
 

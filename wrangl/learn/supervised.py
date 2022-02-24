@@ -109,7 +109,7 @@ class SupervisedModel(pl.LightningModule):
         model_kwargs = model_kwargs or {}
         logger = logging.getLogger(name='{}:train_test'.format(cls.__name__))
         pl.utilities.seed.seed_everything(seed=cfg.seed, workers=True)
-        dout = os.getcwd()
+        dout = cfg.savedir
 
         checkpoint = C.ModelCheckpoint(
             dirpath=dout,
