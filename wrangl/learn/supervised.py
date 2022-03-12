@@ -102,15 +102,20 @@ class SupervisedModel(pl.LightningModule):
         sample_ids = list(range(len(context)))
         random.shuffle(sample_ids)
         sample_ids = sample_ids[:self.hparams.val_sample_size]
-        self.pred_samples = [(context[i], pred[i], gold[i]) for i in sample_ids]
+
+        random.shuffle(self.pred_samples)
+        for i in sample_ids:
+            self.pred_samples.insert(0, (context[i], pred[i], gold[i]))
+        self.pred_samples = self.pred_samples[:self.hparams.val_sample_size]
 
     @classmethod
     def run_train_test(cls, cfg, train_dataset, eval_dataset, model_kwargs=None):
         model_kwargs = model_kwargs or {}
         pl.utilities.seed.seed_everything(seed=cfg.seed, workers=True)
-        dout = cfg.savedir
+        dout = os.getcwd()
 
         logger = logging.getLogger(name='{}:train_test'.format(cls.__name__))
+        logger.info('Logging to {}'.format(dout))
 
         checkpoint = C.ModelCheckpoint(
             dirpath=dout,
@@ -125,7 +130,7 @@ class SupervisedModel(pl.LightningModule):
 
         train_logger = None
         if cfg.wandb.enable:
-            train_logger = WandbLogger(project=cfg.wandb.project, name=cfg.wandb.name, entity=cfg.wandb.entity, save_dir=dout)
+            train_logger = WandbLogger(project=cfg.wandb.project, name=cfg.wandb.name, entity=cfg.wandb.entity, save_dir=cfg.wandb.dir)
 
         fconfig = os.path.join(dout, 'config.yaml')
         OmegaConf.save(config=cfg, f=fconfig)

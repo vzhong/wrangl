@@ -11,9 +11,9 @@ hydra:
       OMP_NUM_THREADS: '1'
       RAY_OBJECT_STORE_ALLOW_SLOW_STORAGE: '1'
   run:
-    dir: '${oc.env:PWD}'
+    dir: '${dproject}/${name}'
   sweep:
-    dir: '${savedir}/sweep'
+    dir: '${dproject}/sweep'
 
 ##########
 # wandb
@@ -27,7 +27,6 @@ wandb:  # wandb settings
 ##########
 # training
 ##########
-savedir: '${oc.env:PWD}/saves/${name}'
 early_stopping:
     monitor: 'val_acc'
     mode: 'max'
@@ -45,7 +44,7 @@ gpus: 0
 strategy: null
 test_only: false
 autoresume: false
-ckpt_path: '${savedir}/latest.ckpt'
+ckpt_path: 'latest.ckpt'
 learning_rate: 0.0001
 val_sample_size: 100
 
@@ -57,6 +56,7 @@ name: '${model}-${suffix}'
 suffix: 'default'
 model: 'mymodel'
 project: 'wrangle-example-xor-clf'
+dproject: '${oc.env:PWD}/saves/${project}'
 
 ##########
 # model params 
