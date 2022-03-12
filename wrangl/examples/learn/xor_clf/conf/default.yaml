@@ -23,6 +23,7 @@ wandb:  # wandb settings
   project: '${project}'
   name: '${name}'
   entity: '${oc.env:USER}'
+  dir: '${dproject}'
 
 ##########
 # training
