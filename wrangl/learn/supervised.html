@@ -1,0 +1,1646 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="pdoc 10.0.3"/>
+    <title>wrangl.learn.supervised API documentation</title>
+
+    <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
+    <style>/*! syntax-highlighting.css */pre{line-height:125%;}span.linenos{color:inherit; background-color:transparent; padding-left:5px; padding-right:20px;}.pdoc-code .hll{background-color:#ffffcc}.pdoc-code{background:#f8f8f8;}.pdoc-code .c{color:#3D7B7B; font-style:italic}.pdoc-code .err{border:1px solid #FF0000}.pdoc-code .k{color:#008000; font-weight:bold}.pdoc-code .o{color:#666666}.pdoc-code .ch{color:#3D7B7B; font-style:italic}.pdoc-code .cm{color:#3D7B7B; font-style:italic}.pdoc-code .cp{color:#9C6500}.pdoc-code .cpf{color:#3D7B7B; font-style:italic}.pdoc-code .c1{color:#3D7B7B; font-style:italic}.pdoc-code .cs{color:#3D7B7B; font-style:italic}.pdoc-code .gd{color:#A00000}.pdoc-code .ge{font-style:italic}.pdoc-code .gr{color:#E40000}.pdoc-code .gh{color:#000080; font-weight:bold}.pdoc-code .gi{color:#008400}.pdoc-code .go{color:#717171}.pdoc-code .gp{color:#000080; font-weight:bold}.pdoc-code .gs{font-weight:bold}.pdoc-code .gu{color:#800080; font-weight:bold}.pdoc-code .gt{color:#0044DD}.pdoc-code .kc{color:#008000; font-weight:bold}.pdoc-code .kd{color:#008000; font-weight:bold}.pdoc-code .kn{color:#008000; font-weight:bold}.pdoc-code .kp{color:#008000}.pdoc-code .kr{color:#008000; font-weight:bold}.pdoc-code .kt{color:#B00040}.pdoc-code .m{color:#666666}.pdoc-code .s{color:#BA2121}.pdoc-code .na{color:#687822}.pdoc-code .nb{color:#008000}.pdoc-code .nc{color:#0000FF; font-weight:bold}.pdoc-code .no{color:#880000}.pdoc-code .nd{color:#AA22FF}.pdoc-code .ni{color:#717171; font-weight:bold}.pdoc-code .ne{color:#CB3F38; font-weight:bold}.pdoc-code .nf{color:#0000FF}.pdoc-code .nl{color:#767600}.pdoc-code .nn{color:#0000FF; font-weight:bold}.pdoc-code .nt{color:#008000; font-weight:bold}.pdoc-code .nv{color:#19177C}.pdoc-code .ow{color:#AA22FF; font-weight:bold}.pdoc-code .w{color:#bbbbbb}.pdoc-code .mb{color:#666666}.pdoc-code .mf{color:#666666}.pdoc-code .mh{color:#666666}.pdoc-code .mi{color:#666666}.pdoc-code .mo{color:#666666}.pdoc-code .sa{color:#BA2121}.pdoc-code .sb{color:#BA2121}.pdoc-code .sc{color:#BA2121}.pdoc-code .dl{color:#BA2121}.pdoc-code .sd{color:#BA2121; font-style:italic}.pdoc-code .s2{color:#BA2121}.pdoc-code .se{color:#AA5D1F; font-weight:bold}.pdoc-code .sh{color:#BA2121}.pdoc-code .si{color:#A45A77; font-weight:bold}.pdoc-code .sx{color:#008000}.pdoc-code .sr{color:#A45A77}.pdoc-code .s1{color:#BA2121}.pdoc-code .ss{color:#19177C}.pdoc-code .bp{color:#008000}.pdoc-code .fm{color:#0000FF}.pdoc-code .vc{color:#19177C}.pdoc-code .vg{color:#19177C}.pdoc-code .vi{color:#19177C}.pdoc-code .vm{color:#19177C}.pdoc-code .il{color:#666666}</style>
+    <style>/*! theme.css */:root{--pdoc-background:#fff;}.pdoc{--text:#212529;--muted:#6c757d;--link:#3660a5;--link-hover:#1659c5;--code:#f8f8f8;--active:#fff598;--accent:#eee;--accent2:#c1c1c1;--nav-hover:rgba(255, 255, 255, 0.5);--name:#0066BB;--def:#008800;--annotation:#007020;}</style>
+    <style>/*! layout.css */html, body{width:100%;height:100%;}html, main{scroll-behavior:smooth;}body{background-color:var(--pdoc-background);}@media (max-width:769px){#navtoggle{cursor:pointer;position:absolute;width:50px;height:40px;top:1rem;right:1rem;border-color:var(--text);color:var(--text);display:flex;opacity:0.8;}#navtoggle:hover{opacity:1;}#togglestate + div{display:none;}#togglestate:checked + div{display:inherit;}main, header{padding:2rem 3vw;}header + main{margin-top:-3rem;}.git-button{display:none !important;}nav input[type="search"]{max-width:77%;}nav input[type="search"]:first-child{margin-top:-6px;}nav input[type="search"]:valid ~ *{display:none !important;}}@media (min-width:770px){:root{--sidebar-width:clamp(12.5rem, 28vw, 22rem);}nav{position:fixed;overflow:auto;height:100vh;width:var(--sidebar-width);}main, header{padding:3rem 2rem 3rem calc(var(--sidebar-width) + 3rem);width:calc(54rem + var(--sidebar-width));max-width:100%;}header + main{margin-top:-4rem;}#navtoggle{display:none;}}#togglestate{position:absolute;height:0;}nav.pdoc{--pad:1.75rem;--indent:1.5rem;background-color:var(--accent);border-right:1px solid var(--accent2);box-shadow:0 0 20px rgba(50, 50, 50, .2) inset;padding:0 0 0 var(--pad);overflow-wrap:anywhere;scrollbar-width:thin; scrollbar-color:var(--accent2) transparent }nav.pdoc::-webkit-scrollbar{width:.4rem; }nav.pdoc::-webkit-scrollbar-thumb{background-color:var(--accent2); }nav.pdoc > div{padding:var(--pad) 0;}nav.pdoc .module-list-button{display:inline-flex;align-items:center;color:var(--text);border-color:var(--muted);margin-bottom:1rem;}nav.pdoc .module-list-button:hover{border-color:var(--text);}nav.pdoc input[type=search]{display:block;outline-offset:0;width:calc(100% - var(--pad));}nav.pdoc .logo{max-width:calc(100% - var(--pad));max-height:35vh;display:block;margin:0 auto 1rem;transform:translate(calc(-.5 * var(--pad)), 0);}nav.pdoc ul{list-style:none;padding-left:0;}nav.pdoc li{display:block;margin:0;padding:.2rem 0 .2rem var(--indent);transition:all 100ms;}nav.pdoc > div > ul > li{padding-left:0;}nav.pdoc li:hover{background-color:var(--nav-hover);}nav.pdoc a, nav.pdoc a:hover{color:var(--text);}nav.pdoc a{display:block;}nav.pdoc > h2:first-of-type{margin-top:1.5rem;}nav.pdoc .class:before{content:"class ";color:var(--muted);}nav.pdoc .function:after{content:"()";color:var(--muted);}nav.pdoc footer:before{content:"";display:block;width:calc(100% - var(--pad));border-top:solid var(--accent2) 1px;margin-top:1.5rem;padding-top:.5rem;}nav.pdoc footer{font-size:small;}</style>
+    <style>/*! content.css */.pdoc{color:var(--text);box-sizing:border-box;line-height:1.5;background:none;}.pdoc .pdoc-button{display:inline-block;border:solid black 1px;border-radius:2px;font-size:.75rem;padding:calc(0.5em - 1px) 1em;transition:100ms all;}.pdoc .visually-hidden{position:absolute !important;width:1px !important;height:1px !important;padding:0 !important;margin:-1px !important;overflow:hidden !important;clip:rect(0, 0, 0, 0) !important;white-space:nowrap !important;border:0 !important;}.pdoc h1, .pdoc h2, .pdoc h3{font-weight:300;margin:.3em 0;padding:.2em 0;}.pdoc a{text-decoration:none;color:var(--link);}.pdoc a:hover{color:var(--link-hover);}.pdoc blockquote{margin-left:2rem;}.pdoc pre{border-top:1px solid var(--accent2);border-bottom:1px solid var(--accent2);margin-top:0;margin-bottom:1em;padding:.5rem 0 .5rem .5rem;overflow-x:auto;background-color:var(--code);}.pdoc code{color:var(--text);padding:.2em .4em;margin:0;font-size:85%;background-color:var(--code);border-radius:6px;}.pdoc a > code{color:inherit;}.pdoc pre > code{display:inline-block;font-size:inherit;background:none;border:none;padding:0;}.pdoc section{margin-bottom:1.5rem;}.pdoc .modulename{margin-top:0;font-weight:bold;}.pdoc .modulename a{color:var(--link);transition:100ms all;}.pdoc .git-button{float:right;border:solid var(--link) 1px;}.pdoc .git-button:hover{background-color:var(--link);color:var(--pdoc-background);}.pdoc details{filter:opacity(1);}.pdoc details:not([open]){height:0;}.pdoc details > summary{position:absolute;top:-35px;right:0;font-size:.75rem;color:var(--muted);padding:0 .7em;user-select:none;cursor:pointer;}.pdoc details > summary:focus{outline:0;}.pdoc .docstring{margin-bottom:1.5rem;}.pdoc > section:first-of-type > .docstring{margin-bottom:2.5rem;}.pdoc .docstring .pdoc-code{margin-left:1em;margin-right:1em;}.pdoc h1:target,.pdoc h2:target,.pdoc h3:target,.pdoc h4:target,.pdoc h5:target,.pdoc h6:target{background-color:var(--active);box-shadow:-1rem 0 0 0 var(--active);}.pdoc div:target > .attr,.pdoc section:target > .attr,.pdoc dd:target > a{background-color:var(--active);}.pdoc .attr:hover{filter:contrast(0.95);}.pdoc .headerlink{position:absolute;width:0;margin-left:-1.5rem;line-height:1.4rem;font-size:1.5rem;font-weight:normal;transition:all 100ms ease-in-out;opacity:0;user-select:none;}.pdoc .attr > .headerlink{margin-left:-2.5rem;}.pdoc *:hover > .headerlink,.pdoc *:target > .attr > .headerlink{opacity:1;}.pdoc .attr{display:block;color:var(--text);margin:.5rem 0 .5rem;padding:.4rem 5rem .4rem 1rem;background-color:var(--accent);}.pdoc .classattr{margin-left:2rem;}.pdoc .name{color:var(--name);font-weight:bold;}.pdoc .def{color:var(--def);font-weight:bold;}.pdoc .signature{white-space:pre-wrap;}.pdoc .annotation{color:var(--annotation);}.pdoc .inherited{margin-left:2rem;}.pdoc .inherited dt{font-weight:700;}.pdoc .inherited dt, .pdoc .inherited dd{display:inline;margin-left:0;margin-bottom:.5rem;}.pdoc .inherited dd:not(:last-child):after{content:", ";}.pdoc .inherited .class:before{content:"class ";}.pdoc .inherited .function a:after{content:"()";}.pdoc .search-result .docstring{overflow:auto;max-height:25vh;}.pdoc .search-result.focused > .attr{background-color:var(--active);}.pdoc .attribution{margin-top:2rem;display:block;opacity:0.5;transition:all 200ms;filter:grayscale(100%);}.pdoc .attribution:hover{opacity:1;filter:grayscale(0%);}.pdoc .attribution img{margin-left:5px;height:35px;vertical-align:middle;width:70px;transition:all 200ms;}.pdoc table{display:block;width:max-content;max-width:100%;overflow:auto;margin-bottom:1rem;}.pdoc table th{font-weight:600;}.pdoc table th, .pdoc table td{padding:6px 13px;border:1px solid var(--accent2);}</style>
+    <style>/*! custom.css */</style><script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']]
+        }
+    };
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+    /* Re-invoke MathJax when DOM content changes, for example during search. */
+    document.addEventListener("DOMContentLoaded", () => {
+        new MutationObserver(() => MathJax.typeset()).observe(
+            document.querySelector("main.pdoc").parentNode,
+            {childList: true}
+        );
+    })
+</script></head>
+<body>
+    <nav class="pdoc">
+        <label id="navtoggle" for="togglestate" class="pdoc-button"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg></label>
+        <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
+        <div>            <a class="pdoc-button module-list-button" href="../learn.html">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0v-2z"/>
+  <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+</svg>                &nbsp;wrangl.learn</a>
+
+
+            <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
+                   pattern=".+" required>
+
+
+
+        <h2>API Documentation</h2>
+            <ul class="memberlist">
+            <li>
+                    <a class="class" href="#SupervisedModel">SupervisedModel</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#SupervisedModel.__init__">SupervisedModel</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.load_model_class">load_model_class</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.get_callbacks">get_callbacks</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.configure_optimizers">configure_optimizers</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.featurize">featurize</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.compute_metrics">compute_metrics</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.compute_loss">compute_loss</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.extract_context">extract_context</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.extract_pred">extract_pred</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.extract_gold">extract_gold</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.forward">forward</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.infer">infer</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.infer_batch_size">infer_batch_size</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.training_step">training_step</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.validation_step">validation_step</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SupervisedModel.run_train_test">run_train_test</a>
+                        </li>
+                </ul>
+
+            </li>
+    </ul>
+
+
+            <footer>Copyright @2022 by Victor Zhong</footer>
+
+        <a class="attribution" title="pdoc: Python API documentation generator" href="https://pdoc.dev">
+            built with <span class="visually-hidden">pdoc</span><img
+                alt="pdoc logo"
+                src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20role%3D%22img%22%20aria-label%3D%22pdoc%20logo%22%20width%3D%22300%22%20height%3D%22150%22%20viewBox%3D%22-1%200%2060%2030%22%3E%3Ctitle%3Epdoc%3C/title%3E%3Cpath%20d%3D%22M29.621%2021.293c-.011-.273-.214-.475-.511-.481a.5.5%200%200%200-.489.503l-.044%201.393c-.097.551-.695%201.215-1.566%201.704-.577.428-1.306.486-2.193.182-1.426-.617-2.467-1.654-3.304-2.487l-.173-.172a3.43%203.43%200%200%200-.365-.306.49.49%200%200%200-.286-.196c-1.718-1.06-4.931-1.47-7.353.191l-.219.15c-1.707%201.187-3.413%202.131-4.328%201.03-.02-.027-.49-.685-.141-1.763.233-.721.546-2.408.772-4.076.042-.09.067-.187.046-.288.166-1.347.277-2.625.241-3.351%201.378-1.008%202.271-2.586%202.271-4.362%200-.976-.272-1.935-.788-2.774-.057-.094-.122-.18-.184-.268.033-.167.052-.339.052-.516%200-1.477-1.202-2.679-2.679-2.679-.791%200-1.496.352-1.987.9a6.3%206.3%200%200%200-1.001.029c-.492-.564-1.207-.929-2.012-.929-1.477%200-2.679%201.202-2.679%202.679A2.65%202.65%200%200%200%20.97%206.554c-.383.747-.595%201.572-.595%202.41%200%202.311%201.507%204.29%203.635%205.107-.037.699-.147%202.27-.423%203.294l-.137.461c-.622%202.042-2.515%208.257%201.727%2010.643%201.614.908%203.06%201.248%204.317%201.248%202.665%200%204.492-1.524%205.322-2.401%201.476-1.559%202.886-1.854%206.491.82%201.877%201.393%203.514%201.753%204.861%201.068%202.223-1.713%202.811-3.867%203.399-6.374.077-.846.056-1.469.054-1.537zm-4.835%204.313c-.054.305-.156.586-.242.629-.034-.007-.131-.022-.307-.157-.145-.111-.314-.478-.456-.908.221.121.432.25.675.355.115.039.219.051.33.081zm-2.251-1.238c-.05.33-.158.648-.252.694-.022.001-.125-.018-.307-.157-.217-.166-.488-.906-.639-1.573.358.344.754.693%201.198%201.036zm-3.887-2.337c-.006-.116-.018-.231-.041-.342.635.145%201.189.368%201.599.625.097.231.166.481.174.642-.03.049-.055.101-.067.158-.046.013-.128.026-.298.004-.278-.037-.901-.57-1.367-1.087zm-1.127-.497c.116.306.176.625.12.71-.019.014-.117.045-.345.016-.206-.027-.604-.332-.986-.695.41-.051.816-.056%201.211-.031zm-4.535%201.535c.209.22.379.47.358.598-.006.041-.088.138-.351.234-.144.055-.539-.063-.979-.259a11.66%2011.66%200%200%200%20.972-.573zm.983-.664c.359-.237.738-.418%201.126-.554.25.237.479.548.457.694-.006.042-.087.138-.351.235-.174.064-.694-.105-1.232-.375zm-3.381%201.794c-.022.145-.061.29-.149.401-.133.166-.358.248-.69.251h-.002c-.133%200-.306-.26-.45-.621.417.091.854.07%201.291-.031zm-2.066-8.077a4.78%204.78%200%200%201-.775-.584c.172-.115.505-.254.88-.378l-.105.962zm-.331%202.302a10.32%2010.32%200%200%201-.828-.502c.202-.143.576-.328.984-.49l-.156.992zm-.45%202.157l-.701-.403c.214-.115.536-.249.891-.376a11.57%2011.57%200%200%201-.19.779zm-.181%201.716c.064.398.194.702.298.893-.194-.051-.435-.162-.736-.398.061-.119.224-.3.438-.495zM8.87%204.141c0%20.152-.123.276-.276.276s-.275-.124-.275-.276.123-.276.276-.276.275.124.275.276zm-.735-.389a1.15%201.15%200%200%200-.314.783%201.16%201.16%200%200%200%201.162%201.162c.457%200%20.842-.27%201.032-.653.026.117.042.238.042.362a1.68%201.68%200%200%201-1.679%201.679%201.68%201.68%200%200%201-1.679-1.679c0-.843.626-1.535%201.436-1.654zM5.059%205.406A1.68%201.68%200%200%201%203.38%207.085a1.68%201.68%200%200%201-1.679-1.679c0-.037.009-.072.011-.109.21.3.541.508.935.508a1.16%201.16%200%200%200%201.162-1.162%201.14%201.14%200%200%200-.474-.912c.015%200%20.03-.005.045-.005.926.001%201.679.754%201.679%201.68zM3.198%204.141c0%20.152-.123.276-.276.276s-.275-.124-.275-.276.123-.276.276-.276.275.124.275.276zM1.375%208.964c0-.52.103-1.035.288-1.52.466.394%201.06.64%201.717.64%201.144%200%202.116-.725%202.499-1.738.383%201.012%201.355%201.738%202.499%201.738.867%200%201.631-.421%202.121-1.062.307.605.478%201.267.478%201.942%200%202.486-2.153%204.51-4.801%204.51s-4.801-2.023-4.801-4.51zm24.342%2019.349c-.985.498-2.267.168-3.813-.979-3.073-2.281-5.453-3.199-7.813-.705-1.315%201.391-4.163%203.365-8.423.97-3.174-1.786-2.239-6.266-1.261-9.479l.146-.492c.276-1.02.395-2.457.444-3.268a6.11%206.11%200%200%200%201.18.115%206.01%206.01%200%200%200%202.536-.562l-.006.175c-.802.215-1.848.612-2.021%201.25-.079.295.021.601.274.837.219.203.415.364.598.501-.667.304-1.243.698-1.311%201.179-.02.144-.022.507.393.787.213.144.395.26.564.365-1.285.521-1.361.96-1.381%201.126-.018.142-.011.496.427.746l.854.489c-.473.389-.971.914-.999%201.429-.018.278.095.532.316.713.675.556%201.231.721%201.653.721.059%200%20.104-.014.158-.02.207.707.641%201.64%201.513%201.64h.013c.8-.008%201.236-.345%201.462-.626.173-.216.268-.457.325-.692.424.195.93.374%201.372.374.151%200%20.294-.021.423-.068.732-.27.944-.704.993-1.021.009-.061.003-.119.002-.179.266.086.538.147.789.147.15%200%20.294-.021.423-.069.542-.2.797-.489.914-.754.237.147.478.258.704.288.106.014.205.021.296.021.356%200%20.595-.101.767-.229.438.435%201.094.992%201.656%201.067.106.014.205.021.296.021a1.56%201.56%200%200%200%20.323-.035c.17.575.453%201.289.866%201.605.358.273.665.362.914.362a.99.99%200%200%200%20.421-.093%201.03%201.03%200%200%200%20.245-.164c.168.428.39.846.68%201.068.358.273.665.362.913.362a.99.99%200%200%200%20.421-.093c.317-.148.512-.448.639-.762.251.157.495.257.726.257.127%200%20.25-.024.37-.071.427-.17.706-.617.841-1.314.022-.015.047-.022.068-.038.067-.051.133-.104.196-.159-.443%201.486-1.107%202.761-2.086%203.257zM8.66%209.925a.5.5%200%201%200-1%200c0%20.653-.818%201.205-1.787%201.205s-1.787-.552-1.787-1.205a.5.5%200%201%200-1%200c0%201.216%201.25%202.205%202.787%202.205s2.787-.989%202.787-2.205zm4.4%2015.965l-.208.097c-2.661%201.258-4.708%201.436-6.086.527-1.542-1.017-1.88-3.19-1.844-4.198a.4.4%200%200%200-.385-.414c-.242-.029-.406.164-.414.385-.046%201.249.367%203.686%202.202%204.896.708.467%201.547.7%202.51.7%201.248%200%202.706-.392%204.362-1.174l.185-.086a.4.4%200%200%200%20.205-.527c-.089-.204-.326-.291-.527-.206zM9.547%202.292c.093.077.205.114.317.114a.5.5%200%200%200%20.318-.886L8.817.397a.5.5%200%200%200-.703.068.5.5%200%200%200%20.069.703l1.364%201.124zm-7.661-.065c.086%200%20.173-.022.253-.068l1.523-.893a.5.5%200%200%200-.506-.863l-1.523.892a.5.5%200%200%200-.179.685c.094.158.261.247.432.247z%22%20transform%3D%22matrix%28-1%200%200%201%2058%200%29%22%20fill%3D%22%233bb300%22/%3E%3Cpath%20d%3D%22M.3%2021.86V10.18q0-.46.02-.68.04-.22.18-.5.28-.54%201.34-.54%201.06%200%201.42.28.38.26.44.78.76-1.04%202.38-1.04%201.64%200%203.1%201.54%201.46%201.54%201.46%203.58%200%202.04-1.46%203.58-1.44%201.54-3.08%201.54-1.64%200-2.38-.92v4.04q0%20.46-.04.68-.02.22-.18.5-.14.3-.5.42-.36.12-.98.12-.62%200-1-.12-.36-.12-.52-.4-.14-.28-.18-.5-.02-.22-.02-.68zm3.96-9.42q-.46.54-.46%201.18%200%20.64.46%201.18.48.52%201.2.52.74%200%201.24-.52.52-.52.52-1.18%200-.66-.48-1.18-.48-.54-1.26-.54-.76%200-1.22.54zm14.741-8.36q.16-.3.54-.42.38-.12%201-.12.64%200%201.02.12.38.12.52.42.16.3.18.54.04.22.04.68v11.94q0%20.46-.04.7-.02.22-.18.5-.3.54-1.7.54-1.38%200-1.54-.98-.84.96-2.34.96-1.8%200-3.28-1.56-1.48-1.58-1.48-3.66%200-2.1%201.48-3.68%201.5-1.58%203.28-1.58%201.48%200%202.3%201v-4.2q0-.46.02-.68.04-.24.18-.52zm-3.24%2010.86q.52.54%201.26.54.74%200%201.22-.54.5-.54.5-1.18%200-.66-.48-1.22-.46-.56-1.26-.56-.8%200-1.28.56-.48.54-.48%201.2%200%20.66.52%201.2zm7.833-1.2q0-2.4%201.68-3.96%201.68-1.56%203.84-1.56%202.16%200%203.82%201.56%201.66%201.54%201.66%203.94%200%201.66-.86%202.96-.86%201.28-2.1%201.9-1.22.6-2.54.6-1.32%200-2.56-.64-1.24-.66-2.1-1.92-.84-1.28-.84-2.88zm4.18%201.44q.64.48%201.3.48.66%200%201.32-.5.66-.5.66-1.48%200-.98-.62-1.46-.62-.48-1.34-.48-.72%200-1.34.5-.62.5-.62%201.48%200%20.96.64%201.46zm11.412-1.44q0%20.84.56%201.32.56.46%201.18.46.64%200%201.18-.36.56-.38.9-.38.6%200%201.46%201.06.46.58.46%201.04%200%20.76-1.1%201.42-1.14.8-2.8.8-1.86%200-3.58-1.34-.82-.64-1.34-1.7-.52-1.08-.52-2.36%200-1.3.52-2.34.52-1.06%201.34-1.7%201.66-1.32%203.54-1.32.76%200%201.48.22.72.2%201.06.4l.32.2q.36.24.56.38.52.4.52.92%200%20.5-.42%201.14-.72%201.1-1.38%201.1-.38%200-1.08-.44-.36-.34-1.04-.34-.66%200-1.24.48-.58.48-.58%201.34z%22%20fill%3D%22green%22/%3E%3C/svg%3E"/>
+        </a>
+</div>
+    </nav>
+    <main class="pdoc">
+            <section>
+                        <a class="pdoc-button git-button" href="https://github.com/vzhong/wrangl/blob/main/wrangl/learn/supervised.py">Edit on GitHub</a>
+                    <h1 class="modulename">
+<a href="./../../wrangl.html">wrangl</a><wbr>.<a href="./../learn.html">learn</a><wbr>.supervised    </h1>
+
+                
+                        <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">importlib.util</span>
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">OmegaConf</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">hydra.utils</span> <span class="kn">import</span> <span class="n">get_original_cwd</span>
+<span class="kn">from</span> <span class="nn">.callbacks</span> <span class="kn">import</span> <span class="n">WandbTableCallback</span>
+<span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="n">Accuracy</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">callbacks</span> <span class="k">as</span> <span class="n">C</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning.loggers</span> <span class="kn">import</span> <span class="n">WandbLogger</span>
+
+
+<span class="k">class</span> <span class="nc">SupervisedModel</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load_model_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_name</span><span class="p">):</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_original_cwd</span><span class="p">(),</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.py&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="n">Model</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">Model</span>
+        <span class="k">return</span> <span class="n">Model</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">get_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">WandbTableCallback</span><span class="p">()]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">enable</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">optimizer</span>
+
+    <span class="k">def</span> <span class="nf">featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a batch of examples to features.</span>
+<span class="sd">        By default this returns the batch as is.</span>
+
+<span class="sd">        Alternatively you may want to set `collate_fn: &quot;ignore&quot;` in your config and use `featurize` to convert raw examples into features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">batch</span>
+
+    <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">gold</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">Accuracy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">m</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">gold</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">extract_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">extract_pred</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">extract_gold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">infer_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">first_key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">first_key</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_id</span><span class="p">):</span>
+        <span class="n">feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;loss&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infer_batch_size</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+        <span class="n">perplexity</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;ppl&#39;</span><span class="p">,</span> <span class="n">perplexity</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infer_batch_size</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">loss</span>
+
+    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_id</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;val&#39;</span><span class="p">):</span>
+        <span class="n">feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_context</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="n">gold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_gold</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+        <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_metrics</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">gold</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infer_batch_size</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+
+        <span class="c1"># for logging to wandb</span>
+        <span class="n">sample_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">context</span><span class="p">)))</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">sample_ids</span><span class="p">)</span>
+        <span class="n">sample_ids</span> <span class="o">=</span> <span class="n">sample_ids</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">val_sample_size</span><span class="p">]</span>
+
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sample_ids</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">pred</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">gold</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">val_sample_size</span><span class="p">]</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_train_test</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">eval_dataset</span><span class="p">,</span> <span class="n">model_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">model_kwargs</span> <span class="o">=</span> <span class="n">model_kwargs</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">seed</span><span class="o">.</span><span class="n">seed_everything</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">dout</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">:train_test&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Logging to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dout</span><span class="p">))</span>
+
+        <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">ModelCheckpoint</span><span class="p">(</span>
+            <span class="n">dirpath</span><span class="o">=</span><span class="n">dout</span><span class="p">,</span>
+            <span class="n">monitor</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">monitor</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{epoch:02d}</span><span class="s1">-{&#39;</span> <span class="o">+</span> <span class="n">cfg</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">monitor</span> <span class="o">+</span> <span class="s1">&#39;:.4f}&#39;</span><span class="p">,</span>
+            <span class="n">every_n_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">save_top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">save_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">train_logger</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">enable</span><span class="p">:</span>
+            <span class="n">train_logger</span> <span class="o">=</span> <span class="n">WandbLogger</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">entity</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">entity</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">dir</span><span class="p">)</span>
+
+        <span class="n">fconfig</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dout</span><span class="p">,</span> <span class="s1">&#39;config.yaml&#39;</span><span class="p">)</span>
+        <span class="n">OmegaConf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">fconfig</span><span class="p">)</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="o">**</span><span class="n">model_kwargs</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading data&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">collate_fn</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+            <span class="n">collate_fn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">cfg</span><span class="o">.</span><span class="n">collate_fn</span> <span class="o">==</span> <span class="s1">&#39;ignore&#39;</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">collate_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">batch</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">collate_fn</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">collate_fn</span>
+        <span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">)</span>
+        <span class="n">eval_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">)</span>
+
+        <span class="n">trainer</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
+            <span class="n">precision</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
+            <span class="n">strategy</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">strategy</span><span class="p">,</span>
+            <span class="n">gpus</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">gpus</span><span class="p">,</span>
+            <span class="n">auto_lr_find</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">auto_scale_batch_size</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">auto_select_gpus</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">gpus</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">benchmark</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">default_root_dir</span><span class="o">=</span><span class="n">dout</span><span class="p">,</span>
+            <span class="n">gradient_clip_val</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">grad_clip_norm</span><span class="p">,</span>
+            <span class="n">gradient_clip_algorithm</span><span class="o">=</span><span class="s1">&#39;norm&#39;</span><span class="p">,</span>
+            <span class="n">log_every_n_steps</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">log_every_n_steps</span><span class="p">,</span>
+            <span class="n">val_check_interval</span><span class="o">=</span><span class="mi">1</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="n">cfg</span><span class="o">.</span><span class="n">val_check_interval</span><span class="p">,</span>
+            <span class="n">limit_val_batches</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">limit_val_batches</span><span class="p">,</span>
+            <span class="n">weights_save_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dout</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span><span class="p">),</span>
+            <span class="n">max_steps</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_steps</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="n">train_logger</span><span class="p">,</span>
+            <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">checkpoint</span><span class="p">]</span> <span class="o">+</span> <span class="n">model</span><span class="o">.</span><span class="n">get_callbacks</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">test_only</span><span class="p">:</span>
+            <span class="n">ckpt_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">autoresume</span><span class="p">:</span>
+                <span class="n">ckpt_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dout</span><span class="p">,</span> <span class="s1">&#39;last.ckpt&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">ckpt_path</span><span class="p">):</span>
+                    <span class="n">ckpt_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">eval_loader</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Finished!&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            </section>
+                <section id="SupervisedModel">
+                                <div class="attr class">
+        <a class="headerlink" href="#SupervisedModel">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">SupervisedModel</span><wbr>(<span class="base">pytorch_lightning.core.lightning.LightningModule</span>):
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SupervisedModel</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load_model_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_name</span><span class="p">):</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_original_cwd</span><span class="p">(),</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.py&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="n">Model</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">Model</span>
+        <span class="k">return</span> <span class="n">Model</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">get_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">WandbTableCallback</span><span class="p">()]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">enable</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">optimizer</span>
+
+    <span class="k">def</span> <span class="nf">featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a batch of examples to features.</span>
+<span class="sd">        By default this returns the batch as is.</span>
+
+<span class="sd">        Alternatively you may want to set `collate_fn: &quot;ignore&quot;` in your config and use `featurize` to convert raw examples into features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">batch</span>
+
+    <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">gold</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">Accuracy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">m</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">gold</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">extract_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">extract_pred</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">extract_gold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">infer_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">first_key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">first_key</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_id</span><span class="p">):</span>
+        <span class="n">feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;loss&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infer_batch_size</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+        <span class="n">perplexity</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;ppl&#39;</span><span class="p">,</span> <span class="n">perplexity</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infer_batch_size</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">loss</span>
+
+    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_id</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;val&#39;</span><span class="p">):</span>
+        <span class="n">feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_context</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="n">gold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_gold</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+        <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_metrics</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">gold</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infer_batch_size</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+
+        <span class="c1"># for logging to wandb</span>
+        <span class="n">sample_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">context</span><span class="p">)))</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">sample_ids</span><span class="p">)</span>
+        <span class="n">sample_ids</span> <span class="o">=</span> <span class="n">sample_ids</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">val_sample_size</span><span class="p">]</span>
+
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sample_ids</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">pred</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">gold</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">val_sample_size</span><span class="p">]</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_train_test</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">eval_dataset</span><span class="p">,</span> <span class="n">model_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">model_kwargs</span> <span class="o">=</span> <span class="n">model_kwargs</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">seed</span><span class="o">.</span><span class="n">seed_everything</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">dout</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">:train_test&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Logging to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dout</span><span class="p">))</span>
+
+        <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">ModelCheckpoint</span><span class="p">(</span>
+            <span class="n">dirpath</span><span class="o">=</span><span class="n">dout</span><span class="p">,</span>
+            <span class="n">monitor</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">monitor</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{epoch:02d}</span><span class="s1">-{&#39;</span> <span class="o">+</span> <span class="n">cfg</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">monitor</span> <span class="o">+</span> <span class="s1">&#39;:.4f}&#39;</span><span class="p">,</span>
+            <span class="n">every_n_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">save_top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">save_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">train_logger</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">enable</span><span class="p">:</span>
+            <span class="n">train_logger</span> <span class="o">=</span> <span class="n">WandbLogger</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">entity</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">entity</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">dir</span><span class="p">)</span>
+
+        <span class="n">fconfig</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dout</span><span class="p">,</span> <span class="s1">&#39;config.yaml&#39;</span><span class="p">)</span>
+        <span class="n">OmegaConf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">fconfig</span><span class="p">)</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="o">**</span><span class="n">model_kwargs</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading data&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">collate_fn</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+            <span class="n">collate_fn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">cfg</span><span class="o">.</span><span class="n">collate_fn</span> <span class="o">==</span> <span class="s1">&#39;ignore&#39;</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">collate_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">batch</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">collate_fn</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">collate_fn</span>
+        <span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">)</span>
+        <span class="n">eval_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">)</span>
+
+        <span class="n">trainer</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
+            <span class="n">precision</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
+            <span class="n">strategy</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">strategy</span><span class="p">,</span>
+            <span class="n">gpus</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">gpus</span><span class="p">,</span>
+            <span class="n">auto_lr_find</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">auto_scale_batch_size</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">auto_select_gpus</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">gpus</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">benchmark</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">default_root_dir</span><span class="o">=</span><span class="n">dout</span><span class="p">,</span>
+            <span class="n">gradient_clip_val</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">grad_clip_norm</span><span class="p">,</span>
+            <span class="n">gradient_clip_algorithm</span><span class="o">=</span><span class="s1">&#39;norm&#39;</span><span class="p">,</span>
+            <span class="n">log_every_n_steps</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">log_every_n_steps</span><span class="p">,</span>
+            <span class="n">val_check_interval</span><span class="o">=</span><span class="mi">1</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="n">cfg</span><span class="o">.</span><span class="n">val_check_interval</span><span class="p">,</span>
+            <span class="n">limit_val_batches</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">limit_val_batches</span><span class="p">,</span>
+            <span class="n">weights_save_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dout</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span><span class="p">),</span>
+            <span class="n">max_steps</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_steps</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="n">train_logger</span><span class="p">,</span>
+            <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">checkpoint</span><span class="p">]</span> <span class="o">+</span> <span class="n">model</span><span class="o">.</span><span class="n">get_callbacks</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">test_only</span><span class="p">:</span>
+            <span class="n">ckpt_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">autoresume</span><span class="p">:</span>
+                <span class="n">ckpt_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dout</span><span class="p">,</span> <span class="s1">&#39;last.ckpt&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">ckpt_path</span><span class="p">):</span>
+                    <span class="n">ckpt_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">eval_loader</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Finished!&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Hooks to be used in LightningModule.</p>
+</div>
+
+
+                            <div id="SupervisedModel.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">SupervisedModel</span><span class="signature">(cfg)</span>
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SupervisedModel.load_model_class" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.load_model_class">#&nbsp;&nbsp</a>
+
+                <div class="decorator">@classmethod</div>
+
+            <span class="def">def</span>
+            <span class="name">load_model_class</span><span class="signature">(cls, model_name)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load_model_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_name</span><span class="p">):</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_original_cwd</span><span class="p">(),</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.py&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="n">Model</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">Model</span>
+        <span class="k">return</span> <span class="n">Model</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SupervisedModel.get_callbacks" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.get_callbacks">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_callbacks</span><span class="signature">(self)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">WandbTableCallback</span><span class="p">()]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">enable</span> <span class="k">else</span> <span class="p">[]</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SupervisedModel.configure_optimizers" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.configure_optimizers">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">configure_optimizers</span><span class="signature">(self)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">optimizer</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Choose what optimizers and learning-rate schedulers to use in your optimization.
+Normally you'd need one. But in the case of GANs or similar you might have multiple.</p>
+
+<h6 id="return">Return</h6>
+
+<blockquote>
+  <p>Any of these 6 options.</p>
+  
+  <ul>
+  <li><strong>Single optimizer</strong>.</li>
+  <li><strong>List or Tuple</strong> of optimizers.</li>
+  <li><strong>Two lists</strong> - The first list has multiple optimizers, and the second has multiple LR schedulers
+  (or multiple <code>lr_scheduler_config</code>).</li>
+  <li><strong>Dictionary</strong>, with an <code>"optimizer"</code> key, and (optionally) a <code>"lr_scheduler"</code>
+  key whose value is a single LR scheduler or <code>lr_scheduler_config</code>.</li>
+  <li><strong>Tuple of dictionaries</strong> as described above, with an optional <code>"frequency"</code> key.</li>
+  <li><strong>None</strong> - Fit will run without any optimizer.</li>
+  </ul>
+</blockquote>
+
+<p>The <code>lr_scheduler_config</code> is a dictionary which contains the scheduler and its associated configuration.
+The default configuration is shown below.</p>
+
+<p>.. code-block:: python</p>
+
+<pre><code>lr_scheduler_config = {
+    # REQUIRED: The scheduler instance
+    "scheduler": lr_scheduler,
+    # The unit of the scheduler's step size, could also be 'step'.
+    # 'epoch' updates the scheduler on epoch end whereas 'step'
+    # updates it after a optimizer update.
+    "interval": "epoch",
+    # How many epochs/steps should pass between calls to
+    # `scheduler.step()`. 1 corresponds to updating the learning
+    # rate after every epoch/step.
+    "frequency": 1,
+    # Metric to to monitor for schedulers like `ReduceLROnPlateau`
+    "monitor": "val_loss",
+    # If set to `True`, will enforce that the value specified 'monitor'
+    # is available when the scheduler is updated, thus stopping
+    # training if not found. If set to `False`, it will only produce a warning
+    "strict": True,
+    # If using the `LearningRateMonitor` callback to monitor the
+    # learning rate progress, this keyword can be used to specify
+    # a custom logged name
+    "name": None,
+}
+</code></pre>
+
+<p>When there are schedulers in which the <code>.step()</code> method is conditioned on a value, such as the
+<code>torch.optim.lr_scheduler.ReduceLROnPlateau</code> scheduler, Lightning requires that the
+<code>lr_scheduler_config</code> contains the keyword <code>"monitor"</code> set to the metric name that the scheduler
+should be conditioned on.</p>
+
+<p>.. testcode::</p>
+
+<pre><code># The ReduceLROnPlateau scheduler requires a monitor
+def configure_optimizers(self):
+    optimizer = Adam(...)
+    return {
+        "optimizer": optimizer,
+        "lr_scheduler": {
+            "scheduler": ReduceLROnPlateau(optimizer, ...),
+            "monitor": "metric_to_track",
+            "frequency": "indicates how often the metric is updated"
+            # If "monitor" references validation metrics, then "frequency" should be set to a
+            # multiple of "trainer.check_val_every_n_epoch".
+        },
+    }
+
+
+# In the case of two optimizers, only one using the ReduceLROnPlateau scheduler
+def configure_optimizers(self):
+    optimizer1 = Adam(...)
+    optimizer2 = SGD(...)
+    scheduler1 = ReduceLROnPlateau(optimizer1, ...)
+    scheduler2 = LambdaLR(optimizer2, ...)
+    return (
+        {
+            "optimizer": optimizer1,
+            "lr_scheduler": {
+                "scheduler": scheduler1,
+                "monitor": "metric_to_track",
+            },
+        },
+        {"optimizer": optimizer2, "lr_scheduler": scheduler2},
+    )
+</code></pre>
+
+<p>Metrics can be made available to monitor by simply logging it using
+<code>self.log('metric_to_track', metric_val)</code> in your <code>~pytorch_lightning.core.lightning.LightningModule</code>.</p>
+
+<h6 id="note">Note</h6>
+
+<blockquote>
+  <p>The <code>frequency</code> value specified in a dict along with the <code>optimizer</code> key is an int corresponding
+  to the number of sequential batches optimized with the specific optimizer.
+  It should be given to none or to all of the optimizers.
+  There is a difference between passing multiple optimizers in a list,
+  and passing multiple optimizers in dictionaries with a frequency of 1:</p>
+
+<pre><code>- In the former case, all optimizers will operate on the given batch in each optimization step.
+- In the latter, only one optimizer will operate on the given batch at every step.
+</code></pre>
+  
+  <p>This is different from the <code>frequency</code> value specified in the <code>lr_scheduler_config</code> mentioned above.</p>
+  
+  <p>.. code-block:: python</p>
+
+<pre><code>def configure_optimizers(self):
+    optimizer_one = torch.optim.SGD(self.model.parameters(), lr=0.01)
+    optimizer_two = torch.optim.SGD(self.model.parameters(), lr=0.01)
+    return [
+        {"optimizer": optimizer_one, "frequency": 5},
+        {"optimizer": optimizer_two, "frequency": 10},
+    ]
+</code></pre>
+  
+  <p>In this example, the first optimizer will be used for the first 5 steps,
+  the second optimizer for the next 10 steps and that cycle will continue.
+  If an LR scheduler is specified for an optimizer using the <code>lr_scheduler</code> key in the above dict,
+  the scheduler will only be updated when its optimizer is being used.</p>
+</blockquote>
+
+<p>Examples::</p>
+
+<pre><code># most cases. no learning rate scheduler
+def configure_optimizers(self):
+    return Adam(self.parameters(), lr=1e-3)
+
+# multiple optimizer case (e.g.: GAN)
+def configure_optimizers(self):
+    gen_opt = Adam(self.model_gen.parameters(), lr=0.01)
+    dis_opt = Adam(self.model_dis.parameters(), lr=0.02)
+    return gen_opt, dis_opt
+
+# example with learning rate schedulers
+def configure_optimizers(self):
+    gen_opt = Adam(self.model_gen.parameters(), lr=0.01)
+    dis_opt = Adam(self.model_dis.parameters(), lr=0.02)
+    dis_sch = CosineAnnealing(dis_opt, T_max=10)
+    return [gen_opt, dis_opt], [dis_sch]
+
+# example with step-based learning rate schedulers
+# each optimizer has its own scheduler
+def configure_optimizers(self):
+    gen_opt = Adam(self.model_gen.parameters(), lr=0.01)
+    dis_opt = Adam(self.model_dis.parameters(), lr=0.02)
+    gen_sch = {
+        'scheduler': ExponentialLR(gen_opt, 0.99),
+        'interval': 'step'  # called after each training step
+    }
+    dis_sch = CosineAnnealing(dis_opt, T_max=10) # called every epoch
+    return [gen_opt, dis_opt], [gen_sch, dis_sch]
+
+# example with optimizer frequencies
+# see training procedure in `Improved Training of Wasserstein GANs`, Algorithm 1
+# https://arxiv.org/abs/1704.00028
+def configure_optimizers(self):
+    gen_opt = Adam(self.model_gen.parameters(), lr=0.01)
+    dis_opt = Adam(self.model_dis.parameters(), lr=0.02)
+    n_critic = 5
+    return (
+        {'optimizer': dis_opt, 'frequency': n_critic},
+        {'optimizer': gen_opt, 'frequency': 1}
+    )
+</code></pre>
+
+<h6 id="note-2">Note</h6>
+
+<blockquote>
+  <p>Some things to know:</p>
+  
+  <ul>
+  <li>Lightning calls <code>.backward()</code> and <code>.step()</code> on each optimizer and learning rate scheduler as needed.</li>
+  <li>If you use 16-bit precision (<code>precision=16</code>), Lightning will automatically handle the optimizers.</li>
+  <li>If you use multiple optimizers, <code><a href="#SupervisedModel.training_step">training_step</a></code> will have an additional <code>optimizer_idx</code> parameter.</li>
+  <li>If you use <code>torch.optim.LBFGS</code>, Lightning handles the closure function automatically for you.</li>
+  <li>If you use multiple optimizers, gradients will be calculated only for the parameters of current optimizer
+  at each training step.</li>
+  <li>If you need to control how often those optimizers step or override the default <code>.step()</code> schedule,
+  override the <code><a href="#SupervisedModel.optimizer_step">optimizer_step</a></code> hook.</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                            </div>
+                            <div id="SupervisedModel.featurize" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.featurize">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">featurize</span><span class="signature">(self, batch)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a batch of examples to features.</span>
+<span class="sd">        By default this returns the batch as is.</span>
+
+<span class="sd">        Alternatively you may want to set `collate_fn: &quot;ignore&quot;` in your config and use `featurize` to convert raw examples into features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">batch</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Converts a batch of examples to features.
+By default this returns the batch as is.</p>
+
+<p>Alternatively you may want to set <code>collate_fn: "ignore"</code> in your config and use <code><a href="#SupervisedModel.featurize">featurize</a></code> to convert raw examples into features.</p>
+</div>
+
+
+                            </div>
+                            <div id="SupervisedModel.compute_metrics" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.compute_metrics">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">compute_metrics</span><span class="signature">(self, pred, gold) -&gt; dict</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">gold</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">Accuracy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">m</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">gold</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SupervisedModel.compute_loss" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.compute_loss">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">compute_loss</span><span class="signature">(self, out, feat, batch) -&gt; torch.Tensor</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SupervisedModel.extract_context" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.extract_context">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">extract_context</span><span class="signature">(self, out, feat, batch) -&gt; List</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extract_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SupervisedModel.extract_pred" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.extract_pred">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">extract_pred</span><span class="signature">(self, out, feat, batch) -&gt; List</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extract_pred</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SupervisedModel.extract_gold" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.extract_gold">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">extract_gold</span><span class="signature">(self, feat, batch) -&gt; List</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extract_gold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SupervisedModel.forward" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.forward">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">forward</span><span class="signature">(self, feat, batch)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Same as <code>torch.nn.Module.forward()</code>.</p>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>*args:</strong>  Whatever you decide to pass into the forward method.</li>
+<li><strong>**kwargs:</strong>  Keyword arguments are also possible.</li>
+</ul>
+
+<h6 id="return">Return</h6>
+
+<blockquote>
+  <p>Your model's output</p>
+</blockquote>
+</div>
+
+
+                            </div>
+                            <div id="SupervisedModel.infer" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.infer">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">infer</span><span class="signature">(self, feat, batch)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SupervisedModel.infer_batch_size" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.infer_batch_size">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">infer_batch_size</span><span class="signature">(self, batch)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">infer_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">first_key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">first_key</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SupervisedModel.training_step" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.training_step">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">training_step</span><span class="signature">(self, batch, batch_id)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_id</span><span class="p">):</span>
+        <span class="n">feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;loss&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infer_batch_size</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+        <span class="n">perplexity</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;ppl&#39;</span><span class="p">,</span> <span class="n">perplexity</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infer_batch_size</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">loss</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Here you compute and return the training loss and some additional metrics for e.g.
+the progress bar or logger.</p>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>batch (<code>~torch.Tensor</code> | (<code>~torch.Tensor</code>, ...) | [<code>~torch.Tensor</code>, ...]):</strong>  The output of your <code>~torch.utils.data.DataLoader</code>. A tensor, tuple or list.</li>
+<li><strong>batch_idx (<code>int</code>):</strong>  Integer displaying index of this batch</li>
+<li><strong>optimizer_idx (<code>int</code>):</strong>  When using multiple optimizers, this argument will also be present.</li>
+<li><strong>hiddens (<code>Any</code>):</strong>  Passed in if
+:paramref:<code>~pytorch_lightning.core.lightning.LightningModule.truncated_bptt_steps</code> &gt; 0.</li>
+</ul>
+
+<h6 id="return">Return</h6>
+
+<blockquote>
+  <p>Any of.</p>
+  
+  <ul>
+  <li><code>~torch.Tensor</code> - The loss tensor</li>
+  <li><code>dict</code> - A dictionary. Can include any keys, but must include the key <code>'loss'</code></li>
+  <li><code>None</code> - Training will skip to the next batch. This is only for automatic optimization.
+  This is not supported for multi-GPU, TPU, IPU, or DeepSpeed.</li>
+  </ul>
+</blockquote>
+
+<p>In this step you'd normally do the forward pass and calculate the loss for a batch.
+You can also do fancier things like multiple forward passes or something model specific.</p>
+
+<p>Example::</p>
+
+<pre><code>def training_step(self, batch, batch_idx):
+    x, y, z = batch
+    out = self.encoder(x)
+    loss = self.loss(out, x)
+    return loss
+</code></pre>
+
+<p>If you define multiple optimizers, this step will be called with an additional
+<code>optimizer_idx</code> parameter.</p>
+
+<p>.. code-block:: python</p>
+
+<pre><code># Multiple optimizers (e.g.: GANs)
+def training_step(self, batch, batch_idx, optimizer_idx):
+    if optimizer_idx == 0:
+        # do training_step with encoder
+        ...
+    if optimizer_idx == 1:
+        # do training_step with decoder
+        ...
+</code></pre>
+
+<p>If you add truncated back propagation through time you will also get an additional
+argument with the hidden states of the previous step.</p>
+
+<p>.. code-block:: python</p>
+
+<pre><code># Truncated back-propagation through time
+def training_step(self, batch, batch_idx, hiddens):
+    # hiddens are the hidden states from the previous truncated backprop step
+    out, hiddens = self.lstm(data, hiddens)
+    loss = ...
+    return {"loss": loss, "hiddens": hiddens}
+</code></pre>
+
+<h6 id="note">Note</h6>
+
+<blockquote>
+  <p>The loss value shown in the progress bar is smoothed (averaged) over the last values,
+  so it differs from the actual loss returned in train/validation step.</p>
+</blockquote>
+</div>
+
+
+                            </div>
+                            <div id="SupervisedModel.validation_step" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.validation_step">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">validation_step</span><span class="signature">(self, batch, batch_id, split=&#39;val&#39;)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_id</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;val&#39;</span><span class="p">):</span>
+        <span class="n">feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_context</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="n">gold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_gold</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_pred</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+        <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_metrics</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">gold</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infer_batch_size</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+
+        <span class="c1"># for logging to wandb</span>
+        <span class="n">sample_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">context</span><span class="p">)))</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">sample_ids</span><span class="p">)</span>
+        <span class="n">sample_ids</span> <span class="o">=</span> <span class="n">sample_ids</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">val_sample_size</span><span class="p">]</span>
+
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sample_ids</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">pred</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">gold</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_samples</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">val_sample_size</span><span class="p">]</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Operates on a single batch of data from the validation set.
+In this step you'd might generate examples or calculate anything of interest like accuracy.</p>
+
+<p>.. code-block:: python</p>
+
+<pre><code># the pseudocode for these calls
+val_outs = []
+for val_batch in val_data:
+    out = validation_step(val_batch)
+    val_outs.append(out)
+validation_epoch_end(val_outs)
+</code></pre>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>batch (<code>~torch.Tensor</code> | (<code>~torch.Tensor</code>, ...) | [<code>~torch.Tensor</code>, ...]):</strong>  The output of your <code>~torch.utils.data.DataLoader</code>. A tensor, tuple or list.</li>
+<li><strong>batch_idx (int):</strong>  The index of this batch</li>
+<li><strong>dataloader_idx (int):</strong>  The index of the dataloader that produced this batch
+(only if multiple val dataloaders used)</li>
+</ul>
+
+<h6 id="return">Return</h6>
+
+<blockquote>
+  <ul>
+  <li>Any object or value</li>
+  <li><code>None</code> - Validation will skip to the next batch</li>
+  </ul>
+</blockquote>
+
+<p>.. code-block:: python</p>
+
+<pre><code># pseudocode of order
+val_outs = []
+for val_batch in val_data:
+    out = validation_step(val_batch)
+    if defined("validation_step_end"):
+        out = validation_step_end(out)
+    val_outs.append(out)
+val_outs = validation_epoch_end(val_outs)
+</code></pre>
+
+<p>.. code-block:: python</p>
+
+<pre><code># if you have one val dataloader:
+def validation_step(self, batch, batch_idx):
+    ...
+
+
+# if you have multiple val dataloaders:
+def validation_step(self, batch, batch_idx, dataloader_idx):
+    ...
+</code></pre>
+
+<p>Examples::</p>
+
+<pre><code># CASE 1: A single validation dataset
+def validation_step(self, batch, batch_idx):
+    x, y = batch
+
+    # implement your own
+    out = self(x)
+    loss = self.loss(out, y)
+
+    # log 6 example images
+    # or generated text... or whatever
+    sample_imgs = x[:6]
+    grid = torchvision.utils.make_grid(sample_imgs)
+    self.logger.experiment.add_image('example_images', grid, 0)
+
+    # calculate acc
+    labels_hat = torch.argmax(out, dim=1)
+    val_acc = torch.sum(y == labels_hat).item() / (len(y) * 1.0)
+
+    # log the outputs!
+    self.log_dict({'val_loss': loss, 'val_acc': val_acc})
+</code></pre>
+
+<p>If you pass in multiple val dataloaders, <code><a href="#SupervisedModel.validation_step">validation_step</a></code> will have an additional argument.</p>
+
+<p>.. code-block:: python</p>
+
+<pre><code># CASE 2: multiple validation dataloaders
+def validation_step(self, batch, batch_idx, dataloader_idx):
+    # dataloader_idx tells you which dataset this is.
+    ...
+</code></pre>
+
+<h6 id="note">Note</h6>
+
+<blockquote>
+  <p>If you don't need to validate you don't need to implement this method.</p>
+</blockquote>
+
+<h6 id="note-2">Note</h6>
+
+<blockquote>
+  <p>When the <code><a href="#SupervisedModel.validation_step">validation_step</a></code> is called, the model has been put in eval mode
+  and PyTorch gradients have been disabled. At the end of validation,
+  the model goes back to training mode and gradients are enabled.</p>
+</blockquote>
+</div>
+
+
+                            </div>
+                            <div id="SupervisedModel.run_train_test" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SupervisedModel.run_train_test">#&nbsp;&nbsp</a>
+
+                <div class="decorator">@classmethod</div>
+
+            <span class="def">def</span>
+            <span class="name">run_train_test</span><span class="signature">(cls, cfg, train_dataset, eval_dataset, model_kwargs=None)</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_train_test</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">eval_dataset</span><span class="p">,</span> <span class="n">model_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">model_kwargs</span> <span class="o">=</span> <span class="n">model_kwargs</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">seed</span><span class="o">.</span><span class="n">seed_everything</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">dout</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">:train_test&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Logging to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dout</span><span class="p">))</span>
+
+        <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">ModelCheckpoint</span><span class="p">(</span>
+            <span class="n">dirpath</span><span class="o">=</span><span class="n">dout</span><span class="p">,</span>
+            <span class="n">monitor</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">monitor</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{epoch:02d}</span><span class="s1">-{&#39;</span> <span class="o">+</span> <span class="n">cfg</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">monitor</span> <span class="o">+</span> <span class="s1">&#39;:.4f}&#39;</span><span class="p">,</span>
+            <span class="n">every_n_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">save_top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">save_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">train_logger</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">enable</span><span class="p">:</span>
+            <span class="n">train_logger</span> <span class="o">=</span> <span class="n">WandbLogger</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">entity</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">entity</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">wandb</span><span class="o">.</span><span class="n">dir</span><span class="p">)</span>
+
+        <span class="n">fconfig</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dout</span><span class="p">,</span> <span class="s1">&#39;config.yaml&#39;</span><span class="p">)</span>
+        <span class="n">OmegaConf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">fconfig</span><span class="p">)</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="o">**</span><span class="n">model_kwargs</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading data&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">collate_fn</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+            <span class="n">collate_fn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">cfg</span><span class="o">.</span><span class="n">collate_fn</span> <span class="o">==</span> <span class="s1">&#39;ignore&#39;</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">collate_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">batch</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">collate_fn</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">collate_fn</span>
+        <span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">)</span>
+        <span class="n">eval_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">)</span>
+
+        <span class="n">trainer</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
+            <span class="n">precision</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
+            <span class="n">strategy</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">strategy</span><span class="p">,</span>
+            <span class="n">gpus</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">gpus</span><span class="p">,</span>
+            <span class="n">auto_lr_find</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">auto_scale_batch_size</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">auto_select_gpus</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">gpus</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">benchmark</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">default_root_dir</span><span class="o">=</span><span class="n">dout</span><span class="p">,</span>
+            <span class="n">gradient_clip_val</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">grad_clip_norm</span><span class="p">,</span>
+            <span class="n">gradient_clip_algorithm</span><span class="o">=</span><span class="s1">&#39;norm&#39;</span><span class="p">,</span>
+            <span class="n">log_every_n_steps</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">log_every_n_steps</span><span class="p">,</span>
+            <span class="n">val_check_interval</span><span class="o">=</span><span class="mi">1</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="n">cfg</span><span class="o">.</span><span class="n">val_check_interval</span><span class="p">,</span>
+            <span class="n">limit_val_batches</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">limit_val_batches</span><span class="p">,</span>
+            <span class="n">weights_save_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dout</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span><span class="p">),</span>
+            <span class="n">max_steps</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_steps</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="n">train_logger</span><span class="p">,</span>
+            <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">checkpoint</span><span class="p">]</span> <span class="o">+</span> <span class="n">model</span><span class="o">.</span><span class="n">get_callbacks</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">test_only</span><span class="p">:</span>
+            <span class="n">ckpt_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">autoresume</span><span class="p">:</span>
+                <span class="n">ckpt_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dout</span><span class="p">,</span> <span class="s1">&#39;last.ckpt&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">ckpt_path</span><span class="p">):</span>
+                    <span class="n">ckpt_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">eval_loader</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Finished!&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt>pytorch_lightning.core.lightning.LightningModule</dt>
+                                <dd id="SupervisedModel.optimizers" class="function">optimizers</dd>
+                <dd id="SupervisedModel.lr_schedulers" class="function">lr_schedulers</dd>
+                <dd id="SupervisedModel.example_input_array" class="variable">example_input_array</dd>
+                <dd id="SupervisedModel.current_epoch" class="variable">current_epoch</dd>
+                <dd id="SupervisedModel.global_step" class="variable">global_step</dd>
+                <dd id="SupervisedModel.global_rank" class="variable">global_rank</dd>
+                <dd id="SupervisedModel.local_rank" class="variable">local_rank</dd>
+                <dd id="SupervisedModel.loaded_optimizer_states_dict" class="variable">loaded_optimizer_states_dict</dd>
+                <dd id="SupervisedModel.on_gpu" class="variable">on_gpu</dd>
+                <dd id="SupervisedModel.automatic_optimization" class="variable">automatic_optimization</dd>
+                <dd id="SupervisedModel.truncated_bptt_steps" class="variable">truncated_bptt_steps</dd>
+                <dd id="SupervisedModel.logger" class="variable">logger</dd>
+                <dd id="SupervisedModel.print" class="function">print</dd>
+                <dd id="SupervisedModel.log" class="function">log</dd>
+                <dd id="SupervisedModel.log_dict" class="function">log_dict</dd>
+                <dd id="SupervisedModel.log_grad_norm" class="function">log_grad_norm</dd>
+                <dd id="SupervisedModel.all_gather" class="function">all_gather</dd>
+                <dd id="SupervisedModel.training_step_end" class="function">training_step_end</dd>
+                <dd id="SupervisedModel.training_epoch_end" class="function">training_epoch_end</dd>
+                <dd id="SupervisedModel.validation_step_end" class="function">validation_step_end</dd>
+                <dd id="SupervisedModel.validation_epoch_end" class="function">validation_epoch_end</dd>
+                <dd id="SupervisedModel.test_step" class="function">test_step</dd>
+                <dd id="SupervisedModel.test_step_end" class="function">test_step_end</dd>
+                <dd id="SupervisedModel.test_epoch_end" class="function">test_epoch_end</dd>
+                <dd id="SupervisedModel.predict_step" class="function">predict_step</dd>
+                <dd id="SupervisedModel.configure_callbacks" class="function">configure_callbacks</dd>
+                <dd id="SupervisedModel.manual_backward" class="function">manual_backward</dd>
+                <dd id="SupervisedModel.backward" class="function">backward</dd>
+                <dd id="SupervisedModel.toggle_optimizer" class="function">toggle_optimizer</dd>
+                <dd id="SupervisedModel.untoggle_optimizer" class="function">untoggle_optimizer</dd>
+                <dd id="SupervisedModel.clip_gradients" class="function">clip_gradients</dd>
+                <dd id="SupervisedModel.configure_gradient_clipping" class="function">configure_gradient_clipping</dd>
+                <dd id="SupervisedModel.optimizer_step" class="function">optimizer_step</dd>
+                <dd id="SupervisedModel.optimizer_zero_grad" class="function">optimizer_zero_grad</dd>
+                <dd id="SupervisedModel.tbptt_split_batch" class="function">tbptt_split_batch</dd>
+                <dd id="SupervisedModel.summarize" class="function">summarize</dd>
+                <dd id="SupervisedModel.freeze" class="function">freeze</dd>
+                <dd id="SupervisedModel.unfreeze" class="function">unfreeze</dd>
+                <dd id="SupervisedModel.get_progress_bar_dict" class="function">get_progress_bar_dict</dd>
+                <dd id="SupervisedModel.to_onnx" class="function">to_onnx</dd>
+                <dd id="SupervisedModel.to_torchscript" class="function">to_torchscript</dd>
+                <dd id="SupervisedModel.model_size" class="variable">model_size</dd>
+                <dd id="SupervisedModel.add_to_queue" class="function">add_to_queue</dd>
+                <dd id="SupervisedModel.get_from_queue" class="function">get_from_queue</dd>
+
+            </div>
+            <div><dt>pytorch_lightning.core.mixins.device_dtype_mixin.DeviceDtypeModuleMixin</dt>
+                                <dd id="SupervisedModel.dtype" class="variable">dtype</dd>
+                <dd id="SupervisedModel.device" class="variable">device</dd>
+                <dd id="SupervisedModel.to" class="function">to</dd>
+                <dd id="SupervisedModel.cuda" class="function">cuda</dd>
+                <dd id="SupervisedModel.cpu" class="function">cpu</dd>
+                <dd id="SupervisedModel.type" class="function">type</dd>
+                <dd id="SupervisedModel.float" class="function">float</dd>
+                <dd id="SupervisedModel.double" class="function">double</dd>
+                <dd id="SupervisedModel.half" class="function">half</dd>
+
+            </div>
+            <div><dt>pytorch_lightning.core.mixins.hparams_mixin.HyperparametersMixin</dt>
+                                <dd id="SupervisedModel.save_hyperparameters" class="function">save_hyperparameters</dd>
+                <dd id="SupervisedModel.hparams" class="variable">hparams</dd>
+                <dd id="SupervisedModel.hparams_initial" class="variable">hparams_initial</dd>
+
+            </div>
+            <div><dt>pytorch_lightning.core.saving.ModelIO</dt>
+                                <dd id="SupervisedModel.CHECKPOINT_HYPER_PARAMS_KEY" class="variable">CHECKPOINT_HYPER_PARAMS_KEY</dd>
+                <dd id="SupervisedModel.CHECKPOINT_HYPER_PARAMS_NAME" class="variable">CHECKPOINT_HYPER_PARAMS_NAME</dd>
+                <dd id="SupervisedModel.CHECKPOINT_HYPER_PARAMS_TYPE" class="variable">CHECKPOINT_HYPER_PARAMS_TYPE</dd>
+                <dd id="SupervisedModel.load_from_checkpoint" class="function">load_from_checkpoint</dd>
+                <dd id="SupervisedModel.on_hpc_save" class="function">on_hpc_save</dd>
+                <dd id="SupervisedModel.on_hpc_load" class="function">on_hpc_load</dd>
+
+            </div>
+            <div><dt>pytorch_lightning.core.hooks.ModelHooks</dt>
+                                <dd id="SupervisedModel.on_fit_start" class="function">on_fit_start</dd>
+                <dd id="SupervisedModel.on_fit_end" class="function">on_fit_end</dd>
+                <dd id="SupervisedModel.on_train_start" class="function">on_train_start</dd>
+                <dd id="SupervisedModel.on_train_end" class="function">on_train_end</dd>
+                <dd id="SupervisedModel.on_validation_start" class="function">on_validation_start</dd>
+                <dd id="SupervisedModel.on_validation_end" class="function">on_validation_end</dd>
+                <dd id="SupervisedModel.on_test_start" class="function">on_test_start</dd>
+                <dd id="SupervisedModel.on_test_end" class="function">on_test_end</dd>
+                <dd id="SupervisedModel.on_predict_start" class="function">on_predict_start</dd>
+                <dd id="SupervisedModel.on_predict_end" class="function">on_predict_end</dd>
+                <dd id="SupervisedModel.on_pretrain_routine_start" class="function">on_pretrain_routine_start</dd>
+                <dd id="SupervisedModel.on_pretrain_routine_end" class="function">on_pretrain_routine_end</dd>
+                <dd id="SupervisedModel.on_train_batch_start" class="function">on_train_batch_start</dd>
+                <dd id="SupervisedModel.on_train_batch_end" class="function">on_train_batch_end</dd>
+                <dd id="SupervisedModel.on_validation_batch_start" class="function">on_validation_batch_start</dd>
+                <dd id="SupervisedModel.on_validation_batch_end" class="function">on_validation_batch_end</dd>
+                <dd id="SupervisedModel.on_test_batch_start" class="function">on_test_batch_start</dd>
+                <dd id="SupervisedModel.on_test_batch_end" class="function">on_test_batch_end</dd>
+                <dd id="SupervisedModel.on_predict_batch_start" class="function">on_predict_batch_start</dd>
+                <dd id="SupervisedModel.on_predict_batch_end" class="function">on_predict_batch_end</dd>
+                <dd id="SupervisedModel.on_validation_model_eval" class="function">on_validation_model_eval</dd>
+                <dd id="SupervisedModel.on_validation_model_train" class="function">on_validation_model_train</dd>
+                <dd id="SupervisedModel.on_test_model_train" class="function">on_test_model_train</dd>
+                <dd id="SupervisedModel.on_test_model_eval" class="function">on_test_model_eval</dd>
+                <dd id="SupervisedModel.on_predict_model_eval" class="function">on_predict_model_eval</dd>
+                <dd id="SupervisedModel.on_epoch_start" class="function">on_epoch_start</dd>
+                <dd id="SupervisedModel.on_epoch_end" class="function">on_epoch_end</dd>
+                <dd id="SupervisedModel.on_train_epoch_start" class="function">on_train_epoch_start</dd>
+                <dd id="SupervisedModel.on_train_epoch_end" class="function">on_train_epoch_end</dd>
+                <dd id="SupervisedModel.on_validation_epoch_start" class="function">on_validation_epoch_start</dd>
+                <dd id="SupervisedModel.on_validation_epoch_end" class="function">on_validation_epoch_end</dd>
+                <dd id="SupervisedModel.on_test_epoch_start" class="function">on_test_epoch_start</dd>
+                <dd id="SupervisedModel.on_test_epoch_end" class="function">on_test_epoch_end</dd>
+                <dd id="SupervisedModel.on_predict_epoch_start" class="function">on_predict_epoch_start</dd>
+                <dd id="SupervisedModel.on_predict_epoch_end" class="function">on_predict_epoch_end</dd>
+                <dd id="SupervisedModel.on_before_zero_grad" class="function">on_before_zero_grad</dd>
+                <dd id="SupervisedModel.on_before_backward" class="function">on_before_backward</dd>
+                <dd id="SupervisedModel.on_after_backward" class="function">on_after_backward</dd>
+                <dd id="SupervisedModel.on_before_optimizer_step" class="function">on_before_optimizer_step</dd>
+                <dd id="SupervisedModel.on_post_move_to_device" class="function">on_post_move_to_device</dd>
+                <dd id="SupervisedModel.configure_sharded_model" class="function">configure_sharded_model</dd>
+
+            </div>
+            <div><dt>pytorch_lightning.core.hooks.DataHooks</dt>
+                                <dd id="SupervisedModel.prepare_data" class="function">prepare_data</dd>
+                <dd id="SupervisedModel.setup" class="function">setup</dd>
+                <dd id="SupervisedModel.teardown" class="function">teardown</dd>
+                <dd id="SupervisedModel.train_dataloader" class="function">train_dataloader</dd>
+                <dd id="SupervisedModel.test_dataloader" class="function">test_dataloader</dd>
+                <dd id="SupervisedModel.val_dataloader" class="function">val_dataloader</dd>
+                <dd id="SupervisedModel.predict_dataloader" class="function">predict_dataloader</dd>
+                <dd id="SupervisedModel.on_train_dataloader" class="function">on_train_dataloader</dd>
+                <dd id="SupervisedModel.on_val_dataloader" class="function">on_val_dataloader</dd>
+                <dd id="SupervisedModel.on_test_dataloader" class="function">on_test_dataloader</dd>
+                <dd id="SupervisedModel.on_predict_dataloader" class="function">on_predict_dataloader</dd>
+                <dd id="SupervisedModel.transfer_batch_to_device" class="function">transfer_batch_to_device</dd>
+                <dd id="SupervisedModel.on_before_batch_transfer" class="function">on_before_batch_transfer</dd>
+                <dd id="SupervisedModel.on_after_batch_transfer" class="function">on_after_batch_transfer</dd>
+
+            </div>
+            <div><dt>pytorch_lightning.core.hooks.CheckpointHooks</dt>
+                                <dd id="SupervisedModel.on_load_checkpoint" class="function">on_load_checkpoint</dd>
+                <dd id="SupervisedModel.on_save_checkpoint" class="function">on_save_checkpoint</dd>
+
+            </div>
+            <div><dt>torch.nn.modules.module.Module</dt>
+                                <dd id="SupervisedModel.dump_patches" class="variable">dump_patches</dd>
+                <dd id="SupervisedModel.register_buffer" class="function">register_buffer</dd>
+                <dd id="SupervisedModel.register_parameter" class="function">register_parameter</dd>
+                <dd id="SupervisedModel.add_module" class="function">add_module</dd>
+                <dd id="SupervisedModel.register_module" class="function">register_module</dd>
+                <dd id="SupervisedModel.get_submodule" class="function">get_submodule</dd>
+                <dd id="SupervisedModel.get_parameter" class="function">get_parameter</dd>
+                <dd id="SupervisedModel.get_buffer" class="function">get_buffer</dd>
+                <dd id="SupervisedModel.get_extra_state" class="function">get_extra_state</dd>
+                <dd id="SupervisedModel.set_extra_state" class="function">set_extra_state</dd>
+                <dd id="SupervisedModel.apply" class="function">apply</dd>
+                <dd id="SupervisedModel.xpu" class="function">xpu</dd>
+                <dd id="SupervisedModel.bfloat16" class="function">bfloat16</dd>
+                <dd id="SupervisedModel.to_empty" class="function">to_empty</dd>
+                <dd id="SupervisedModel.register_backward_hook" class="function">register_backward_hook</dd>
+                <dd id="SupervisedModel.register_full_backward_hook" class="function">register_full_backward_hook</dd>
+                <dd id="SupervisedModel.register_forward_pre_hook" class="function">register_forward_pre_hook</dd>
+                <dd id="SupervisedModel.register_forward_hook" class="function">register_forward_hook</dd>
+                <dd id="SupervisedModel.T_destination" class="variable">T_destination</dd>
+                <dd id="SupervisedModel.state_dict" class="function">state_dict</dd>
+                <dd id="SupervisedModel.load_state_dict" class="function">load_state_dict</dd>
+                <dd id="SupervisedModel.parameters" class="function">parameters</dd>
+                <dd id="SupervisedModel.named_parameters" class="function">named_parameters</dd>
+                <dd id="SupervisedModel.buffers" class="function">buffers</dd>
+                <dd id="SupervisedModel.named_buffers" class="function">named_buffers</dd>
+                <dd id="SupervisedModel.children" class="function">children</dd>
+                <dd id="SupervisedModel.named_children" class="function">named_children</dd>
+                <dd id="SupervisedModel.modules" class="function">modules</dd>
+                <dd id="SupervisedModel.named_modules" class="function">named_modules</dd>
+                <dd id="SupervisedModel.train" class="function">train</dd>
+                <dd id="SupervisedModel.eval" class="function">eval</dd>
+                <dd id="SupervisedModel.requires_grad_" class="function">requires_grad_</dd>
+                <dd id="SupervisedModel.zero_grad" class="function">zero_grad</dd>
+                <dd id="SupervisedModel.share_memory" class="function">share_memory</dd>
+                <dd id="SupervisedModel.extra_repr" class="function">extra_repr</dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+    </main>
+<script>
+    function escapeHTML(html) {
+        return document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
+    }
+
+    const originalContent = document.querySelector("main.pdoc");
+    let currentContent = originalContent;
+
+    function setContent(innerHTML) {
+        let elem;
+        if (innerHTML) {
+            elem = document.createElement("main");
+            elem.classList.add("pdoc");
+            elem.innerHTML = innerHTML;
+        } else {
+            elem = originalContent;
+        }
+        if (currentContent !== elem) {
+            currentContent.replaceWith(elem);
+            currentContent = elem;
+        }
+    }
+
+    function getSearchTerm() {
+        return (new URL(window.location)).searchParams.get("search");
+    }
+
+    const searchBox = document.querySelector(".pdoc input[type=search]");
+    searchBox.addEventListener("input", function () {
+        let url = new URL(window.location);
+        if (searchBox.value.trim()) {
+            url.hash = "";
+            url.searchParams.set("search", searchBox.value);
+        } else {
+            url.searchParams.delete("search");
+        }
+        history.replaceState("", "", url.toString());
+        onInput();
+    });
+    window.addEventListener("popstate", onInput);
+
+
+    let search, searchErr;
+
+    async function initialize() {
+        try {
+            search = await new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                script.type = "text/javascript";
+                script.async = true;
+                script.onload = () => resolve(window.pdocSearch);
+                script.onerror = (e) => reject(e);
+                script.src = "../../search.js";
+                document.getElementsByTagName("head")[0].appendChild(script);
+            });
+        } catch (e) {
+            console.error("Cannot fetch pdoc search index");
+            searchErr = "Cannot fetch search index.";
+        }
+        onInput();
+
+        document.querySelector("nav.pdoc").addEventListener("click", e => {
+            if (e.target.hash) {
+                searchBox.value = "";
+                searchBox.dispatchEvent(new Event("input"));
+            }
+        });
+    }
+
+    function onInput() {
+        setContent((() => {
+            const term = getSearchTerm();
+            if (!term) {
+                return null
+            }
+            if (searchErr) {
+                return `<h3>Error: ${searchErr}</h3>`
+            }
+            if (!search) {
+                return "<h3>Searching...</h3>"
+            }
+
+            window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+
+            const results = search(term);
+
+            let html;
+            if (results.length === 0) {
+                html = `No search results for '${escapeHTML(term)}'.`
+            } else {
+                html = `<h4>${results.length} search result${results.length > 1 ? "s" : ""} for '${escapeHTML(term)}'.</h4>`;
+            }
+            for (let result of results.slice(0, 10)) {
+                let doc = result.doc;
+                let url = `../../${doc.modulename.replaceAll(".", "/")}.html`;
+                if (doc.qualname) {
+                    url += `#${doc.qualname}`;
+                }
+
+                let heading;
+                switch (result.doc.type) {
+                    case "function":
+                        heading = `<span class="def">${doc.funcdef}</span> <span class="name">${doc.fullname}</span><span class="signature">${doc.signature}:</span>`;
+                        break;
+                    case "class":
+                        heading = `<span class="def">class</span> <span class="name">${doc.fullname}</span>`;
+                        if (doc.bases)
+                            heading += `<wbr>(<span class="base">${doc.bases}</span>)`;
+                        heading += `:`;
+                        break;
+                    case "variable":
+                        heading = `<span class="name">${doc.fullname}</span>`;
+                        if (doc.annotation)
+                            heading += `<span class="annotation">${doc.annotation}</span>`;
+                        if (doc.default_value)
+                            heading += `<span class="default_value">${doc.default_value}</span>`;
+                        break;
+                    default:
+                        heading = `<span class="name">${doc.fullname}</span>`;
+                        break;
+                }
+                html += `
+                        <section class="search-result">
+                        <a href="${url}" class="attr ${doc.type}">${heading}</a>
+                        <div class="docstring">${doc.doc}</div>
+                        </section>
+                    `;
+
+            }
+            return html;
+        })());
+    }
+
+    if (getSearchTerm()) {
+        initialize();
+        searchBox.value = getSearchTerm();
+        onInput();
+    } else {
+        searchBox.addEventListener("focus", initialize, {once: true});
+    }
+
+    searchBox.addEventListener("keydown", e => {
+        if (["ArrowDown", "ArrowUp", "Enter"].includes(e.key)) {
+            let focused = currentContent.querySelector(".search-result.focused");
+            if (!focused) {
+                currentContent.querySelector(".search-result").classList.add("focused");
+            } else if (
+                e.key === "ArrowDown"
+                && focused.nextElementSibling
+                && focused.nextElementSibling.classList.contains("search-result")
+            ) {
+                focused.classList.remove("focused");
+                focused.nextElementSibling.classList.add("focused");
+                focused.nextElementSibling.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                    inline: "nearest"
+                });
+            } else if (
+                e.key === "ArrowUp"
+                && focused.previousElementSibling
+                && focused.previousElementSibling.classList.contains("search-result")
+            ) {
+                focused.classList.remove("focused");
+                focused.previousElementSibling.classList.add("focused");
+                focused.previousElementSibling.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                    inline: "nearest"
+                });
+            } else if (
+                e.key === "Enter"
+            ) {
+                focused.querySelector("a").click();
+            }
+        }
+    });
+</script></body>
+</html>
