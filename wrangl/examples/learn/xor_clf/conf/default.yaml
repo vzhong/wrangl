@@ -41,6 +41,7 @@ collate_fn: 'auto'  # use 'ignore' to pass an identity collate and define featur
 max_steps: 1_000_000
 log_every_n_steps: 100
 val_check_interval: 100
+flush_logs_every_n_steps: 100
 gpus: 0
 strategy: null
 test_only: false
@@ -57,7 +58,8 @@ name: '${model}-${suffix}'
 suffix: 'default'
 model: 'mymodel'
 project: 'wrangle-example-xor-clf'
-dproject: '${oc.env:PWD}/saves/${project}'
+dsave: '${oc.env:PWD}/saves'
+dproject: '${dsave}/${project}'
 
 ##########
 # model params 
