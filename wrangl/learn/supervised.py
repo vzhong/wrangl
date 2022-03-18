@@ -1,4 +1,5 @@
 import os
+import json
 import torch
 import random
 import logging
@@ -85,6 +86,15 @@ class SupervisedModel(pl.LightningModule):
         perplexity = torch.exp(loss)
         self.log('ppl', perplexity, batch_size=self.infer_batch_size(batch))
         return loss
+
+    def test_step(self, batch, batch_id, split='test'):
+        return self.validation_ste(batch, batch_id, split='test')
+
+    def predict_step(self, batch, batch_id):
+        feat = self.featurize(batch)
+        out = self.infer(feat, batch)
+        pred = self.extract_pred(out, feat, batch)
+        return pred
 
     def validation_step(self, batch, batch_id, split='val'):
         feat = self.featurize(batch)
@@ -174,4 +184,34 @@ class SupervisedModel(pl.LightningModule):
                 if not os.path.isfile(ckpt_path):
                     ckpt_path = None
             trainer.fit(model, train_loader, eval_loader, ckpt_path=ckpt_path)
+
+        model = cls.load_from_checkpoint(os.path.join(dout, 'last.ckpt'))
+        result = trainer.test(model, eval_loader, verbose=True)
+        with open(os.path.join(dout, 'test_results.json'), 'wt') as f:
+            json.dump(result, f, indent=2)
         logger.info('Finished!')
+
+    @classmethod
+    def run_pred(cls, cfg, fcheckpoint, eval_dataset):
+        model = cls.load_from_checkpoint(fcheckpoint)
+
+        if cfg.collate_fn == 'auto':
+            collate_fn = None
+        elif cfg.collate_fn == 'ignore':
+            def collate_fn(batch):
+                return batch
+        else:
+            collate_fn = cls.collate_fn
+        eval_loader = DataLoader(eval_dataset, batch_size=cfg.batch_size, collate_fn=collate_fn)
+
+        trainer = pl.Trainer(
+            precision=cfg.precision,
+            strategy=cfg.strategy,
+            gpus=cfg.gpus,
+            auto_lr_find=False,
+            auto_scale_batch_size=False,
+            auto_select_gpus=cfg.gpus > 0,
+            benchmark=True,
+        )
+        result = trainer.predict(model, eval_loader)
+        return result
