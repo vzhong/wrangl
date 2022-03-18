@@ -13,7 +13,7 @@ from hydra.utils import get_original_cwd
 from .callbacks import WandbTableCallback
 from .metrics import Accuracy
 from pytorch_lightning import callbacks as C
-from pytorch_lightning.loggers import WandbLogger
+from pytorch_lightning.loggers import WandbLogger, CSVLogger
 
 
 class SupervisedModel(pl.LightningModule):
@@ -138,9 +138,9 @@ class SupervisedModel(pl.LightningModule):
             verbose=True,
         )
 
-        train_logger = None
+        train_logger = [CSVLogger(save_dir=dout, name='logs', flush_logs_every_n_steps=cfg.flush_logs_every_n_steps)]
         if cfg.wandb.enable:
-            train_logger = WandbLogger(project=cfg.wandb.project, name=cfg.wandb.name, entity=cfg.wandb.entity, save_dir=cfg.wandb.dir)
+            train_logger.append(WandbLogger(project=cfg.wandb.project, name=cfg.wandb.name, entity=cfg.wandb.entity, save_dir=cfg.wandb.dir))
 
         fconfig = os.path.join(dout, 'config.yaml')
         OmegaConf.save(config=cfg, f=fconfig)
