@@ -8,3 +8,4 @@ wandb
 hydra-core
 hydra-submitit-launcher
 pytorch_lightning
+appwrite
