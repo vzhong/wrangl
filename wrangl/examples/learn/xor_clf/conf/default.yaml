@@ -16,7 +16,7 @@ hydra:
     dir: '${dproject}/sweep'
 
 ##########
-# wandb
+# logging
 ##########
 wandb:  # wandb settings
   enable: false
@@ -24,6 +24,14 @@ wandb:  # wandb settings
   name: '${name}'
   entity: '${oc.env:USER}'
   dir: '${dproject}'
+appwrite:  # appwrite settings
+  enable: false
+  project: '${oc.env:WRANGL_APPWRITE_PROJECT}'
+  secret: '${oc.env:WRANGL_APPWRITE_SECRET}'
+  url: '${oc.env:WRANGL_APPWRITE_URL}'
+  plot:
+    x: 'step'
+    y: 'val_acc'
 
 ##########
 # training
