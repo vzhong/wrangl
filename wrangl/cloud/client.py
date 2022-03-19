@@ -20,7 +20,10 @@ class AppwriteClient:
     - WRANGL_APPWRITE_PROJECT: Appwrite project id - you must create this project ID in Appwrite first.
     """
 
-    def __init__(self, url=os.environ['WRANGL_APPWRITE_URL'], secret=os.environ['WRANGL_APPWRITE_SECRET'], project=os.environ['WRANGL_APPWRITE_PROJECT']):
+    def __init__(self, url=None, secret=None, project=None):
+        url = url or os.environ['WRANGL_APPWRITE_URL']
+        secret = secret or os.environ['WRANGL_APPWRITE_SECRET']
+        project = project or os.environ['WRANGL_APPWRITE_PROJECT']
         self.appwrite_client = Base()
         self.appwrite_client.set_endpoint(url)
         self.appwrite_client.set_project(project)
@@ -105,9 +108,3 @@ class AppwriteClient:
             ffig = tempdir.joinpath(fname)
             fig.savefig(ffig, bbox_inches='tight')
             return self.upload_file(bucket_id=project_id, fname=ffig, overwrite=True)
-
-
-if __name__ == '__main__':
-    cloud = AppwriteClient()
-    print(cloud.upload_experiment('/Users/victor/project/wrangl/wrangl/examples/learn/xor_clf/saves/wrangle-example-xor-clf/mymodel-default/'))
-    print(cloud.plot_experiment('wrangle-example-xor-clf', 'mymodel-default'))
