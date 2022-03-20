@@ -1,1 +1,1 @@
-from .client import AppwriteClient
+from .s3 import S3Client

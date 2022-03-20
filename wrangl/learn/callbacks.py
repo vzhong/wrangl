@@ -20,19 +20,15 @@ class WandbTableCallback(pl.Callback):
         wandb.log(dict(gen=table))
 
 
-class AppWriteCallback(pl.Callback):
-
-    def __init__(self, cfg):
-        super().__init__()
-        self.cfg = cfg
+class S3Callback(pl.Callback):
 
     def on_validation_end(self, trainer, model):
-        from ..cloud.client import AppwriteClient
+        from ..cloud import S3Client
         cfg = model.hparams
-        client = AppwriteClient()
+        client = S3Client(url=cfg.s3.url, key=cfg.s3.key, secret=cfg.s3.secret, bucket=cfg.s3.bucket)
         client.upload_experiment(os.getcwd())
         client.plot_experiment(
             project_id=cfg.project,
             experiment_id=cfg.name,
-            **cfg.appwrite.plot
+            **cfg.s3.plot
         )

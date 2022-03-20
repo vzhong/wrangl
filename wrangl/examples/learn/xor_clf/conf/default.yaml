@@ -24,11 +24,12 @@ wandb:  # wandb settings
   name: '${name}'
   entity: '${oc.env:USER}'
   dir: '${dproject}'
-appwrite:  # appwrite settings
+s3:  # s3 settings
   enable: false
-  project: '${oc.env:WRANGL_APPWRITE_PROJECT}'
-  secret: '${oc.env:WRANGL_APPWRITE_SECRET}'
-  url: '${oc.env:WRANGL_APPWRITE_URL}'
+  bucket: '${oc.env:WRANGL_S3_BUCKET}'
+  key: '${oc.env:WRANGL_S3_KEY}'
+  secret: '${oc.env:WRANGL_S3_SECRET}'
+  url: '${oc.env:WRANGL_S3_URL}'
   plot:
     x: 'step'
     y: 'val_acc'

@@ -10,7 +10,7 @@ from torch.optim import Adam
 from omegaconf import OmegaConf
 from torch.utils.data import DataLoader
 from hydra.utils import get_original_cwd
-from .callbacks import WandbTableCallback, AppWriteCallback
+from .callbacks import WandbTableCallback, S3Callback
 from .metrics import Accuracy
 from pytorch_lightning import callbacks as C
 from pytorch_lightning.loggers import WandbLogger, CSVLogger
@@ -37,8 +37,8 @@ class SupervisedModel(pl.LightningModule):
         # TODO: correctly use default args - vzhong
         if 'wandb' in self.hparams and self.hparams.wandb.enable:
             callbacks.append(WandbTableCallback())
-        if 'appwrite' in self.hparams and self.hparams.appwrite.enable:
-            callbacks.append(AppWriteCallback(self.hparams.appwrite))
+        if 's3' in self.hparams and self.hparams.s3.enable:
+            callbacks.append(S3Callback())
         return callbacks
 
     def configure_optimizers(self):
