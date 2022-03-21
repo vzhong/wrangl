@@ -1,1 +1,4 @@
+global-exclude *.pyc
+global-exclude __pycache__
 include requirements.txt
+recursive-include wrangl/* *.yaml

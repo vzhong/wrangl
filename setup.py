@@ -4,7 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, find_namespace_packages
 from codecs import open
 from os import path
 
@@ -66,7 +66,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']) + find_namespace_packages(include=["hydra_plugins.*"]),
 
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
@@ -87,8 +87,7 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    package_data={
-    },
+    include_package_data=True,
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:

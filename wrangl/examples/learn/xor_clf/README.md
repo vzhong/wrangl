@@ -5,10 +5,6 @@ This example trains a XOR classifier using a combination of
 
 In order to run this example, you must install the `learn` module dependencies via
 
-```bash
-pip install -e .[learn]
-```
-
 To train locally (settings in `conf/default.yaml`):
 
 ```bash

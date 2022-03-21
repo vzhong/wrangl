@@ -10,7 +10,7 @@ from torch.optim import Adam
 from omegaconf import OmegaConf
 from torch.utils.data import DataLoader
 from hydra.utils import get_original_cwd
-from .callbacks import WandbTableCallback, S3Callback
+from .callbacks import WandbTableCallback, S3Callback, GitCallback
 from .metrics import Accuracy
 from pytorch_lightning import callbacks as C
 from pytorch_lightning.loggers import WandbLogger, CSVLogger
@@ -34,11 +34,12 @@ class SupervisedModel(pl.LightningModule):
 
     def get_callbacks(self):
         callbacks = []
-        # TODO: correctly use default args - vzhong
-        if 'wandb' in self.hparams and self.hparams.wandb.enable:
+        if self.hparams.git.enable:
+            callbacks.append(GitCallback())
+        if self.hparams.wandb.enable:
             callbacks.append(WandbTableCallback())
-        if 's3' in self.hparams and self.hparams.s3.enable:
-            callbacks.append(S3Callback())
+        if self.hparams.s3.enable:
+            callbacks.append(S3Callback(self.hparams.s3))
         return callbacks
 
     def configure_optimizers(self):
@@ -94,7 +95,7 @@ class SupervisedModel(pl.LightningModule):
         return loss
 
     def test_step(self, batch, batch_id, split='test'):
-        return self.validation_ste(batch, batch_id, split='test')
+        return self.validation_step(batch, batch_id, split='test')
 
     def predict_step(self, batch, batch_id):
         feat = self.featurize(batch)

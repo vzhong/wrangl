@@ -1,0 +1,73 @@
+defaults:
+  - override hydra/launcher: local.yaml
+  - _self_
+
+##########
+# launcher
+##########
+hydra:
+  job:
+    name: '${name}'
+    env_set:
+      OMP_NUM_THREADS: '1'
+      RAY_OBJECT_STORE_ALLOW_SLOW_STORAGE: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+  run:
+    dir: '${dproject}/${name}'
+  sweep:
+    dir: '${dproject}/sweep'
+
+##########
+# logging
+##########
+git:
+  enable: true
+wandb:  # wandb settings
+  enable: false
+  project: '${project}'
+  name: '${name}'
+  entity: '${oc.env:USER}'
+  dir: '${dproject}'
+s3:  # s3 settings
+  enable: false
+  fcredentials: '${oc.env:WRANGL_S3_FCREDENTIALS}'
+  project_id: '${project}'
+  experiment_id: '${name}'
+  plot:
+    x: 'step'
+    y: '${early_stopping.monitor}'
+  checkpoint: true
+  pred_samples: true
+
+##########
+# training
+##########
+early_stopping:
+    monitor: 'val_acc'
+    mode: 'max'
+debug: false
+seed: 0
+gpus: 0
+batch_size: 100
+grad_clip_norm: 10
+collate_fn: 'auto'  # use 'ignore' to pass an identity collate and define featurize instead
+max_steps: 1_000
+log_every_n_steps: 100
+val_check_interval: 100
+flush_logs_every_n_steps: 100
+test_only: false
+autoresume: false
+ckpt_path: 'latest.ckpt'
+learning_rate: 0.0001
+val_sample_size: 100
+
+
+##########
+# naming
+##########
+name: '${model}-${suffix}'
+suffix: 'default'
+model: 'mymodel'
+project: 'default-project'
+dsave: '${oc.env:PWD}/saves'
+dproject: '${dsave}/${project}'

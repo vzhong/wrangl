@@ -18,13 +18,20 @@ class S3Client:
     - WRANGL_S3_KEY: API key.
     - WRANGL_S3_SECRET: API secret.
     - WRANGL_S3_BUCKET: bucket name.
+
+    Alternatively you can also specify a credentials JSON file with the environment variables ina dictionary.
     """
 
-    def __init__(self, url=None, key=None, secret=None, bucket=None):
-        url = url or os.environ['WRANGL_S3_URL']
-        key = key or os.environ['WRANGL_S3_KEY']
-        secret = secret or os.environ['WRANGL_S3_SECRET']
-        self.bucket = bucket or os.environ['WRANGL_S3_BUCKET']
+    def __init__(self, url=None, key=None, secret=None, bucket=None, fcredentials=None):
+        if fcredentials:
+            with open(fcredentials) as f:
+                credentials = json.load(f)
+        else:
+            credentials = os.environ
+        url = url or credentials['WRANGL_S3_URL']
+        key = key or credentials['WRANGL_S3_KEY']
+        secret = secret or credentials['WRANGL_S3_SECRET']
+        self.bucket = bucket or credentials['WRANGL_S3_BUCKET']
         self.client = minio.Minio(endpoint=url, access_key=key, secret_key=secret)
 
     def upload_content(self, project_id, experiment_id, fname, content, content_type='application/json'):
