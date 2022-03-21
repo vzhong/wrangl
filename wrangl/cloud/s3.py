@@ -27,13 +27,13 @@ class S3Client:
         self.bucket = bucket or os.environ['WRANGL_S3_BUCKET']
         self.client = minio.Minio(endpoint=url, access_key=key, secret_key=secret)
 
-    def upload_content(self, project_id, fname, content, overwrite=False, content_type='application/json'):
-        obj_name = '{}/{}'.format(project_id, fname)
-        # for existing in self.client.list_objects(self.bucket, prefix=obj_name):
-        #     import pdb; pdb.set_trace()
+    def upload_content(self, project_id, experiment_id, fname, content, content_type='application/json'):
         data = io.BytesIO(content.encode('utf-8'))
-        res = self.client.put_object(self.bucket, obj_name, data, length=len(content), content_type=content_type)
+        res = self.client.put_object(self.bucket, self.get_path(project_id, experiment_id, fname), data, length=len(content), content_type=content_type)
         return res
+
+    def upload_file(self, project_id, experiment_id, fname, from_fname, content_type='application/json'):
+        return self.client.fput_object(self.bucket, self.get_path(project_id, experiment_id, fname), from_fname, content_type=content_type)
 
     def upload_experiment(self, dexp):
         dexp = pathlib.Path(dexp)
@@ -51,21 +51,22 @@ class S3Client:
 
         # make sure document does not exist
         experiment_id = config['name']
-        fconfig = '{}.config.json'.format(experiment_id)
-        flog = '{}.log.json'.format(experiment_id)
 
-        config_response = self.upload_content(project_id=project_id, fname=fconfig, content=json.dumps(config, indent=2), overwrite=True)
-        log_response = self.upload_content(project_id=project_id, fname=flog, content=json.dumps(logs, indent=2), overwrite=True)
+        config_response = self.upload_content(project_id=project_id, experiment_id=experiment_id, fname='config.json', content=json.dumps(config, indent=2))
+        log_response = self.upload_content(project_id=project_id, experiment_id=experiment_id, fname='logs.json', content=json.dumps(logs, indent=2))
         return dict(config=config_response, log=log_response)
 
-    def download_content(self, project_id, fname):
-        obj_name = '{}/{}'.format(project_id, fname)
-        obj = json.loads(self.client.get_object(self.bucket, obj_name).data.decode())
+    @classmethod
+    def get_path(cls, project_id, experiment_id, fname):
+        return '{}/{}/{}'.format(project_id, experiment_id, fname)
+
+    def download_content(self, project_id, experiment_id, fname):
+        obj = json.loads(self.client.get_object(self.bucket, self.get_path(project_id, experiment_id, fname)).data.decode())
         return obj
 
     def get_experiment(self, project_id, experiment_id):
-        config = self.download_content(project_id, '{}.config.json'.format(experiment_id))
-        logs = self.download_content(project_id, '{}.log.json'.format(experiment_id))
+        config = self.download_content(project_id, experiment_id, 'config.json')
+        logs = self.download_content(project_id, experiment_id, 'logs.json')
         df = pd.DataFrame(logs)
         return config, df
 
@@ -86,8 +87,7 @@ class S3Client:
             tempdir = pathlib.Path(tempdir_path)
             ffig = tempdir.joinpath(fname)
             fig.savefig(ffig, bbox_inches='tight')
-            obj_name = '{}/{}'.format(project_id, fname)
-            return self.client.fput_object(self.bucket, obj_name, ffig, content_type='application/pdf')
+            return self.upload_file(project_id, experiment_id, fname, ffig, content_type='application/pdf')
 
 
 if __name__ == '__main__':
