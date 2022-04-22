@@ -192,8 +192,9 @@ class SupervisedModel(pl.LightningModule):
         logger.info('Finished!')
 
     @classmethod
-    def run_pred(cls, cfg, fcheckpoint, eval_dataset):
-        model = cls.load_from_checkpoint(fcheckpoint)
+    def run_pred(cls, cfg, fcheckpoint, eval_dataset, model_kwargs=None):
+        model_kwargs = model_kwargs or {}
+        model = cls.load_from_checkpoint(fcheckpoint, **model_kwargs)
 
         if cfg.collate_fn == 'auto':
             collate_fn = None
@@ -214,4 +215,30 @@ class SupervisedModel(pl.LightningModule):
             benchmark=True,
         )
         result = trainer.predict(model, eval_loader)
+        return result
+
+    @classmethod
+    def run_test(cls, cfg, fcheckpoint, eval_dataset, model_kwargs=None):
+        model_kwargs = model_kwargs or {}
+        model = cls.load_from_checkpoint(fcheckpoint, **model_kwargs)
+
+        if cfg.collate_fn == 'auto':
+            collate_fn = None
+        elif cfg.collate_fn == 'ignore':
+            def collate_fn(batch):
+                return batch
+        else:
+            collate_fn = cls.collate_fn
+        eval_loader = DataLoader(eval_dataset, batch_size=cfg.batch_size, collate_fn=collate_fn)
+
+        trainer = pl.Trainer(
+            precision=cfg.precision,
+            strategy=cfg.strategy,
+            gpus=cfg.gpus,
+            auto_lr_find=False,
+            auto_scale_batch_size=False,
+            auto_select_gpus=cfg.gpus > 0,
+            benchmark=True,
+        )
+        result = trainer.test(model, eval_loader, verbose=True)
         return result
