@@ -118,13 +118,20 @@
 <span class="sd">    - WRANGL_S3_KEY: API key.</span>
 <span class="sd">    - WRANGL_S3_SECRET: API secret.</span>
 <span class="sd">    - WRANGL_S3_BUCKET: bucket name.</span>
+
+<span class="sd">    Alternatively you can also specify a credentials JSON file with the environment variables ina dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_URL&#39;</span><span class="p">]</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_KEY&#39;</span><span class="p">]</span>
-        <span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_SECRET&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span> <span class="o">=</span> <span class="n">bucket</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_BUCKET&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fcredentials</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fcredentials</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fcredentials</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">credentials</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">credentials</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_URL&#39;</span><span class="p">]</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_KEY&#39;</span><span class="p">]</span>
+        <span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_SECRET&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span> <span class="o">=</span> <span class="n">bucket</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_BUCKET&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">minio</span><span class="o">.</span><span class="n">Minio</span><span class="p">(</span><span class="n">endpoint</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">access_key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="n">secret</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">upload_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">):</span>
@@ -222,13 +229,20 @@
 <span class="sd">    - WRANGL_S3_KEY: API key.</span>
 <span class="sd">    - WRANGL_S3_SECRET: API secret.</span>
 <span class="sd">    - WRANGL_S3_BUCKET: bucket name.</span>
+
+<span class="sd">    Alternatively you can also specify a credentials JSON file with the environment variables ina dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_URL&#39;</span><span class="p">]</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_KEY&#39;</span><span class="p">]</span>
-        <span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_SECRET&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span> <span class="o">=</span> <span class="n">bucket</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_BUCKET&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fcredentials</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fcredentials</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fcredentials</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">credentials</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">credentials</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_URL&#39;</span><span class="p">]</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_KEY&#39;</span><span class="p">]</span>
+        <span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_SECRET&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span> <span class="o">=</span> <span class="n">bucket</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_BUCKET&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">minio</span><span class="o">.</span><span class="n">Minio</span><span class="p">(</span><span class="n">endpoint</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">access_key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="n">secret</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">upload_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">):</span>
@@ -306,6 +320,8 @@ The following environment variables are required.</p>
 <li>WRANGL_S3_SECRET: API secret.</li>
 <li>WRANGL_S3_BUCKET: bucket name.</li>
 </ul>
+
+<p>Alternatively you can also specify a credentials JSON file with the environment variables ina dictionary.</p>
 </div>
 
 
@@ -313,16 +329,21 @@ The following environment variables are required.</p>
                                         <div class="attr function"><a class="headerlink" href="#S3Client.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">S3Client</span><span class="signature">(url=None, key=None, secret=None, bucket=None)</span>
+            <span class="name">S3Client</span><span class="signature">(url=None, key=None, secret=None, bucket=None, fcredentials=None)</span>
     </div>
 
             <details>
             <summary>View Source</summary>
-            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_URL&#39;</span><span class="p">]</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_KEY&#39;</span><span class="p">]</span>
-        <span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_SECRET&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span> <span class="o">=</span> <span class="n">bucket</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_BUCKET&#39;</span><span class="p">]</span>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fcredentials</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fcredentials</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fcredentials</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">credentials</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">credentials</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_URL&#39;</span><span class="p">]</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_KEY&#39;</span><span class="p">]</span>
+        <span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_SECRET&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span> <span class="o">=</span> <span class="n">bucket</span> <span class="ow">or</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;WRANGL_S3_BUCKET&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">minio</span><span class="o">.</span><span class="n">Minio</span><span class="p">(</span><span class="n">endpoint</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">access_key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="n">secret</span><span class="p">)</span>
 </pre></div>
 
