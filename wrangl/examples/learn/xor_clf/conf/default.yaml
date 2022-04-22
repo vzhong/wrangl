@@ -16,7 +16,7 @@ hydra:
     dir: '${dproject}/sweep'
 
 ##########
-# wandb
+# logging
 ##########
 wandb:  # wandb settings
   enable: false
@@ -24,6 +24,17 @@ wandb:  # wandb settings
   name: '${name}'
   entity: '${oc.env:USER}'
   dir: '${dproject}'
+s3:  # s3 settings
+  enable: false
+  bucket: '${oc.env:WRANGL_S3_BUCKET}'
+  key: '${oc.env:WRANGL_S3_KEY}'
+  secret: '${oc.env:WRANGL_S3_SECRET}'
+  url: '${oc.env:WRANGL_S3_URL}'
+  plot:
+    x: 'step'
+    y: 'val_acc'
+  checkpoint: true
+  pred_samples: true
 
 ##########
 # training
@@ -38,7 +49,7 @@ limit_val_batches: 1.0
 batch_size: 100
 grad_clip_norm: 10
 collate_fn: 'auto'  # use 'ignore' to pass an identity collate and define featurize instead
-max_steps: 1_000_000
+max_steps: 1_000
 log_every_n_steps: 100
 val_check_interval: 100
 flush_logs_every_n_steps: 100

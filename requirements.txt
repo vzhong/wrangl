@@ -5,6 +5,7 @@ plotille
 pandas
 pdoc
 wandb
+minio
 hydra-core
 hydra-submitit-launcher
 pytorch_lightning
