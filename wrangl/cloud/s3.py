@@ -86,15 +86,21 @@ class S3Client:
             return
 
         sns.set(font_scale=1.5)
-        fig, ax = plt.subplots(figsize=(10, 5))
-        sns.lineplot(x=x, y=y, data=df, ax=ax, **plot_kwargs)
 
-        fname = '{}_vs_{}.pdf'.format(x, y)
-        with tempfile.TemporaryDirectory() as tempdir_path:
-            tempdir = pathlib.Path(tempdir_path)
-            ffig = tempdir.joinpath(fname)
-            fig.savefig(ffig, bbox_inches='tight')
-            return self.upload_file(project_id, experiment_id, fname, ffig, content_type='application/pdf')
+        if isinstance(y, str):
+            y = [y]
+
+        for yi in y:
+            yi = yi.strip()
+            fig, ax = plt.subplots(figsize=(10, 5))
+            sns.lineplot(x=x, y=yi, data=df, ax=ax, **plot_kwargs)
+
+            fname = '{}_vs_{}.pdf'.format(x, yi)
+            with tempfile.TemporaryDirectory() as tempdir_path:
+                tempdir = pathlib.Path(tempdir_path)
+                ffig = tempdir.joinpath(fname)
+                fig.savefig(ffig, bbox_inches='tight')
+                self.upload_file(project_id, experiment_id, fname, ffig, content_type='application/pdf')
 
 
 if __name__ == '__main__':
