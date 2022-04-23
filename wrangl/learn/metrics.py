@@ -22,7 +22,7 @@ class Accuracy(Metric):
         return {'acc': pred == gold}
 
 
-class SetF1:
+class SetF1(Metric):
 
     def compute_one(self, pred: set, gold: set):
         common = pred.intersection(gold)
@@ -40,3 +40,13 @@ class SetF1:
             for k, v in self.compute_one(pi, gi).items():
                 metrics[k].append(v)
         return {k: sum(v)/len(v) for k, v in metrics.items()}
+
+
+class Rouge(Metric):
+
+    def __init__(self):
+        from rouge_score import rouge_scorer
+        self.scorer = rouge_scorer.RougeScorer(['rougeL'], use_stemmer=True)
+
+    def compute_one(self, pred: str, gold: str):
+        return dict(rouge=self.scorer.score(pred, gold)['rougeL'].fmeasure)
