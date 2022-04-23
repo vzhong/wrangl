@@ -51,7 +51,7 @@ class S3Callback(pl.Callback):
             )
         if self.cfg.pred_samples:
             data = [dict(context=repr(context), gen=repr(gen), gold=repr(gold)) for context, gen, gold in model.pred_samples]
-            self.client.upload_content(self.cfg.project_id, self.cfg.experiment_id, 'pred_samples.json', json.dumps(data))
+            self.client.upload_content(self.cfg.project_id, self.cfg.experiment_id, 'pred_samples.json', json.dumps(data, indent=2))
 
     def on_fit_start(self, trainer, model):
         for fname in glob.glob('git.*'):
