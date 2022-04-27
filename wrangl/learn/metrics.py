@@ -22,6 +22,12 @@ class Accuracy(Metric):
         return {'acc': pred == gold}
 
 
+class MSE(Metric):
+
+    def compute_one(self, pred, gold):
+        return {'mse': (pred - gold) ** 2}
+
+
 class SetF1(Metric):
 
     def compute_one(self, pred: set, gold: set):
