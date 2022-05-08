@@ -3,11 +3,31 @@ defaults:
   - wrangl_supervised_experiment
   - _self_
 
+##########
+# training
+##########
 early_stopping:
     monitor: 'val_acc'
     mode: 'max'
+gpus: 0
+batch_size: 100
+collate_fn: 'auto'  # use 'ignore' to pass an identity collate and define featurize instead
+max_steps: 1_000
+log_every_n_steps: 100
+val_check_interval: 100
+flush_logs_every_n_steps: 100
+learning_rate: 0.0001
+val_sample_size: 100
 
+
+##########
+# naming
+##########
 model: 'mymodel'
-project: 'wrangle-example-xor-clf'
+project: 'wrangl-examples-xor_clf'
 
+
+###########
+# params
+###########
 dhid: 300

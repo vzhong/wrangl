@@ -1,5 +1,5 @@
 import unittest
-from wrangl.examples import preprocess_sql_db as T
+from wrangl.examples.preprocess import sql_db as T
 
 
 class TestLoadSQLDB(unittest.TestCase):

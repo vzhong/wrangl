@@ -1,5 +1,5 @@
 import unittest
-from wrangl.examples import preprocess_repeat_string as T
+from wrangl.examples.preprocess import repeat_string as T
 
 
 class TestRepeatString(unittest.TestCase):

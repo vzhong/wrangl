@@ -1,4 +1,4 @@
-from wrangl.learn import SupervisedModel
+from wrangl.learn import SupervisedModel, metrics as M
 from torch import nn
 from torch.nn import functional as F
 
@@ -12,6 +12,10 @@ class Model(SupervisedModel):
             nn.ReLU(),
             nn.Linear(cfg.dhid, 2),
         )
+        self.acc = M.Accuracy()
+
+    def compute_metrics(self, pred: list, gold: list) -> dict:
+        return self.acc(pred, gold)
 
     def compute_loss(self, out, feat, batch):
         return F.cross_entropy(out, feat['label'])

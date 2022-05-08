@@ -1,5 +1,5 @@
 import unittest
-from wrangl.examples import preprocess_jsonl_files as T
+from wrangl.examples.preprocess import jsonl_files as T
 
 
 class TestLoadJsonlFiles(unittest.TestCase):

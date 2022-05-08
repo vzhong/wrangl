@@ -4,7 +4,6 @@ from wrangl.data import IterableDataset, Processor
 import contextlib
 import tqdm
 import io
-import stanza
 import unittest
 
 
@@ -19,6 +18,7 @@ class MyProcessor(Processor):
 
 
 if __name__ == '__main__':
+    import stanza
     tc = unittest.TestCase()
 
     zen = io.StringIO()
