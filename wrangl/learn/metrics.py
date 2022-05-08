@@ -2,12 +2,32 @@ from collections import defaultdict
 
 
 class Metric:
+    """
+    Interface for a metric.
+    """
 
     def compute_one(self, pred, gold):
-        """Computes metrics for one example"""
+        """
+        Computes metrics for one example.
+        You must implement this.
+
+        Args:
+            pred: single prediction.
+            gold: corresponding ground truth.
+        """
         raise NotImplementedError()
 
     def __call__(self, pred, gold):
+        return self.forward(pred, gold)
+
+    def forward(self, pred: list, gold: list) -> dict:
+        """
+        Computes metric over list of predictions and ground truths and returns a dictionary of scores.
+
+        Args:
+            pred: list of predictions.
+            gold: corresponding ground truths.
+        """
         metrics = defaultdict(list)
         for pi, gi in zip(pred, gold):
             m = self.compute_one(pi, gi)
@@ -17,18 +37,28 @@ class Metric:
 
 
 class Accuracy(Metric):
+    """
+    Computes exact match accuracy under the key "acc".
+    """
 
     def compute_one(self, pred, gold):
         return {'acc': pred == gold}
 
 
 class MSE(Metric):
+    """
+    Computes mean squared error under the key "mse".
+    """
 
     def compute_one(self, pred, gold):
         return {'mse': (pred - gold) ** 2}
 
 
 class SetF1(Metric):
+    """
+    Computes F1 score under the key "f1", "precision", and "recall".
+    Here, both single prediction and ground truth are assumed to be a `set`.
+    """
 
     def compute_one(self, pred: set, gold: set):
         common = pred.intersection(gold)
@@ -49,6 +79,11 @@ class SetF1(Metric):
 
 
 class Rouge(Metric):
+    """
+    Computes Rouge score under the key "rouge".
+    Here, both single prediction and ground truth are assumed to be a `str`.
+    You must install `rouge_scorer` for this to work.
+    """
 
     def __init__(self):
         from rouge_score import rouge_scorer

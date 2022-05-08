@@ -1,5 +1,8 @@
+"""
+Callbacks that can be used during PytorchLightning training.
+"""
+
 import os
-import git
 import glob
 import json
 import wandb
@@ -11,9 +14,9 @@ from hydra.utils import get_original_cwd
 
 
 class WandbTableCallback(pl.Callback):
-
-    def __init__(self):
-        super().__init__()
+    """
+    Uploads sample predictions to Wandb.
+    """
 
     def on_validation_end(self, trainer, model):
         wandb_logger = [exp for exp in trainer.logger.experiment if isinstance(exp, wandb.sdk.wandb_run.Run)]
@@ -28,6 +31,9 @@ class WandbTableCallback(pl.Callback):
 
 
 class S3Callback(pl.Callback):
+    """
+    Uploads experiment config, git diffs, logs, best checkpoints, and plots to S3.
+    """
 
     def __init__(self, cfg):
         super().__init__()
@@ -49,9 +55,9 @@ class S3Callback(pl.Callback):
                 experiment_id=self.cfg.experiment_id,
                 **self.cfg.plot
             )
-        if self.cfg.pred_samples:
-            data = [dict(context=repr(context), gen=repr(gen), gold=repr(gold)) for context, gen, gold in model.pred_samples]
-            self.client.upload_content(self.cfg.project_id, self.cfg.experiment_id, 'pred_samples.json', json.dumps(data, indent=2))
+
+        for fname in ['pred_samples.json']:
+            self.client.upload_file(self.cfg.project_id, self.cfg.experiment_id, fname, fname, content_type='text/plain')
 
     def on_fit_start(self, trainer, model):
         for fname in glob.glob('git.*'):
@@ -59,8 +65,12 @@ class S3Callback(pl.Callback):
 
 
 class GitCallback(pl.Callback):
+    """
+    Dumps git diffs to work directory.
+    """
 
     def on_init_end(self, trainer):
+        import git
         repo = git.Repo(get_original_cwd(), search_parent_directories=True)
         with open('git.patch.diff', 'wt') as f:
             f.write(repo.git.diff(repo.head.commit.tree))

@@ -10,3 +10,4 @@ hydra-core
 hydra-submitit-launcher
 pytorch_lightning
 gitpython
+moolib

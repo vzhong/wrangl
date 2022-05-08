@@ -1,8 +1,8 @@
 class Processor:
     """
-    Generic worker to process examples.
+    An interface object for processing examples.
     """
 
     def process(self, *args, **kwargs):
-        """Process a single example"""
+        """Process a single example. You must implement this."""
         raise NotImplementedError()

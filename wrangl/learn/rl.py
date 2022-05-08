@@ -10,13 +10,13 @@ import time
 from typing import Optional
 
 import hydra
-import moolib
 import omegaconf
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import wandb
 
+import moolib
 from moolib.examples.common import nest
 from moolib.examples.common import record
 from moolib.examples.common import vtrace

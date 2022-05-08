@@ -21,7 +21,7 @@ hydra:
 # logging
 ##########
 git:
-  enable: true
+  enable: false
 wandb:  # wandb settings
   enable: false
   project: '${project}'
@@ -30,7 +30,7 @@ wandb:  # wandb settings
   dir: '${dproject}'
 s3:  # s3 settings
   enable: false
-  fcredentials: '${oc.env:WRANGL_S3_FCREDENTIALS}'
+  fcredentials: 'not set'
   project_id: '${project}'
   experiment_id: '${name}'
   plot:

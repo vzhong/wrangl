@@ -1,3 +1,6 @@
+"""
+Boilerplate that combines Hydra conf and PytorchLightning for supervised training.
+"""
 import os
 import json
 import torch
@@ -17,10 +20,34 @@ from pytorch_lightning.loggers import WandbLogger, CSVLogger
 
 
 class SupervisedModel(pl.LightningModule):
+    """
+    Supervised learning Pytorch lightning module.
+    You should overload this model as you see fit.
+    """
 
     @classmethod
-    def load_model_class(cls, model_name):
-        fname = os.path.join(get_original_cwd(), 'model', '{}.py'.format(model_name))
+    def load_model_class(cls, model_name, model_dir='model'):
+        """
+        Loads a model from file. Note that model class must be `Model`.
+
+        Args:
+            model_name: name of model to load.
+            model_dir: directory of model files.
+
+        Suppose we have our model files in a directory `mymodels`, and in `mymodels/cool_model.py` we have:
+
+        ```
+        from wrangl.learn import SupervisedModel
+        class Model(SupervisedModel):
+            ...
+        ```
+
+        To load this model we would call in `train.py`:
+        ```python
+        MyModel = SupervisedModel.load_model_class('cool_model', 'mymodels')
+        ```
+        """
+        fname = os.path.join(get_original_cwd(), model_dir, '{}.py'.format(model_name))
         spec = importlib.util.spec_from_file_location(model_name, fname)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -28,11 +55,30 @@ class SupervisedModel(pl.LightningModule):
         return Model
 
     def __init__(self, cfg):
+        """
+        Instiate a model from config file.
+
+        Args:
+            cfg: `omegaconf.OmegaConf` config to use.
+
+        By default, this config is created by [Hydra](https://hydra.cc) from your config files.
+        If you'd like to use a `dict`, instead:
+
+        ```python
+        conf = OmegaConf.create({"var1" : "v", "var2" : [1, {"a": "1", "b": "2", 3: "c"}]})
+        model = Model(conf)
+        ```
+
+        For more info on OmegaConf, see [their docs](https://omegaconf.readthedocs.io/).
+        """
         super().__init__()
         self.save_hyperparameters(cfg)
         self.pred_samples = []
 
     def get_callbacks(self):
+        """
+        Returns a list of `pytorch_lightning.callbacks.Callback`s to use for training.
+        """
         callbacks = []
         if self.hparams.git.enable:
             callbacks.append(GitCallback())
@@ -43,10 +89,13 @@ class SupervisedModel(pl.LightningModule):
         return callbacks
 
     def configure_optimizers(self):
+        """
+        Returns a the `torch.optim.Optimizer` to use for this model.
+        """
         optimizer = Adam(self.parameters(), lr=self.hparams.learning_rate)
         return optimizer
 
-    def featurize(self, batch):
+    def featurize(self, batch: list):
         """
         Converts a batch of examples to features.
         By default this returns the batch as is.
@@ -55,29 +104,95 @@ class SupervisedModel(pl.LightningModule):
         """
         return batch
 
-    def compute_metrics(self, pred, gold) -> dict:
+    def compute_metrics(self, pred: list, gold: list) -> dict:
+        """
+        Computes metrics between predictions and ground truths.
+        """
         m = Accuracy()
         return m(pred, gold)
 
     def compute_loss(self, out, feat, batch) -> torch.Tensor:
+        """
+        Computes loss from inputs and model output.
+        You must implement this function.
+
+        Args:
+            out: model output from `wrangl.learn.supervised.Model.forward`.
+            feat: featurize output from `wrangl.learn.supervised.Model.featurize`.
+            batch: Dataset iterator output.
+
+        """
         raise NotImplementedError()
 
     def extract_context(self, out, feat, batch) -> List:
+        """
+        Extract example context from inputs and model output.
+        You must implement this function.
+
+        Args:
+            out: model output from `wrangl.learn.supervised.Model.forward`.
+            feat: featurize output from `wrangl.learn.supervised.Model.featurize`.
+            batch: Dataset iterator output.
+
+        """
+
         raise NotImplementedError()
 
     def extract_pred(self, out, feat, batch) -> List:
+        """
+        Extract model predictions from inputs and model output.
+        You must implement this function.
+
+        Args:
+            out: model output from `wrangl.learn.supervised.Model.forward`.
+            feat: featurize output from `wrangl.learn.supervised.Model.featurize`.
+            batch: Dataset iterator output.
+        """
+
         raise NotImplementedError()
 
     def extract_gold(self, feat, batch) -> List:
+        """
+        Extract ground truths from inputs and model output.
+        You must implement this function.
+
+        Args:
+            out: model output from `wrangl.learn.supervised.Model.forward`.
+            feat: featurize output from `wrangl.learn.supervised.Model.featurize`.
+            batch: Dataset iterator output.
+
+        """
+
         raise NotImplementedError()
 
     def forward(self, feat, batch):
+        """
+        Computes model output from inputs.
+        You must implement this function.
+
+        Args:
+            feat: featurize output from `wrangl.learn.supervised.Model.featurize`.
+            batch: Dataset iterator output.
+
+        """
         raise NotImplementedError()
 
     def infer(self, feat, batch):
+        """
+        Computes model output from inputs for inference.
+        Defaults to `wrangl.learn.supervised.Model.forward`.
+
+        Args:
+            feat: featurize output from `wrangl.learn.supervised.Model.featurize`.
+            batch: Dataset iterator output.
+
+        """
         return self.forward(feat, batch)
 
     def infer_batch_size(self, batch):
+        """
+        Infers batch size from batch of raw examples.
+        """
         if isinstance(batch, list):
             return len(batch)
         if isinstance(batch, dict):
@@ -86,6 +201,11 @@ class SupervisedModel(pl.LightningModule):
         return None
 
     def training_step(self, batch, batch_id):
+        """
+        One training step in PytorchLightning.
+        You should not have to modify this.
+        For more information, see `pytorch_lightning.training_step`.
+        """
         feat = self.featurize(batch)
         out = self.forward(feat, batch)
         loss = self.compute_loss(out, feat, batch)
@@ -95,15 +215,36 @@ class SupervisedModel(pl.LightningModule):
         return loss
 
     def test_step(self, batch, batch_id, split='test'):
+        """
+        One test step in PytorchLightning.
+        You should not have to modify this.
+        For more information, see `pytorch_lightning.validation_step`.
+        """
         return self.validation_step(batch, batch_id, split='test')
 
     def predict_step(self, batch, batch_id):
+
+        """
+        One prediction step in PytorchLightning.
+        You should not have to modify this.
+        For more information, see `pytorch_lightning.prediction_step`.
+        """
         feat = self.featurize(batch)
         out = self.infer(feat, batch)
         pred = self.extract_pred(out, feat, batch)
         return pred
 
     def validation_step(self, batch, batch_id, split='val'):
+        """
+        One validation step in PytorchLightning.
+        You should not have to modify this.
+        For more information, see `pytorch_lightning.validation_step`.
+
+        A core difference here is that Wrangl will
+        1. compute metrics automatically
+        2. extract example contexts, predictions, and ground truths
+        3. save predictions to disk (and upload to S3, Wandb etc.) for debugging
+        """
         feat = self.featurize(batch)
         context = self.extract_context(feat, batch)
         gold = self.extract_gold(feat, batch)
@@ -125,8 +266,28 @@ class SupervisedModel(pl.LightningModule):
             self.pred_samples.insert(0, (context[i], pred[i], gold[i]))
         self.pred_samples = self.pred_samples[:self.hparams.val_sample_size]
 
+        with open('pred_samples.json', 'wt') as f:
+            data = [dict(context=repr(context), gen=repr(gen), gold=repr(gold)) for context, gen, gold in self.pred_samples]
+            json.dump(data, f, indent=2)
+
     @classmethod
-    def run_train_test(cls, cfg, train_dataset, eval_dataset, model_kwargs=None):
+    def run_train_test(cls, cfg: OmegaConf, train_dataset: torch.utils.data.DataLoader, eval_dataset: torch.utils.data.DataLoader, model_kwargs=None):
+        """
+        Creates a model according to config and trains/evaluates it.
+
+        Args:
+            cfg: config to use.
+            train_dataset: dataset for training.
+            eval_dataset: dataset for validation.
+            model_kwargs: key ward arguments for model constructor.
+
+        This will additionally set up according to your config file
+            - manual seeds
+            - early stopping
+            - checkpoint saving
+            - gradient clipping
+            - callbacks (including an always on CSV logger)
+        """
         model_kwargs = model_kwargs or {}
         pl.utilities.seed.seed_everything(seed=cfg.seed, workers=True)
         dout = os.getcwd()
@@ -199,7 +360,20 @@ class SupervisedModel(pl.LightningModule):
         logger.info('Finished!')
 
     @classmethod
-    def run_pred(cls, cfg, fcheckpoint, eval_dataset, model_kwargs=None):
+    def run_inference(cls, cfg: OmegaConf, fcheckpoint: str, eval_dataset: torch.utils.data.DataLoader, model_kwargs=None, test=False):
+        """
+        Loads a model according to config and runs inference.
+
+        Args:
+            cfg: config to use.
+            fcheckpoint: model checkpoint to load.
+            eval_dataset: dataset for validation.
+            model_kwargs: key ward arguments for model constructor.
+            test: whether to evaluate metrics
+
+        Returns:
+            if `test==True` then returns a dictionary of scores, otherwise returns a list of model predictions.
+        """
         model_kwargs = model_kwargs or {}
         model = cls.load_from_checkpoint(fcheckpoint, **model_kwargs)
 
@@ -221,31 +395,8 @@ class SupervisedModel(pl.LightningModule):
             auto_select_gpus=cfg.gpus > 0,
             benchmark=True,
         )
-        result = trainer.predict(model, eval_loader)
-        return result
-
-    @classmethod
-    def run_test(cls, cfg, fcheckpoint, eval_dataset, model_kwargs=None):
-        model_kwargs = model_kwargs or {}
-        model = cls.load_from_checkpoint(fcheckpoint, **model_kwargs)
-
-        if cfg.collate_fn == 'auto':
-            collate_fn = None
-        elif cfg.collate_fn == 'ignore':
-            def collate_fn(batch):
-                return batch
+        if test:
+            result = trainer.test(model, eval_loader, verbose=True)
         else:
-            collate_fn = cls.collate_fn
-        eval_loader = DataLoader(eval_dataset, batch_size=cfg.batch_size, collate_fn=collate_fn)
-
-        trainer = pl.Trainer(
-            precision=cfg.precision,
-            strategy=cfg.strategy,
-            gpus=cfg.gpus,
-            auto_lr_find=False,
-            auto_scale_batch_size=False,
-            auto_select_gpus=cfg.gpus > 0,
-            benchmark=True,
-        )
-        result = trainer.test(model, eval_loader, verbose=True)
+            result = trainer.predict(model, eval_loader)
         return result

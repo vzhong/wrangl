@@ -6,6 +6,8 @@ from collections.abc import Iterable
 from pathlib import Path
 from torch.utils.data import IterableDataset as Base
 
+__all__ = ["Dataset", "IterableDataset", "SQLDataset", "FileDataset"]
+
 
 class FullCacheException(Exception):
     pass
@@ -13,7 +15,7 @@ class FullCacheException(Exception):
 
 class Dataset(Base):
     """
-    A generic torch.utils.data.IterableDataset that processes examples in parallel.
+    An interface that wraps `torch.utils.data.IterableDataset` to processes examples in parallel.
     """
 
     def __init__(self, pool: ray.util.actor_pool.ActorPool, cache_size: int = 1024, shuffle: bool = False, timeout: int = 10):
@@ -69,6 +71,7 @@ class Dataset(Base):
 
     def iterate_unprocessed(self):
         """
+        You must implement this function.
         Loads unprocessed examples.
 
         Returns:
@@ -93,6 +96,9 @@ class Dataset(Base):
 
 
 class IterableDataset(Dataset):
+    """
+    A Dataset over a Python iterable.
+    """
 
     def __init__(self, iterable: Iterable, pool: ray.util.ActorPool, cache_size: int = 1024, shuffle: bool = False, timeout: int = 10):
         """
@@ -120,6 +126,9 @@ class IterableDataset(Dataset):
 
 
 class SQLDataset(Dataset):
+    """
+    A Dataset over a SQLite SQL query.
+    """
 
     def __init__(self, fdb: Union[str, Path], query: str, pool: ray.util.ActorPool, cache_size: int = 1024, shuffle: bool = False, timeout: int = 10):
         """
@@ -158,13 +167,16 @@ class SQLDataset(Dataset):
 
 
 class FileDataset(Dataset):
+    """
+    A Dataset over a list of files.
+    """
 
     def __init__(self, fnames: List[Union[str, Path]], pool: ray.util.ActorPool, cache_size: int = 1024, shuffle: bool = False, timeout: int = 10):
         """
         Loads lines from input files.
 
         Args:
-            fnames: list of text or `bz2` files to loader from.
+            fnames: list of text or `bz2` files to load from.
             pool: pool of `wrangl.data.loader.processor.Processor`s to process each example. If not specified, then no processing will be done.
             cache_size: how many examples to keep in the cache.
             shuffle: pseudo random order (local shuffling within cache).
@@ -187,4 +199,11 @@ class FileDataset(Dataset):
                     yield line
 
     def open_file(self, fname):
+        """
+        Loads lines from input files.
+
+        Args:
+            fname: text or `bz2` file to load from.
+        """
+
         return bz2.open(fname, 'rt') if fname.endswith('.bz2') else open(fname, 'rt')

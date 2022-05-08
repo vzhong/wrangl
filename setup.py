@@ -24,7 +24,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='wrangl',
-    version='0.0.6',
+    version='0.0.7',
 
     python_requires='>3.7',
 
@@ -79,7 +79,6 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        'learn': ['pytorch_lightning', 'wandb', 'hydra-submitit-launcher'],
         'dev': ['check-manifest', 'pdoc', 'twine'],
         'test': ['coverage', 'nose'],
     },
