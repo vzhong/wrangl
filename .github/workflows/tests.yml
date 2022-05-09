@@ -20,7 +20,10 @@ jobs:
         python -m pip install --upgrade pip
     - name: Install package
       run: |
-        env USE_CUDA=0 pip install -e .[dev]
+        pip install -e .[dev]
+    - name: Install RL
+      run: |
+        env USE_CUDA=0 pip install .[rl]
     - name: Run tests
       run: |
         wrangl autotest
