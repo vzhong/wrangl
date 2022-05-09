@@ -4,14 +4,8 @@ import hydra
 import torch
 import random
 import logging
-import warnings
 from wrangl.learn import SupervisedModel
 from wrangl.data import IterableDataset, Processor
-
-
-warnings.filterwarnings(
-    "ignore", ".*Trying to infer the `batch_size` from an ambiguous collection.*"
-)
 
 
 logger = logging.getLogger(__name__)

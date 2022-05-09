@@ -1,4 +1,6 @@
 ## Prepocessing data
+This directory contains examples on data preprocessing using Wrangl.
+The examples are:
 
 - text strings: `wrangl.examples.prepocess.repeat_strings`
 - multiple BZip2 compressed JSONL files: `wrangl.examples.prepocess.jsonl_files`

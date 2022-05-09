@@ -340,7 +340,6 @@ class SupervisedModel(pl.LightningModule):
             log_every_n_steps=cfg.log_every_n_steps,
             val_check_interval=1 if cfg.debug else cfg.val_check_interval,
             limit_val_batches=cfg.limit_val_batches,
-            weights_save_path=os.path.join(dout, 'weights'),
             max_steps=cfg.max_steps,
             logger=train_logger,
             callbacks=[checkpoint] + model.get_callbacks(),

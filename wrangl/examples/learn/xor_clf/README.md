@@ -2,6 +2,11 @@
 
 This example trains a XOR classifier.
 
+```bash
+git clone https://github.com/vzhong/wrangl
+cd wrangl/wrangl/examples/learn/xor_clf
+```
+
 ## Training
 To train locally (settings in `conf/default.yaml`):
 

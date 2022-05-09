@@ -14,6 +14,15 @@ class Model(SupervisedModel):
         )
         self.acc = M.Accuracy()
 
+    def featurize(self, batch: list):
+        """
+        Converts a batch of examples to features.
+        By default this returns the batch as is.
+
+        Alternatively you may want to set `collate_fn: "ignore"` in your config and use `featurize` to convert raw examples into features.
+        """
+        return batch
+
     def compute_metrics(self, pred: list, gold: list) -> dict:
         return self.acc(pred, gold)
 
