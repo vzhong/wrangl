@@ -15,8 +15,7 @@ collate_fn: 'auto'  # use 'ignore' to pass an identity collate and define featur
 max_steps: 1_000
 log_every_n_steps: 100
 val_check_interval: 100
-flush_logs_every_n_steps: 100
-learning_rate: 0.0001
+learning_rate: 0.00001
 val_sample_size: 100
 
 
@@ -24,7 +23,7 @@ val_sample_size: 100
 # naming
 ##########
 model: 'mymodel'
-project: 'wrangl-examples-xor_clf'
+project: 'wrangl-examples-dynasent_clf'
 
 ###########
 # params

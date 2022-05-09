@@ -10,8 +10,9 @@ class Model(SupervisedModel):
         super().__init__(cfg)
         self.lm = AutoModel.from_pretrained(cfg.lm)
         self.tokenizer = AutoTokenizer.from_pretrained(cfg.lm)
-        self.labels = ['positive', 'neutral', 'negative', 'mixed']
-        self.mlp = nn.Linear(self.lm.hidden_size, 4)  # there are 4 classes
+        self.labels = ['positive', 'neutral', 'negative']
+        self.mlp = nn.Linear(self.lm.config.hidden_size, len(self.labels))
+        self.acc = M.Accuracy()
 
     def featurize(self, batch: list):
         """
@@ -26,18 +27,18 @@ class Model(SupervisedModel):
         return self.acc(pred, gold)
 
     def compute_loss(self, out, feat, batch):
-        return F.cross_entropy(out, feat['label'])
+        return F.cross_entropy(out, feat['label_idx'])
 
     def extract_context(self, feat, batch):
         return batch['sent']
 
     def extract_pred(self, out, feat, batch):
-        return [self.labels[x for x in out.max(1)[1].tolist()]
+        return [self.labels[x] for x in out.max(1)[1].tolist()]
 
     def extract_gold(self, feat, batch):
         return batch['label_text']
 
     def forward(self, feat, batch):
-        sent = self.tokenizer.batch_encode_plus(feat['sent'], add_special_tokens=True, padding='max_length', truncation=True, max_length=80, return_tensors='pt')
+        sent = self.tokenizer.batch_encode_plus(feat['sent'], add_special_tokens=True, padding='max_length', truncation=True, max_length=80, return_tensors='pt').to(self.device)
         out = self.lm(**sent).last_hidden_state
         return self.mlp(out[:, 0])  # use the [CLS] token for classification
