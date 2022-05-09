@@ -1,19 +1,8 @@
-# Learning examples
+### Supervised learning from scratch
 
-This directory contains learning experiment examples using Wrangl.
-They are:
+You can find examples of how to use Wrangl for supervised learning in `wrangl.examples.learn.xor_clf`.
 
-- Supervised learning experiments
-  - learning a XOR : `wrangl.examples.learn.xor_clf`
-- Reinforcement learning experiments
-  - TBD
-
-Moreover, `wrangl.examples.learn.dynasent_clf` illustrates an example of how to use `wrangl project` to quickly create a project from scratch.
-
-
-## Supervised learning from scratch
-
-We'll build a question answering model on the [DynaSent dataset](https://github.com/cgpotts/dynasent).
+Here, we'll build from scratch a sentiment classifier on the [DynaSent dataset](https://github.com/cgpotts/dynasent).
 The finished project for this example is in `wrangl.examples.learn.dynasent_clf`.
 First, let's bootstrap our model using the `xor_clf` example and download the dataset.
 
