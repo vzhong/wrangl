@@ -37,6 +37,7 @@ If [moolib](https://github.com/facebookresearch/moolib) install fails because yo
 See [the documentation](https://victorzhong.com/wrangl) for how to use Wrangl.
 Examples of projects using Wrangl are found in `wrangl.examples`.
 In particular `wrangl.examples.learn.xor_clf` shows an example of using Wrangl to quickly set up a supervised classification task.
+`wrangl.examples.learn.atari_rl` shows an example of reinforcement learning using IMPALA VTrace.
 For parallel data preprocessing `wrangl.examples.preprocess.using_stanza` shows an example of using Stanford NLP Stanza to parse text in parallel across CPU cores.
 
 If you find this work helpful, please consider citing
