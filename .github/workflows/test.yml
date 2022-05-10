@@ -1,13 +1,13 @@
-name: Docs
+name: Build
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, moolib-docs ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  docs:
+  setup:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -18,13 +18,22 @@ jobs:
     - name: Update pip
       run: |
         python -m pip install --upgrade pip
+    - name: Install CPU pytorch
+      run: |
+        pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
     - name: Install package
       run: |
         pip install -e .[dev]
+    - name: Install RL
+      run: |
+        USE_CUDA=0 pip install -e .[rl]
+    - name: Run tests
+      run: |
+        python -m wrangl.interactive.cmd autotest
     - name: Build docs
       run: |
-        env WRANGL_DOCS_HOST=https://github.com/vzhong/wrangl/blob/main/wrangl/ wrangl autodoc
-    - name: Deploy
+        WRANGL_DOCS_HOST=https://github.com/vzhong/wrangl/blob/main/wrangl/ python -m wrangl.interactive.cmd autodoc
+    - name: Deploy docs
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}

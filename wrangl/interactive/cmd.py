@@ -25,3 +25,7 @@ def main():
     elif args.cmd == 'autotest':
         tests = unittest.TestLoader().discover(args.dtest)
         unittest.runner.TextTestRunner().run(tests)
+
+
+if __name__ == '__main__':
+    main()
