@@ -80,7 +80,7 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={
         'dev': ['check-manifest', 'pdoc', 'twine'],
-        'rl': ['moolib'],
+        'rl': ['moolib', 'gym'],
         'test': ['coverage', 'nose'],
     },
 

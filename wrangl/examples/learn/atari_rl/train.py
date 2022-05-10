@@ -2,7 +2,6 @@ import gym
 import hydra
 import pprint
 from wrangl.learn.rl import MoolibVtrace
-import atari_preprocessing
 
 
 def create_env(flags):
@@ -17,6 +16,7 @@ def create_env(flags):
 
     # Using wrapper from seed_rl in order to do random no-ops _before_ frameskipping.
     # gym.wrappers.AtariPreprocessing doesn't play well with the -v5 versions of the game.
+    import atari_preprocessing
     env = atari_preprocessing.AtariPreprocessing(
         env,
         frame_skip=flags.env.num_action_repeats,
