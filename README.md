@@ -1,7 +1,7 @@
 # Wrangl
 
-[![Tests](https://github.com/vzhong/wrangl/actions/workflows/tests.yml/badge.svg)](https://github.com/vzhong/wrangl/actions/workflows/tests.yml)
-[![Docs](https://github.com/vzhong/wrangl/actions/workflows/docs.yml/badge.svg)](https://www.victorzhong.com/wrangl)
+[![Tests](https://github.com/vzhong/wrangl/actions/workflows/test.yml/badge.svg)](https://github.com/vzhong/wrangl/actions/workflows/test.yml)
+ task
 
 Parallel data preprocessing and fast experiments for NLP and ML.
 See [docs here](https://www.victorzhong.com/wrangl).
