@@ -49,8 +49,6 @@ To log results onto Wandb (assuming your `wandb` user is your current `$USER`, i
 python train.py wandb.enable=true
 ```
 
-[Here is an example](https://wandb.ai/vzhong/wrangl-examples-xor_clf) of the Wandb run for this job.
-
 ## S3
 To log results into your custom S3 bucket, first create a JSON file (e.g. `mycredentials.json`) with your S3 credentials:
 
