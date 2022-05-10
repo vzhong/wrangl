@@ -21,4 +21,4 @@ def main(args):
     if dst.joinpath('__init__.py').is_file():
         os.remove(dst.joinpath('__init__.py'))
     if dst.joinpath('saves').is_dir():
-        os.rmdir(dst.joinpath('saves'))
+        shutil.rmtree(dst.joinpath('saves'))
