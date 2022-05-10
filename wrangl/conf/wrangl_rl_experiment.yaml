@@ -30,7 +30,7 @@ num_actor_batches: 2
 num_actor_cpus: 4
 learning_rate: 0.0006
 unroll_length: 20
-use_lstm: false
+stateful: false
 virtual_batch_size: 32
 reward_clip: 1.0
 warmup: 0

@@ -70,11 +70,11 @@ class Model(MoolibVtrace):
         self.fc = nn.Linear(3872, 256)
 
         # FC output size + one-hot of last action + last reward.
-        core_output_size = self.fc.out_features + num_actions + 1
-
-        if self.use_lstm:
-            self.core = nn.LSTM(core_output_size, 256, num_layers=1)
+        core_input_size = core_output_size = self.fc.out_features + num_actions + 1
+        if FLAGS.stateful:
             core_output_size = 256
+
+        self.state_tracker = self.make_state_tracker(core_input_size, core_output_size)
 
         self.policy = nn.Linear(core_output_size, num_actions)
         self.baseline = nn.Linear(core_output_size, 1)
@@ -107,27 +107,12 @@ class Model(MoolibVtrace):
         clipped_reward = torch.clamp(reward, -1, 1).view(T * B, 1)
         core_input = torch.cat([x, clipped_reward, one_hot_last_action], dim=-1)
 
-        if self.use_lstm:
-            done = inputs["done"]
-            core_input = core_input.view(T, B, -1)
-            core_output_list = []
-            notdone = (~done).float()
-            for input, nd in zip(core_input.unbind(), notdone.unbind()):
-                # Reset core state to zero whenever an episode ended.
-                # Make `done` broadcastable with (num_layers, B, hidden_size)
-                # states:
-                nd = nd.view(1, -1, 1)
-                core_state = nest.map(nd.mul, core_state)
-                output, core_state = self.core(input.unsqueeze(0), core_state)
-                core_output_list.append(output)
-            core_output = torch.flatten(torch.cat(core_output_list), 0, 1)
-        else:
-            core_output = core_input
+        core_output, core_state = self.update_state(core_input, core_state, done=inputs['done'])
 
         policy_logits = self.policy(core_output)
         baseline = self.baseline(core_output)
 
-        action = torch.multinomial(F.softmax(policy_logits, dim=1), num_samples=1)
+        action = torch.multinomial(F.softmax(policy_logits.reshape(T*B, -1), dim=1), num_samples=1)
 
         policy_logits = policy_logits.view(T, B, self.num_actions)
         baseline = baseline.view(T, B)

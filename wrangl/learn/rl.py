@@ -18,6 +18,9 @@ import torch.nn.functional as F
 from argparse import Namespace
 import wandb
 
+import socket
+import coolname
+
 import moolib
 from moolib.examples.common import nest
 from moolib.examples.common import vtrace
@@ -30,6 +33,13 @@ from .model import BaseModel
 
 
 __all__ = ['MoolibVtrace']
+
+
+def uid():
+    return "%s:%i:%s" % (socket.gethostname(), os.getpid(), coolname.generate_slug(2))
+
+
+omegaconf.OmegaConf.register_new_resolver("uid", uid, use_cache=True)
 
 
 @dataclasses.dataclass
@@ -76,8 +86,8 @@ class MoolibVtrace(BaseModel):
 
     In addition, if you want to use the default state tracking, you must
 
-    - have a `self.core` module that computes the next state
-    - override `wrangl.learn.rl.MoolibVtrace.initial_core_state` to provide initial model states
+    - implement a `self.state_tracker` module to compute the next state
+    - override `wrangl.learn.rl.MoolibVtrace.initial_state` to provide initial model states
     """
 
     @classmethod
@@ -246,21 +256,22 @@ class MoolibVtrace(BaseModel):
             model_kwargs: model keyword args.
         """
         dsave = os.getcwd()
+        localdir = os.path.join(dsave, 'peers', FLAGS.local_name)
         fconfig = os.path.join(dsave, 'config.yaml')
         omegaconf.OmegaConf.save(config=FLAGS, f=fconfig)
 
         envs = cls.create_env_pool(FLAGS, create_train_env)
         eval_envs = cls.create_env_pool(FLAGS, create_eval_env, override_actor_batches=1)
 
-        logging.info("Flags:\n%s\n", pprint.pformat(dict(FLAGS)))
+        logging.info("Flags:\n%s\n", pprint.pformat(omegaconf.OmegaConf.to_container(FLAGS, resolve=True)))
         logging.info("Save directory: %s", dsave)
 
         train_id = "%s/%s/%s" % (FLAGS.wandb.entity, FLAGS.wandb.project, FLAGS.wandb.name)
 
         logging.info("train_id: %s", train_id)
 
-        if not os.path.isdir(FLAGS.localdir):
-            os.makedirs(FLAGS.localdir)
+        if not os.path.isdir(localdir):
+            os.makedirs(localdir)
 
         print("EnvPool started")
 
@@ -294,7 +305,7 @@ class MoolibVtrace(BaseModel):
         eval_env_state = common.EnvBatchState(moolib_args, model)
 
         rpc = moolib.Rpc()
-        rpc.set_name(FLAGS.name)
+        rpc.set_name(FLAGS.local_name)
         rpc.connect(FLAGS.connect)
 
         rpc_group = moolib.Group(rpc, name=train_id)
@@ -414,7 +425,7 @@ class MoolibVtrace(BaseModel):
                     logging.warning("Training interrupted!")
                 # If we're not connected, sleep for a bit so we don't busy-wait
                 logging.info("Your training will commence shortly.")
-                time.sleep(1)
+                time.sleep(10)
                 continue
 
             was_leader = is_leader
@@ -471,9 +482,9 @@ class MoolibVtrace(BaseModel):
                     leader_filename = os.path.join(
                         dsave, "leader-%03d" % learner_state.num_previous_leaders
                     )
-                    record.symlink_path(FLAGS.localdir, leader_filename)
+                    record.symlink_path(localdir, leader_filename)
                     logging.info(
-                        "Created symlink %s -> %s", leader_filename, FLAGS.localdir
+                        "Created symlink %s -> %s", leader_filename, localdir
                     )
                     learner_state.num_previous_leaders += 1
                 if not was_leader and not os.path.exists(checkpoint_path):
@@ -483,7 +494,8 @@ class MoolibVtrace(BaseModel):
                     cls.save_checkpoint(FLAGS, checkpoint_path, learner_state)
                     test_results = cls.run_test(FLAGS, eval_envs, checkpoint_path, env_state=eval_env_state, model_kwargs=model_kwargs, eval_steps=FLAGS.eval_steps)
                     for k in ['mean_episode_return', 'running_reward']:
-                        stats['eval_{}'.format(k)] += test_results[k]
+                        if test_results[k] is not None:
+                            stats['eval_{}'.format(k)] += test_results[k]
 
                     if FLAGS.s3.enable:
                         s3.on_save_checkpoint(trainer=None, model=None, checkpoint=learner_state.save())
@@ -652,22 +664,43 @@ class MoolibVtrace(BaseModel):
         """
         Returns the initial states for the policy learner.
         """
-        if not self.use_lstm:
+        if not self.hparams.stateful:
             return tuple()
         return tuple(
-            torch.zeros(self.core.num_layers, batch_size, self.core.hidden_size)
+            torch.zeros(self.state_tracker.num_layers, batch_size, self.state_tracker.hidden_size)
             for _ in range(2)
         )
 
-    def forward(self, inputs, core_state=None) -> Tuple[dict, tuple]:
+    def make_state_tracker(self, din, dout):
+        return nn.LSTM(din, dout, num_layers=1) if self.hparams.stateful else None
+
+    def update_state(self, state_tracker_input, state_tracker_state, done):
+        if not self.hparams.stateful:
+            return state_tracker_input, state_tracker_state
+        T, B, *_ = done.size()
+        state_tracker_input = state_tracker_input.view(T, B, -1)
+        state_tracker_output_list = []
+        notdone = (~done).float()
+        for input, nd in zip(state_tracker_input.unbind(), notdone.unbind()):
+            # Reset state_tracker state to zero whenever an episode ended.
+            # Make `done` broadcastable with (num_layers, B, hidden_size)
+            # states:
+            nd = nd.view(1, -1, 1)
+            state_tracker_state = nest.map(nd.mul, state_tracker_state)
+            output, state_tracker_state = self.state_tracker(input.unsqueeze(0), state_tracker_state)
+            state_tracker_output_list.append(output)
+        state_tracker_output = torch.cat(state_tracker_output_list)
+        return state_tracker_output, state_tracker_state
+
+    def forward(self, inputs, state_tracker_state=None) -> Tuple[dict, tuple]:
         """
         Computing one step of the policy.
 
         Args:
             inputs: policy inputs, each is of shape [T, B, _*] where T is the unroll length and B is the batch size.
-            core_state: previous learner states, each is of shape [T, B, _*].
+            state_tracker_state: previous learner states, each is of shape [T, B, _*].
 
-        This method must return a tuple `(output, core_state)` of the following format:
+        This method must return a tuple `(output, state_tracker_state)` of the following format:
 
         ```python
         output = dict(
@@ -675,7 +708,7 @@ class MoolibVtrace(BaseModel):
             baseline=baseline  # shape [T, B],
             action=action  # shape [T, B],
         )
-        return output, core_state
+        return output, state_tracker_state
         ```
         """
         raise NotImplementedError()
