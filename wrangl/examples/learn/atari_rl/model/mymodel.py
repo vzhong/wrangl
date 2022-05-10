@@ -4,13 +4,15 @@ from torch import nn
 import torch.nn.functional as F
 
 from moolib.examples.common import nest
+from wrangl.learn.rl import MoolibVtrace
 
 
-class Net(nn.Module):
-    def __init__(self, num_actions=18, input_channels=4, use_lstm=False):
-        super(Net, self).__init__()
+class Model(MoolibVtrace):
+
+    def __init__(self, FLAGS, num_actions=18, input_channels=4):
+        super().__init__(FLAGS)
+        self.use_lstm = FLAGS.use_lstm
         self.num_actions = num_actions
-        self.use_lstm = use_lstm
 
         self.feat_convs = []
         self.resnet1 = []
@@ -70,20 +72,12 @@ class Net(nn.Module):
         # FC output size + one-hot of last action + last reward.
         core_output_size = self.fc.out_features + num_actions + 1
 
-        if use_lstm:
+        if self.use_lstm:
             self.core = nn.LSTM(core_output_size, 256, num_layers=1)
             core_output_size = 256
 
-        self.policy = nn.Linear(core_output_size, self.num_actions)
+        self.policy = nn.Linear(core_output_size, num_actions)
         self.baseline = nn.Linear(core_output_size, 1)
-
-    def initial_state(self, batch_size=1):
-        if not self.use_lstm:
-            return tuple()
-        return tuple(
-            torch.zeros(self.core.num_layers, batch_size, self.core.hidden_size)
-            for _ in range(2)
-        )
 
     def forward(self, inputs, core_state=None):
         reward = inputs["reward"]
@@ -145,9 +139,3 @@ class Net(nn.Module):
             action=action,
         )
         return output, core_state
-
-
-def create_model(flags):
-    model = Net(use_lstm=flags.use_lstm)
-    model.to(device=flags.device)
-    return model

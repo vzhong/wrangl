@@ -1,5 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
-# Adapted from https://github.com/facebookresearch/moolib
+"""
+Adapted from https://github.com/facebookresearch/moolib
+"""
 import copy
 import dataclasses
 import logging
@@ -7,20 +9,27 @@ import os
 import pprint
 import signal
 import time
-from typing import Optional
-
-import hydra
 import omegaconf
+from typing import Optional, Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from argparse import Namespace
 import wandb
 
 import moolib
 from moolib.examples.common import nest
-from moolib.examples.common import record
 from moolib.examples.common import vtrace
+from moolib.examples.common import record
 from moolib.examples import common
+
+from pytorch_lightning.loggers import CSVLogger
+from .callbacks import GitCallback, S3Callback
+from .model import BaseModel
+
+
+__all__ = ['MoolibVtrace']
 
 
 @dataclasses.dataclass
@@ -56,7 +65,20 @@ class LearnerState:
                 self.global_stats[k] = type(self.global_stats[k])(**v)
 
 
-class MoolibVtrace:
+class MoolibVtrace(BaseModel):
+    """
+    This interface is based on the reference VTrace implementation from moolib.
+
+    The functions you need to implement are:
+
+    - `wrangl.learn.rl.MoolibVtrace.__init__`
+    - `wrangl.learn.rl.MoolibVtrace.forward`
+
+    In addition, if you want to use the default state tracking, you must
+
+    - have a `self.core` module that computes the next state
+    - override `wrangl.learn.rl.MoolibVtrace.initial_core_state` to provide initial model states
+    """
 
     @classmethod
     def compute_baseline_loss(cls, advantages):
@@ -79,16 +101,6 @@ class MoolibVtrace:
         cross_entropy = cross_entropy.view_as(advantages)
         policy_gradient_loss_per_timestep = cross_entropy * advantages.detach()
         return torch.mean(policy_gradient_loss_per_timestep)
-
-    @classmethod
-    def create_optimizer(cls, model, FLAGS):
-        return torch.optim.RMSprop(
-            model.parameters(),
-            lr=FLAGS.optimizer.learning_rate,
-            alpha=FLAGS.optimizer.alpha,
-            momentum=FLAGS.optimizer.momentum,
-            eps=FLAGS.optimizer.epsilon,
-        )
 
     @classmethod
     def create_scheduler(cls, optimizer, FLAGS):
@@ -162,7 +174,7 @@ class MoolibVtrace:
         stats["model_version"] += 1
 
     @classmethod
-    def log(cls, FLAGS, stats, step, is_global=False):
+    def log(cls, FLAGS, logger, stats, step, is_global=False):
         stats_values = {}
         prefix = "global/" if is_global else "local/"
         for k, v in stats.items():
@@ -170,8 +182,9 @@ class MoolibVtrace:
             v.reset()
 
         logging.info(stats_values)
-        if not is_global:
-            record.log_to_file(**stats_values)
+        if is_global:
+            logger.log_metrics(stats_values, step=step)
+            logger.save()
 
         if FLAGS.wandb.enable:
             wandb.log(stats_values, step=step)
@@ -205,39 +218,67 @@ class MoolibVtrace:
         return env_train_steps
 
     @classmethod
-    def launch(cls, FLAGS, create_env, create_model):
-        logging.info("flags:\n%s\n", pprint.pformat(dict(FLAGS)))
-        logging.info("savedir: %s", FLAGS.savedir)
+    def create_env_pool(cls, FLAGS, create_env, override_actor_batches: int = None) -> moolib.EnvPool:
+        """
+        Returns a batched environment.
+
+        Args:
+            FLAGS: experiment config.
+            create_env: function `f(FLAGS)` that returns a single Gym environment in the batch.
+            override_actor_batches: optional argument to override the number of actor batches.
+        """
+        return moolib.EnvPool(
+            lambda: create_env(FLAGS),
+            num_processes=FLAGS.num_actor_cpus,
+            batch_size=FLAGS.actor_batch_size,
+            num_batches=FLAGS.num_actor_batches if override_actor_batches is None else override_actor_batches,
+        )
+
+    @classmethod
+    def run_train_test(cls, FLAGS, create_train_env, create_eval_env, model_kwargs=None):
+        """
+        Trains a policy.
+
+        Args:
+            FLAGS: experiment config.
+            create_train_env: function `f(FLAGS)` that returns a single Gym environment for training.
+            create_eval_env: function `f(FLAGS)` that returns a single Gym environment for validation.
+            model_kwargs: model keyword args.
+        """
+        dsave = os.getcwd()
+        fconfig = os.path.join(dsave, 'config.yaml')
+        omegaconf.OmegaConf.save(config=FLAGS, f=fconfig)
+
+        envs = cls.create_env_pool(FLAGS, create_train_env)
+        eval_envs = cls.create_env_pool(FLAGS, create_eval_env, override_actor_batches=1)
+
+        logging.info("Flags:\n%s\n", pprint.pformat(dict(FLAGS)))
+        logging.info("Save directory: %s", dsave)
 
         train_id = "%s/%s/%s" % (FLAGS.wandb.entity, FLAGS.wandb.project, FLAGS.wandb.name)
 
         logging.info("train_id: %s", train_id)
-
-        envs = moolib.EnvPool(
-            lambda: create_env(FLAGS),
-            num_processes=FLAGS.num_actor_cpus,
-            batch_size=FLAGS.actor_batch_size,
-            num_batches=FLAGS.num_actor_batches,
-        )
 
         if not os.path.isdir(FLAGS.localdir):
             os.makedirs(FLAGS.localdir)
 
         print("EnvPool started")
 
-        model = create_model(FLAGS)
-        optimizer = cls.create_optimizer(model, FLAGS)
+        device = 'cpu'
+        if FLAGS.gpus > 0:
+            device = 'cuda:0'
+            # hack for moolib
+        moolib_args = Namespace(**omegaconf.OmegaConf.to_container(FLAGS, resolve=True))
+        moolib_args.device = device
+
+        model_kwargs = model_kwargs or {}
+        model = cls(FLAGS, **model_kwargs).to(device)
+        optimizer = model.configure_optimizers()
         scheduler = cls.create_scheduler(optimizer, FLAGS)
         learner_state = LearnerState(model, optimizer, scheduler)
 
         model_numel = sum(p.numel() for p in model.parameters() if p.requires_grad)
         logging.info("Number of model parameters: %i", model_numel)
-        record.write_metadata(
-            FLAGS.localdir,
-            hydra.utils.get_original_cwd(),
-            flags=omegaconf.OmegaConf.to_container(FLAGS),
-            model_numel=model_numel,
-        )
 
         if FLAGS.wandb.enable:
             wandb.init(
@@ -248,8 +289,9 @@ class MoolibVtrace:
             )
 
         env_states = [
-            common.EnvBatchState(FLAGS, model) for _ in range(FLAGS.num_actor_batches)
+            common.EnvBatchState(moolib_args, model) for _ in range(FLAGS.num_actor_batches)
         ]
+        eval_env_state = common.EnvBatchState(moolib_args, model)
 
         rpc = moolib.Rpc()
         rpc.set_name(FLAGS.name)
@@ -265,12 +307,14 @@ class MoolibVtrace:
         )
         accumulator.set_virtual_batch_size(FLAGS.virtual_batch_size)
 
-        learn_batcher = moolib.Batcher(FLAGS.batch_size, FLAGS.device, dim=1)
+        learn_batcher = moolib.Batcher(FLAGS.batch_size, device, dim=1)
 
         stats = {
             "mean_episode_return": common.StatMean(),
             "mean_episode_step": common.StatMean(),
             "SPS": common.StatMean(),
+            "eval_mean_episode_return": common.StatMean(),
+            "eval_running_reward": common.StatMean(),
             "env_act_steps": common.StatSum(),
             "env_train_steps": common.StatSum(),
             "optimizer_steps": common.StatSum(),
@@ -287,7 +331,7 @@ class MoolibVtrace:
 
         checkpoint_path = FLAGS.ckpt_path
 
-        if os.path.exists(checkpoint_path):
+        if FLAGS.autoresume and os.path.exists(checkpoint_path):
             logging.info("Loading checkpoint: %s" % checkpoint_path)
             cls.load_checkpoint(checkpoint_path, learner_state)
             accumulator.set_model_version(learner_state.model_version)
@@ -333,6 +377,18 @@ class MoolibVtrace:
         last_reduce_stats = now
         is_leader = False
         is_connected = False
+
+        logger = CSVLogger(save_dir=dsave, name='logs', flush_logs_every_n_steps=FLAGS.flush_logs_every_n_steps)
+        logger.log_hyperparams(FLAGS)
+
+        if FLAGS.git.enable:
+            git = GitCallback()
+            git.on_init_end()
+
+        if FLAGS.s3.enable:
+            s3 = S3Callback(FLAGS.s3)
+            s3.on_fit_start(trainer=None, model=None)
+
         while not terminate:
             prev_now = now
             now = time.time()
@@ -386,7 +442,7 @@ class MoolibVtrace:
             if now - last_reduce_stats >= 2:
                 last_reduce_stats = now
                 global_stats_accumulator.reduce(stats)
-            if now - last_log >= FLAGS.log_interval:
+            if now - last_log >= FLAGS.log_every_n_steps:
                 delta = now - last_log
                 last_log = now
 
@@ -400,8 +456,10 @@ class MoolibVtrace:
 
                 steps = learner_state.global_stats["env_train_steps"].result()
 
-                cls.log(FLAGS, stats, step=steps, is_global=False)
-                cls.log(FLAGS, learner_state.global_stats, step=steps, is_global=True)
+                cls.log(FLAGS, logger, stats, step=steps, is_global=False)
+                cls.log(FLAGS, logger, learner_state.global_stats, step=steps, is_global=True)
+                if FLAGS.s3.enable:
+                    s3.on_validation_end(trainer=None, model=None)
 
                 if warm_up_time > 0:
                     logging.info(
@@ -411,7 +469,7 @@ class MoolibVtrace:
             if is_leader:
                 if not was_leader:
                     leader_filename = os.path.join(
-                        FLAGS.savedir, "leader-%03d" % learner_state.num_previous_leaders
+                        dsave, "leader-%03d" % learner_state.num_previous_leaders
                     )
                     record.symlink_path(FLAGS.localdir, leader_filename)
                     logging.info(
@@ -420,9 +478,15 @@ class MoolibVtrace:
                     learner_state.num_previous_leaders += 1
                 if not was_leader and not os.path.exists(checkpoint_path):
                     logging.info("Training a new model from scratch.")
-                if learner_state.train_time - learner_state.last_checkpoint >= FLAGS.checkpoint_interval:
+                if learner_state.train_time - learner_state.last_checkpoint >= FLAGS.val_check_interval:
                     learner_state.last_checkpoint = learner_state.train_time
                     cls.save_checkpoint(FLAGS, checkpoint_path, learner_state)
+                    test_results = cls.run_test(FLAGS, eval_envs, checkpoint_path, env_state=eval_env_state, model_kwargs=model_kwargs, eval_steps=FLAGS.eval_steps)
+                    for k in ['mean_episode_return', 'running_reward']:
+                        stats['eval_{}'.format(k)] += test_results[k]
+
+                    if FLAGS.s3.enable:
+                        s3.on_save_checkpoint(trainer=None, model=None, checkpoint=learner_state.save())
 
             if accumulator.has_gradients():
                 gradient_stats = accumulator.get_gradient_stats()
@@ -447,7 +511,7 @@ class MoolibVtrace:
                 cpu_env_outputs = env_state.future.result()
 
                 env_outputs = nest.map(
-                    lambda t: t.to(FLAGS.device, copy=True), cpu_env_outputs
+                    lambda t: t.to(device, copy=True), cpu_env_outputs
                 )
 
                 env_outputs["prev_action"] = env_state.prev_action
@@ -487,3 +551,131 @@ class MoolibVtrace:
         if is_connected and is_leader:
             cls.save_checkpoint(FLAGS, checkpoint_path, learner_state)
         logging.info("Graceful exit. Bye bye!")
+
+    @classmethod
+    def run_test(cls, FLAGS: omegaconf.OmegaConf, envs: moolib.EnvPool, fcheckpoint: str, env_state=None, eval_steps=100, model_kwargs=None) -> dict:
+        """
+        Evaluates checkpoint of policy.
+
+        Args:
+            FLAGS: experiment config.
+            envs: batched environments.
+            fcheckpoint: saved checkpoint.
+            env_state: batched environment state, if not given then will be created internally.
+            eval_steps: how many steps to evaluate.
+            model_kwargs: model keyword args.
+
+        Returns:
+            a dictionary of evaluation results.
+        """
+        model_kwargs = model_kwargs or {}
+
+        device = 'cpu'
+        if FLAGS.gpus > 0:
+            device = 'cuda:0'
+            # hack for moolib
+
+        model = cls(FLAGS, **model_kwargs).to(device)
+
+        if env_state is None:
+            device = 'cpu'
+            if FLAGS.gpus > 0:
+                device = 'cuda:0'
+                # hack for moolib
+            moolib_args = Namespace(**omegaconf.OmegaConf.to_container(FLAGS, resolve=True))
+            moolib_args.device = device
+            env_state = common.EnvBatchState(moolib_args, model)
+
+        env_act_steps = 0
+
+        stats = {
+            "mean_episode_return": common.StatMean(),
+            "mean_episode_step": common.StatMean(),
+            "env_act_steps": common.StatSum(),
+            "env_train_steps": common.StatSum(),
+            "running_reward": common.StatMean(),
+            "running_step": common.StatMean(),
+            "steps_done": common.StatSum(),
+            "episodes_done": common.StatSum(),
+        }
+
+        while env_act_steps < eval_steps:
+            # Generate data.
+            if env_state.future is None:
+                env_state.future = envs.step(0, env_state.prev_action)
+            cpu_env_outputs = env_state.future.result()
+
+            env_outputs = nest.map(
+                lambda t: t.to(device, copy=True), cpu_env_outputs
+            )
+
+            env_outputs["prev_action"] = env_state.prev_action
+            prev_core_state = env_state.core_state
+            model.eval()
+            with torch.no_grad():
+                actor_outputs, env_state.core_state = model(
+                    nest.map(lambda t: t.unsqueeze(0), env_outputs),
+                    env_state.core_state,
+                )
+            actor_outputs = nest.map(lambda t: t.squeeze(0), actor_outputs)
+            action = actor_outputs["action"]
+            env_state.update(cpu_env_outputs, action, stats)
+
+            # envs.step invalidates cpu_env_outputs
+            del cpu_env_outputs
+            env_state.future = envs.step(0, action)
+
+            stats["env_act_steps"] += action.numel()
+            env_act_steps += action.numel()
+
+            last_data = {
+                "env_outputs": env_outputs,
+                "actor_outputs": actor_outputs,
+            }
+
+            if not env_state.time_batcher.empty():
+                data = env_state.time_batcher.get()
+                data["initial_core_state"] = env_state.initial_core_state
+
+                # We need the last entry of the previous time batch
+                # to be put into the first entry of this time batch,
+                # with the initial_core_state to match
+                env_state.initial_core_state = prev_core_state
+                env_state.time_batcher.stack(last_data)
+
+        stats_values = {}
+        for k, v in stats.items():
+            stats_values[k] = v.result()
+        return stats_values
+
+    def initial_state(self, batch_size=1) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Returns the initial states for the policy learner.
+        """
+        if not self.use_lstm:
+            return tuple()
+        return tuple(
+            torch.zeros(self.core.num_layers, batch_size, self.core.hidden_size)
+            for _ in range(2)
+        )
+
+    def forward(self, inputs, core_state=None) -> Tuple[dict, tuple]:
+        """
+        Computing one step of the policy.
+
+        Args:
+            inputs: policy inputs, each is of shape [T, B, _*] where T is the unroll length and B is the batch size.
+            core_state: previous learner states, each is of shape [T, B, _*].
+
+        This method must return a tuple `(output, core_state)` of the following format:
+
+        ```python
+        output = dict(
+            policy_logits=policy_logits  # shape [T, B, num_actions],
+            baseline=baseline  # shape [T, B],
+            action=action  # shape [T, B],
+        )
+        return output, core_state
+        ```
+        """
+        raise NotImplementedError()

@@ -1,3 +1,0 @@
-gym[atari, accept-rom-license]
-opencv-python
-git+https://github.com/facebookresearch/moolib

@@ -1,19 +1,8 @@
-# Copyright (c) Facebook, Inc. and its affiliates.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 import gym
-
-from . import atari_preprocessing
+import hydra
+import pprint
+from wrangl.learn.rl import MoolibVtrace
+import atari_preprocessing
 
 
 def create_env(flags):
@@ -37,3 +26,19 @@ def create_env(flags):
     )
     env = gym.wrappers.FrameStack(env, num_stack=4)
     return env
+
+
+@hydra.main(config_path="conf", config_name="default")
+def main(cfg):
+    Model = MoolibVtrace.load_model_class(cfg.model, model_dir='model')
+    if not cfg.test_only:
+        Model.run_train_test(cfg, create_train_env=create_env, create_eval_env=create_env)
+    else:
+        checkpoint_path = 'last.ckpt'
+        eval_envs = Model.create_env_pool(cfg, create_env, override_actor_batches=1)
+        test_results = Model.run_test(cfg, eval_envs, checkpoint_path, eval_steps=cfg.eval_steps)
+        pprint.pprint(test_results)
+
+
+if __name__ == "__main__":
+    main()

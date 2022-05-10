@@ -161,7 +161,7 @@ class S3Client:
             fig, ax = plt.subplots(figsize=(10, 5))
             sns.lineplot(x=x, y=yi, data=df, ax=ax, **plot_kwargs)
 
-            fname = '{}_vs_{}.pdf'.format(x, yi)
+            fname = '{}_vs_{}.pdf'.format(x.replace('/', '--'), yi.replace('/', '--'))
             with tempfile.TemporaryDirectory() as tempdir_path:
                 tempdir = pathlib.Path(tempdir_path)
                 ffig = tempdir.joinpath(fname)

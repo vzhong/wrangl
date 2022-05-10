@@ -57,7 +57,8 @@ class S3Callback(pl.Callback):
             )
 
         for fname in ['pred_samples.json']:
-            self.client.upload_file(self.cfg.project_id, self.cfg.experiment_id, fname, fname, content_type='text/plain')
+            if os.path.isfile(fname):
+                self.client.upload_file(self.cfg.project_id, self.cfg.experiment_id, fname, fname, content_type='text/plain')
 
     def on_fit_start(self, trainer, model):
         for fname in glob.glob('git.*'):
@@ -69,7 +70,7 @@ class GitCallback(pl.Callback):
     Dumps git diffs to work directory.
     """
 
-    def on_init_end(self, trainer):
+    def on_init_end(self, trainer=None):
         import git
         repo = git.Repo(get_original_cwd(), search_parent_directories=True)
         with open('git.patch.diff', 'wt') as f:

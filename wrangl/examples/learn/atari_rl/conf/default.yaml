@@ -1,0 +1,37 @@
+# see config options in https://github.com/vzhong/wrangl/wrangl/conf
+defaults:
+  - wrangl_rl_experiment
+  - _self_
+
+model: 'mymodel'
+project: 'wrangl-examples-atari_rl'
+
+localdir: "${dsave}/peers/${peer}"
+local_name: "${name}-${peer}"
+peer: 0
+max_steps: 5_000_000
+autoresume: false
+
+actor_batch_size: 32
+baseline_cost: 0.5
+batch_size: 8
+connect: 127.0.0.1:4431
+discounting: 0.99
+entropy_cost: 0.0006
+env:
+  name: "ALE/Breakout-v5"  # See https://brosa.ca/blog/ale-release-v0.7
+  repeat_action_probability: 0.0  # Sticky action probability
+  num_action_repeats: 4
+  noop_max: 30
+fixup_init: true
+grad_clip_norm: 40
+log_every_n_steps: 100
+val_check_interval: 100  # how often to evaluate in seconds
+num_actor_batches: 2
+num_actor_cpus: 4
+unroll_length: 20
+use_lstm: false
+virtual_batch_size: 32
+reward_clip: 1.0
+warmup: 0
+eval_steps: 10000  # how many steps to evaluate for

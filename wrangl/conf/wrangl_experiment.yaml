@@ -34,10 +34,11 @@ s3:  # s3 settings
   project_id: '${project}'
   experiment_id: '${name}'
   plot:
-    x: 'step'
+    x: '${time_key}'
     y: '${early_stopping.monitor}'
   checkpoint: true
   pred_samples: true
+time_key: 'step'
 
 ##########
 # training
