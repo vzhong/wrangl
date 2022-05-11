@@ -519,7 +519,7 @@ class MoolibVtrace(BaseModel):
                 if learner_state.train_time - learner_state.last_checkpoint >= FLAGS.val_check_interval:
                     learner_state.last_checkpoint = learner_state.train_time
                     cls.save_checkpoint(FLAGS, checkpoint_path, learner_state)
-                    test_results = cls.run_test(FLAGS, eval_envs, checkpoint_path, env_state=eval_env_state, model_kwargs=model_kwargs, eval_steps=FLAGS.eval_steps)
+                    test_results = cls.run_test(FLAGS, eval_envs, checkpoint_path, env_state=eval_env_state, model=model, eval_steps=FLAGS.eval_steps)
                     for k in ['mean_episode_return', 'running_reward']:
                         if test_results[k] is not None:
                             stats['eval_{}'.format(k)] += test_results[k]
@@ -592,7 +592,7 @@ class MoolibVtrace(BaseModel):
         logging.info("Graceful exit. Bye bye!")
 
     @classmethod
-    def run_test(cls, FLAGS: omegaconf.OmegaConf, envs: moolib.EnvPool, fcheckpoint: str, env_state=None, eval_steps=100, model_kwargs=None) -> dict:
+    def run_test(cls, FLAGS: omegaconf.OmegaConf, envs: moolib.EnvPool, fcheckpoint=None, env_state=None, eval_steps=100, model_kwargs=None, model=None) -> dict:
         """
         Evaluates checkpoint of policy.
 
@@ -607,16 +607,17 @@ class MoolibVtrace(BaseModel):
         Returns:
             a dictionary of evaluation results.
         """
-        model_kwargs = model_kwargs or {}
-
         device = 'cpu'
         if FLAGS.gpus > 0:
             device = 'cuda:0'
             # hack for moolib
 
-        model = cls(FLAGS, **model_kwargs).to(device)
-        state = torch.load(fcheckpoint)
-        model.load_state_dict(state['learner_state']['model'])
+        if model is None:
+            assert fcheckpoint is not None
+            model_kwargs = model_kwargs or {}
+            model = cls(FLAGS, **model_kwargs).to(device)
+            state = torch.load(fcheckpoint)
+            model.load_state_dict(state['learner_state']['model'])
 
         if env_state is None:
             device = 'cpu'
@@ -718,7 +719,7 @@ class MoolibVtrace(BaseModel):
             state_tracker_state = nest.map(nd.mul, state_tracker_state)
             output, state_tracker_state = self.state_tracker(input.unsqueeze(0), state_tracker_state)
             state_tracker_output_list.append(output)
-        state_tracker_output = torch.cat(state_tracker_output_list)
+        state_tracker_output = torch.flatten(torch.cat(state_tracker_output_list), 0, 1)
         return state_tracker_output, state_tracker_state
 
     def forward(self, inputs, state_tracker_state=None) -> Tuple[dict, tuple]:
