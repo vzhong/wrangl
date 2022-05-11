@@ -91,8 +91,41 @@ class MoolibVtrace(BaseModel):
     """
 
     @classmethod
-    def compute_baseline_loss(cls, advantages):
-        return 0.5 * torch.mean(advantages ** 2)
+    def compute_baseline_loss(cls, actor_baseline, learner_baseline, target, clip_delta_value=None):
+        # Adjustments courtesy of Eric Hambro
+        baseline_loss = (target - learner_baseline) ** 2
+
+        if clip_delta_value:
+            # Common PPO trick - clip a change in baseline fn
+            # (cf PPO2 github.com/Stable-Baselines-Team/stable-baselines)
+            delta_baseline = learner_baseline - actor_baseline
+            clipped_baseline = actor_baseline + torch.clamp(
+                delta_baseline, -clip_delta_value, clip_delta_value
+            )
+            clipped_baseline_loss = (target - clipped_baseline) ** 2
+            baseline_loss = torch.max(baseline_loss, clipped_baseline_loss)
+        return 0.5 * torch.mean(baseline_loss)
+
+    def compute_policy_gradient_loss(actor_log_prob, learner_log_prob, advantages, normalize_advantages=False, clip_delta_policy=None):
+        # Adjustments courtesy of Eric Hambro
+        advantages = advantages.detach()
+        if normalize_advantages:
+            # Common PPO trick (cf PPO2 github.com/Stable-Baselines-Team/stable-baselines)
+            adv = advantages
+            advantages = (adv - adv.mean()) / max(1e-3, adv.std())
+        if clip_delta_policy:
+            # APPO policy loss - clip a change in policy fn
+            ratio = torch.exp(learner_log_prob - actor_log_prob)
+            policy_loss = ratio * advantages
+            clip_high = 1 + clip_delta_policy
+            clip_low = 1.0 / clip_high
+            clipped_ratio = torch.clamp(ratio, clip_low, clip_high)
+            clipped_policy_loss = clipped_ratio * advantages
+            policy_loss = torch.min(policy_loss, clipped_policy_loss)
+        else:
+            # IMPALA policy loss
+            policy_loss = learner_log_prob * advantages
+        return -torch.mean(policy_loss)
 
     @classmethod
     def compute_entropy_loss(cls, logits):
@@ -100,17 +133,6 @@ class MoolibVtrace(BaseModel):
         log_policy = F.log_softmax(logits, dim=-1)
         entropy_per_timestep = torch.sum(-policy * log_policy, dim=-1)
         return -torch.mean(entropy_per_timestep)
-
-    @classmethod
-    def compute_policy_gradient_loss(cls, logits, actions, advantages):
-        cross_entropy = F.nll_loss(
-            F.log_softmax(torch.flatten(logits, 0, 1), dim=-1),
-            target=torch.flatten(actions, 0, 1),
-            reduction="none",
-        )
-        cross_entropy = cross_entropy.view_as(advantages)
-        policy_gradient_loss_per_timestep = cross_entropy * advantages.detach()
-        return torch.mean(policy_gradient_loss_per_timestep)
 
     @classmethod
     def create_scheduler(cls, optimizer, FLAGS):
@@ -140,7 +162,7 @@ class MoolibVtrace(BaseModel):
         env_outputs = nest.map(lambda t: t[1:], env_outputs)
         actor_outputs = nest.map(lambda t: t[:-1], actor_outputs)
 
-        rewards = env_outputs["reward"]
+        rewards = env_outputs["reward"] * FLAGS.reward_scale
         if FLAGS.reward_clip:
             rewards = torch.clip(rewards, -FLAGS.reward_clip, FLAGS.reward_clip)
 
@@ -162,12 +184,17 @@ class MoolibVtrace(BaseModel):
             learner_outputs["policy_logits"]
         )
         pg_loss = cls.compute_policy_gradient_loss(
-            learner_outputs["policy_logits"],
-            actor_outputs["action"],
+            vtrace_returns.behavior_action_log_probs,
+            vtrace_returns.target_action_log_probs,
             vtrace_returns.pg_advantages,
+            FLAGS.normalize_advantages,
+            FLAGS.appo_clip_policy,
         )
         baseline_loss = FLAGS.baseline_cost * cls.compute_baseline_loss(
-            vtrace_returns.vs - learner_outputs["baseline"]
+            actor_outputs['baseline'],
+            learner_outputs['baseline'],
+            vtrace_returns.vs,
+            FLAGS.appo_clip_baseline,
         )
         total_loss = entropy_loss + pg_loss + baseline_loss
         total_loss.backward()

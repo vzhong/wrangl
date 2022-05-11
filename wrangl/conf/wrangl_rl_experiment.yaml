@@ -26,6 +26,9 @@ discounting: 0.99
 entropy_cost: 0.0006
 env: null
 grad_clip_norm: 40
+normalize_advantages: true
+appo_clip_baseline: 1.0  # null to disable
+appo_clip_policy: 0.1  # null to disable
 num_actor_batches: 2
 num_actor_cpus: 4
 learning_rate: 0.0006
@@ -33,6 +36,7 @@ unroll_length: 20
 stateful: false
 virtual_batch_size: 32
 reward_clip: 1.0
+reward_scale: 1.0
 warmup: 0
 val_check_interval: 100  # how often to evaluate in seconds
 eval_steps: 10000  # how many steps to evaluate for

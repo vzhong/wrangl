@@ -11,7 +11,7 @@ early_stopping:
     mode: 'max'
 optim:
   params:
-    lr: 0.001
+    lr: 0.00001
 gpus: 0
 batch_size: 100
 collate_fn: 'auto'  # use 'ignore' to pass an identity collate and define featurize instead

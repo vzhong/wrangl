@@ -8,14 +8,15 @@ project: 'wrangl-examples-atari_rl'
 
 optim:
   params:
-    lr: 0.0001
-    eps: 0.000001
+    lr: 0.001
+    betas: [0, 0.99]
+    eps: 0.0000007
     weight_decay: 0
 
 localdir: "${dsave}/peers/${peer}"
 local_name: "${uid:}"
 peer: 0
-max_steps: 5_000_000
+max_steps: 500_000_000
 autoresume: false
 
 actor_batch_size: 32
