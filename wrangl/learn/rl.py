@@ -615,6 +615,8 @@ class MoolibVtrace(BaseModel):
             # hack for moolib
 
         model = cls(FLAGS, **model_kwargs).to(device)
+        state = torch.load(fcheckpoint)
+        model.load_state_dict(state['learner_state']['model'])
 
         if env_state is None:
             device = 'cpu'
