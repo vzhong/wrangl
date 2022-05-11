@@ -16,8 +16,8 @@ def create_env(flags):
 
     # Using wrapper from seed_rl in order to do random no-ops _before_ frameskipping.
     # gym.wrappers.AtariPreprocessing doesn't play well with the -v5 versions of the game.
-    import atari_preprocessing
-    env = atari_preprocessing.AtariPreprocessing(
+    import wrappers
+    env = wrappers.AtariPreprocessing(
         env,
         frame_skip=flags.env.num_action_repeats,
         terminal_on_life_loss=False,

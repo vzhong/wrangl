@@ -111,4 +111,4 @@ Here is the validation accuracy across steps, logged onto S3:
 
 ### Reinforcement learning from scratch
 
-An example of RL can be found in `wrangl.examples.learn.atari_rl`.
+Example of RL can be found in `wrangl.examples.learn.atari_rl`.
