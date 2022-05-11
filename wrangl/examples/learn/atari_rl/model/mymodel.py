@@ -3,7 +3,6 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from moolib.examples.common import nest
 from wrangl.learn.rl import MoolibVtrace
 
 
@@ -11,7 +10,6 @@ class Model(MoolibVtrace):
 
     def __init__(self, FLAGS, num_actions=18, input_channels=4):
         super().__init__(FLAGS)
-        self.use_lstm = FLAGS.use_lstm
         self.num_actions = num_actions
 
         self.feat_convs = []

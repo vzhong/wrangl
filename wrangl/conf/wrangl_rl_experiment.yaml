@@ -26,9 +26,9 @@ discounting: 0.99
 entropy_cost: 0.0006
 env: null
 grad_clip_norm: 40
-normalize_advantages: true
-appo_clip_baseline: 1.0  # null to disable
-appo_clip_policy: 0.1  # null to disable
+normalize_advantages: false
+appo_clip_baseline: null  # null to disable
+appo_clip_policy: null  # null to disable
 num_actor_batches: 2
 num_actor_cpus: 4
 learning_rate: 0.0006
