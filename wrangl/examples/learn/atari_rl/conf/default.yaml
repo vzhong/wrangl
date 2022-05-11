@@ -6,6 +6,12 @@ defaults:
 model: 'mymodel'
 project: 'wrangl-examples-atari_rl'
 
+optim:
+  params:
+    lr: 0.0001
+    eps: 0.000001
+    weight_decay: 0
+
 localdir: "${dsave}/peers/${peer}"
 local_name: "${uid:}"
 peer: 0

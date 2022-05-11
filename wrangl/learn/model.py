@@ -1,7 +1,7 @@
 import os
 import importlib
 import pytorch_lightning as pl
-from torch.optim import Adam
+from torch import optim
 from hydra.utils import get_original_cwd
 
 
@@ -61,5 +61,6 @@ class BaseModel(pl.LightningModule):
         """
         Returns a the `torch.optim.Optimizer` to use for this model.
         """
-        optimizer = Adam(self.parameters(), lr=self.hparams.learning_rate)
-        return optimizer
+        opt = self.hparams.optim
+        Optimizer = getattr(optim, opt.name)
+        return Optimizer(self.parameters(), **opt.params)
