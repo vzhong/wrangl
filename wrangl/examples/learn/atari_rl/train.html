@@ -92,8 +92,8 @@
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="c1"># Using wrapper from seed_rl in order to do random no-ops _before_ frameskipping.</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="c1"># gym.wrappers.AtariPreprocessing doesn&#39;t play well with the -v5 versions of the game.</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="kn">import</span> <span class="nn">atari_preprocessing</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">env</span> <span class="o">=</span> <span class="n">atari_preprocessing</span><span class="o">.</span><span class="n">AtariPreprocessing</span><span class="p">(</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="kn">import</span> <span class="nn">wrappers</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">env</span> <span class="o">=</span> <span class="n">wrappers</span><span class="o">.</span><span class="n">AtariPreprocessing</span><span class="p">(</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>        <span class="n">env</span><span class="p">,</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="n">frame_skip</span><span class="o">=</span><span class="n">flags</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">num_action_repeats</span><span class="p">,</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>        <span class="n">terminal_on_life_loss</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -145,8 +145,8 @@
 </span><span id="create_env-16"><a href="#create_env-16"><span class="linenos">16</span></a>
 </span><span id="create_env-17"><a href="#create_env-17"><span class="linenos">17</span></a>    <span class="c1"># Using wrapper from seed_rl in order to do random no-ops _before_ frameskipping.</span>
 </span><span id="create_env-18"><a href="#create_env-18"><span class="linenos">18</span></a>    <span class="c1"># gym.wrappers.AtariPreprocessing doesn&#39;t play well with the -v5 versions of the game.</span>
-</span><span id="create_env-19"><a href="#create_env-19"><span class="linenos">19</span></a>    <span class="kn">import</span> <span class="nn">atari_preprocessing</span>
-</span><span id="create_env-20"><a href="#create_env-20"><span class="linenos">20</span></a>    <span class="n">env</span> <span class="o">=</span> <span class="n">atari_preprocessing</span><span class="o">.</span><span class="n">AtariPreprocessing</span><span class="p">(</span>
+</span><span id="create_env-19"><a href="#create_env-19"><span class="linenos">19</span></a>    <span class="kn">import</span> <span class="nn">wrappers</span>
+</span><span id="create_env-20"><a href="#create_env-20"><span class="linenos">20</span></a>    <span class="n">env</span> <span class="o">=</span> <span class="n">wrappers</span><span class="o">.</span><span class="n">AtariPreprocessing</span><span class="p">(</span>
 </span><span id="create_env-21"><a href="#create_env-21"><span class="linenos">21</span></a>        <span class="n">env</span><span class="p">,</span>
 </span><span id="create_env-22"><a href="#create_env-22"><span class="linenos">22</span></a>        <span class="n">frame_skip</span><span class="o">=</span><span class="n">flags</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">num_action_repeats</span><span class="p">,</span>
 </span><span id="create_env-23"><a href="#create_env-23"><span class="linenos">23</span></a>        <span class="n">terminal_on_life_loss</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
