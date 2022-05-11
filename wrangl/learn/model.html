@@ -86,7 +86,7 @@
             <div class="pdoc-code codehilite"><pre><span></span><span id="L-0"><a href="#L-0"><span class="linenos"> 0</span></a><span class="kn">import</span> <span class="nn">os</span>
 </span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">importlib</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">hydra.utils</span> <span class="kn">import</span> <span class="n">get_original_cwd</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
@@ -146,8 +146,9 @@
 </span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>        <span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a><span class="sd">        Returns a the `torch.optim.Optimizer` to use for this model.</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">)</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>        <span class="k">return</span> <span class="n">optimizer</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>        <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">optim</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>        <span class="n">Optimizer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">optim</span><span class="p">,</span> <span class="n">opt</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>        <span class="k">return</span> <span class="n">Optimizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="o">**</span><span class="n">opt</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
 </span></pre></div>
 
         </details>
@@ -220,8 +221,9 @@
 </span><span id="BaseModel-61"><a href="#BaseModel-61"><span class="linenos">61</span></a>        <span class="sd">&quot;&quot;&quot;</span>
 </span><span id="BaseModel-62"><a href="#BaseModel-62"><span class="linenos">62</span></a><span class="sd">        Returns a the `torch.optim.Optimizer` to use for this model.</span>
 </span><span id="BaseModel-63"><a href="#BaseModel-63"><span class="linenos">63</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="BaseModel-64"><a href="#BaseModel-64"><span class="linenos">64</span></a>        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">)</span>
-</span><span id="BaseModel-65"><a href="#BaseModel-65"><span class="linenos">65</span></a>        <span class="k">return</span> <span class="n">optimizer</span>
+</span><span id="BaseModel-64"><a href="#BaseModel-64"><span class="linenos">64</span></a>        <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">optim</span>
+</span><span id="BaseModel-65"><a href="#BaseModel-65"><span class="linenos">65</span></a>        <span class="n">Optimizer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">optim</span><span class="p">,</span> <span class="n">opt</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="BaseModel-66"><a href="#BaseModel-66"><span class="linenos">66</span></a>        <span class="k">return</span> <span class="n">Optimizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="o">**</span><span class="n">opt</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
 </span></pre></div>
 
         </details>
@@ -364,8 +366,9 @@ class Model(SupervisedModel):
 </span><span id="BaseModel.configure_optimizers-61"><a href="#BaseModel.configure_optimizers-61"><span class="linenos">61</span></a>        <span class="sd">&quot;&quot;&quot;</span>
 </span><span id="BaseModel.configure_optimizers-62"><a href="#BaseModel.configure_optimizers-62"><span class="linenos">62</span></a><span class="sd">        Returns a the `torch.optim.Optimizer` to use for this model.</span>
 </span><span id="BaseModel.configure_optimizers-63"><a href="#BaseModel.configure_optimizers-63"><span class="linenos">63</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="BaseModel.configure_optimizers-64"><a href="#BaseModel.configure_optimizers-64"><span class="linenos">64</span></a>        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">)</span>
-</span><span id="BaseModel.configure_optimizers-65"><a href="#BaseModel.configure_optimizers-65"><span class="linenos">65</span></a>        <span class="k">return</span> <span class="n">optimizer</span>
+</span><span id="BaseModel.configure_optimizers-64"><a href="#BaseModel.configure_optimizers-64"><span class="linenos">64</span></a>        <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">optim</span>
+</span><span id="BaseModel.configure_optimizers-65"><a href="#BaseModel.configure_optimizers-65"><span class="linenos">65</span></a>        <span class="n">Optimizer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">optim</span><span class="p">,</span> <span class="n">opt</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="BaseModel.configure_optimizers-66"><a href="#BaseModel.configure_optimizers-66"><span class="linenos">66</span></a>        <span class="k">return</span> <span class="n">Optimizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="o">**</span><span class="n">opt</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
 </span></pre></div>
 
         </details>
