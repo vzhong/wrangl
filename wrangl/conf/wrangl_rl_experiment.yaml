@@ -34,7 +34,7 @@ num_actor_cpus: 4
 learning_rate: 0.0006
 unroll_length: 20
 stateful: false
-virtual_batch_size: 32
+virtual_batch_size: '${batch_size}'
 reward_clip: 1.0
 reward_scale: 1.0
 warmup: 0

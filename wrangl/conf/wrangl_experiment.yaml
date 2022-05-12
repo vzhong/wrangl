@@ -50,10 +50,10 @@ optim:
   name: 'Adam'
   params:
     lr: 0.001
-    betas: [0.9, 0.999]
-    eps: 0.00000008
-    weight_decay: 0
-    amsgrad: false
+    # betas: [0.9, 0.999]
+    # eps: 0.00000008
+    # weight_decay: 0
+    # amsgrad: false
 debug: false
 seed: 0
 gpus: 0
