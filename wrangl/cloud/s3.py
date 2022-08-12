@@ -73,6 +73,23 @@ class S3Client:
         """
         return self.client.fput_object(self.bucket, self.get_path(project_id, experiment_id, fname), from_fname, content_type=content_type)
 
+    def download_file(self, project_id: str, experiment_id: str, fname: str, from_fname: str, content_type='application/json'):
+        """
+        Downloads a file from a project's experiment.
+
+        The file will be downloaded from `<WRANGL_S3_URL>/<WRANGL_S3_BUCKET>/<project_id>/<experiment_id>/<fname>`.
+
+        Args:
+            project_id: name of project.
+            experiment_id: name of experiment.
+            fname: local path to file to download.
+            from_fname: name of file in S3 directory.
+            content_type: S3 content type.
+        """
+        data = self.client.get_object(self.bucket, self.get_path(project_id, experiment_id, from_fname)).data
+        with open(fname, 'wb') as f:
+            f.write(data)
+
     def upload_experiment(self, dexp):
         """
         Uploads an experiment, including its config and logs.
