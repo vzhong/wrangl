@@ -45,7 +45,7 @@ class SupervisedModel(BaseModel):
         """
         return batch
 
-    def compute_metrics(self, pred: list, gold: list) -> dict:
+    def compute_metrics(self, pred: list, gold: list, batch: list) -> dict:
         """
         Computes metrics between predictions and ground truths.
         """
@@ -193,7 +193,7 @@ class SupervisedModel(BaseModel):
         out = self.infer(feat, batch)
         pred = self.extract_pred(out, feat, batch)
 
-        metrics = self.compute_metrics(pred, gold)
+        metrics = self.compute_metrics(pred, gold, batch)
         for k, v in metrics.items():
             self.log('{}_{}'.format(split, k), v, batch_size=self.infer_batch_size(batch))
 
@@ -265,7 +265,7 @@ class SupervisedModel(BaseModel):
         else:
             collate_fn = cls.collate_fn
         train_loader = DataLoader(train_dataset, batch_size=cfg.batch_size, collate_fn=collate_fn)
-        eval_loader = DataLoader(eval_dataset, batch_size=cfg.batch_size, collate_fn=collate_fn)
+        eval_loader = DataLoader(eval_dataset, batch_size=cfg.val_batch_size, collate_fn=collate_fn)
 
         trainer = pl.Trainer(
             precision=cfg.precision,
@@ -294,8 +294,11 @@ class SupervisedModel(BaseModel):
             trainer.fit(model, train_loader, eval_loader, ckpt_path=ckpt_path)
 
         model = cls.load_from_checkpoint(os.path.join(dout, 'last.ckpt'))
-        result = trainer.test(model, eval_loader, verbose=True)
-        with open(os.path.join(dout, 'test_results.json'), 'wt') as f:
+        result = trainer.test(model, eval_loader, verbose=True, test=False)
+        with open(os.path.join(dout, 'eval_pred.json'), 'wt') as f:
+            json.dump(result, f, indent=2)
+        result = trainer.test(model, eval_loader, verbose=True, test=True)
+        with open(os.path.join(dout, 'eval_test.json'), 'wt') as f:
             json.dump(result, f, indent=2)
         logger.info('Finished!')
 
@@ -338,5 +341,7 @@ class SupervisedModel(BaseModel):
         if test:
             result = trainer.test(model, eval_loader, verbose=True)
         else:
-            result = trainer.predict(model, eval_loader)
+            result = []
+            for b in trainer.predict(model, eval_loader):
+                result.extend(b)
         return result

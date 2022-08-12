@@ -519,10 +519,10 @@ class MoolibVtrace(BaseModel):
                 if learner_state.train_time - learner_state.last_checkpoint >= FLAGS.val_check_interval:
                     learner_state.last_checkpoint = learner_state.train_time
                     cls.save_checkpoint(FLAGS, checkpoint_path, learner_state)
-                    test_results = cls.run_test(FLAGS, eval_envs, checkpoint_path, env_state=eval_env_state, model=model, eval_steps=FLAGS.eval_steps)
-                    for k in ['mean_episode_return', 'running_reward']:
-                        if test_results[k] is not None:
-                            stats['eval_{}'.format(k)] += test_results[k]
+                    # test_results = cls.run_test(FLAGS, eval_envs, checkpoint_path, env_state=eval_env_state, model=model, eval_steps=FLAGS.eval_steps)
+                    # for k in ['mean_episode_return', 'running_reward']:
+                    #     if test_results[k] is not None:
+                    #         stats['eval_{}'.format(k)] += test_results[k]
 
                     if FLAGS.s3.enable:
                         s3.on_save_checkpoint(trainer=None, model=None, checkpoint=learner_state.save())

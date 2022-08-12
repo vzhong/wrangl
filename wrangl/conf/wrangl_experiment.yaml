@@ -16,6 +16,7 @@ hydra:
     dir: '${dproject}/${name}'
   sweep:
     dir: '${dproject}/sweep'
+    subdir: '${hydra.job.num}-${name}'
 
 ##########
 # logging
@@ -58,6 +59,7 @@ debug: false
 seed: 0
 gpus: 0
 batch_size: 100
+val_batch_size: '${batch_size}'
 grad_clip_norm: 10
 collate_fn: 'auto'  # use 'ignore' to pass an identity collate and define featurize instead
 max_steps: 1_000

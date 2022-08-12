@@ -75,7 +75,7 @@ class SetF1(Metric):
                 continue
             for k, v in self.compute_one(pi, gi).items():
                 metrics[k].append(v)
-        return {k: sum(v)/len(v) for k, v in metrics.items()}
+        return {k: (sum(v)/len(v)) for k, v in metrics.items()}
 
 
 class Rouge(Metric):
