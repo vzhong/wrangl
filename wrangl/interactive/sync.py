@@ -49,7 +49,7 @@ def main(args):
         bar = tqdm.tqdm(match, desc='uploading projects')
         for root in bar:
             bar.set_description(root)
-            exp_id = os.path.dirname(root)
+            exp_id = os.path.basename(root)
             for tgt in ['config.yaml']:
                 src = os.path.join(root, tgt)
                 client.upload_file(
