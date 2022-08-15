@@ -49,25 +49,5 @@ def main(args):
         bar = tqdm.tqdm(match, desc='uploading projects')
         for root in bar:
             bar.set_description(root)
-            exp_id = os.path.basename(root)
-            for tgt in ['config.yaml']:
-                src = os.path.join(root, tgt)
-                client.upload_file(
-                    project_id=args.proj,
-                    experiment_id=exp_id,
-                    fname=tgt,
-                    from_fname=src,
-                    content_type='application/octet-stream',
-                )
-            # concat logs
-            log = []
-            for logdir in os.listdir(os.path.join(root, 'logs')):
-                flog = os.path.join(root, 'logs', logdir, 'metrics.csv')
-                if os.path.isfile(flog):
-                    with open(flog, 'rt') as f:
-                        reader = csv.reader(f)
-                        header = next(reader)
-                        for row in reader:
-                            log.append(dict(zip(header, row)))
-            client.upload_content(args.proj, exp_id, 'metrics.json', content=json.dumps(log))
+            client.upload_experiment(root)
         bar.close()
