@@ -90,13 +90,14 @@ class S3Client:
         with open(fname, 'wb') as f:
             f.write(data)
 
-    def upload_experiment(self, dexp, overwrite_project=None):
+    def upload_experiment(self, dexp, overwrite_project=None, overwrite_experiment=None):
         """
         Uploads an experiment, including its config and logs.
 
         Args:
             dexp: local path to experiment directory.
             overwrite_project: optionally overwrite project name.
+            overwrite_experiment: optionally overwrite experiment name.
         """
         dexp = pathlib.Path(dexp)
         config = OmegaConf.to_container(OmegaConf.load(dexp.joinpath('config.yaml')), resolve=True)

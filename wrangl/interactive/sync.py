@@ -8,54 +8,51 @@ from ..cloud import s3
 
 def add_parser_arguments(parser):
     parser.add_argument('--fconfig', default=os.environ.get('WRANGL_S3_FCREDENTIALS'), help='S3 config file')
-    parser.add_argument('action', choices=('push', 'pull', 'projpush', 'projpull'), help='command')
-    parser.add_argument('src', help='source path')
-    parser.add_argument('--tgt', help='target path, default to current directory')
-    parser.add_argument('--proj', default='sync', help='project')
-    parser.add_argument('--exp', default='default', help='project')
+    parser.add_argument('action', choices=('push', 'pull'), help='command')
+    parser.add_argument('--local', help='local path, defaults to local directory', default=os.getcwd())
+    parser.add_argument('--remote', help='remote path')
+    parser.add_argument('--ignore_extensions', nargs='*', default=('.ckpt', 'pred_samples.json', '.log', 'hparams.yaml'), help='ignore these extensions')
+    parser.add_argument('--ignore_directories', nargs='*', default=('wandb', '.hydra', 'submitit', 'lightning_logs'), help='ignore these subdirectories')
+
+
+def should_ignore(src, ignore_extensions, ignore_directories):
+    for ext in ignore_extensions:
+        if src.endswith(ext):
+            return True
+    for folder in src.split('/'):
+        if folder in ignore_directories:
+            return True
+    return False
 
 
 def main(args):
+    args.ignore_extensions = set(args.ignore_extensions)
+    args.ignore_directories = set(args.ignore_directories)
     client = s3.S3Client(fcredentials=args.fconfig)
-    if args.tgt is None:
-        args.tgt = os.path.join(os.getcwd(), os.path.basename(args.src))
-    print('{} from {} to {}'.format(args.action, args.src, args.tgt))
+    print('{} local {} remote {}'.format(args.action, args.local, args.remote))
     if args.action == 'push':
-        client.upload_file(
-            project_id=args.proj,
-            experiment_id=args.exp,
-            fname=args.tgt,
-            from_fname=args.src,
-            content_type='application/octet-stream',
-        )
-    elif args.action == 'pull':
-        client.download_file(
-            project_id=args.proj,
-            experiment_id=args.exp,
-            fname=args.tgt,
-            from_fname=args.src,
-            content_type='application/octet-stream',
-        )
-    elif args.action == 'projpush':
-        match = []
-        for root, _, files in os.walk(args.src):
-            if root.endswith('.hydra') or '/wandb/' in root:
-                continue
-            for fname in files:
-                if fname == 'config.yaml':
-                    match.append((root))
-        bar = tqdm.tqdm(match, desc='uploading projects')
-        for root in bar:
-            bar.set_description(root)
-            client.upload_experiment(root, overwrite_project=args.proj)
+        files = []
+        if os.path.isfile(args.local):
+            files.append(args.local)
+        else:
+            for root, _, fs in os.walk(args.local):
+                for f in fs:
+                    files.append(os.path.join(root, f))
+        files = [f for f in files if not should_ignore(f, args.ignore_extensions, args.ignore_directories)]
+        bar = tqdm.tqdm(files, desc='uploading')
+        for src in bar:
+            sub = src.replace(args.local, '').strip('/')
+            tgt = os.path.join(args.remote, sub)
+            client.client.fput_object(client.bucket, tgt, src)
+            bar.set_description(sub)
         bar.close()
-    elif args.action == 'projpull':
-        match = client.list_experiments(args.src)
-        bar = tqdm.tqdm(match, desc='downloading projects')
-        for dexp in bar:
-            bar.set_description(dexp)
-            exp_id = os.path.basename(dexp)
-            proj_id = os.path.dirname(dexp)
-            client.download_experiment(proj_id, exp_id, dout=args.tgt)
-            client.get_experiment(proj_id, exp_id)
+    elif args.action == 'pull':
+        files = client.client.list_objects(client.bucket, recursive=True, prefix=args.remote)
+        files = [f.object_name for f in files if not should_ignore(f.object_name, args.ignore_extensions, args.ignore_directories)]
+        bar = tqdm.tqdm(files, desc='downloading')
+        for tgt in bar:
+            sub = tgt.replace(args.remote, '').strip('/')
+            src = os.path.join(args.local, sub)
+            client.client.fget_object(client.bucket, tgt, src)
+            bar.set_description(sub)
         bar.close()
