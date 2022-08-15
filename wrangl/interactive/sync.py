@@ -2,15 +2,13 @@
 Autodocuments this library.
 """
 import os
-import csv
-import json
 import tqdm
 from ..cloud import s3
 
 
 def add_parser_arguments(parser):
     parser.add_argument('--fconfig', default=os.environ.get('WRANGL_S3_FCREDENTIALS'), help='S3 config file')
-    parser.add_argument('action', choices=('push', 'pull', 'projpush'), help='command')
+    parser.add_argument('action', choices=('push', 'pull', 'projpush', 'projpull'), help='command')
     parser.add_argument('src', help='source path')
     parser.add_argument('--tgt', help='target path, default to current directory')
     parser.add_argument('--proj', default='sync', help='project')
@@ -49,5 +47,15 @@ def main(args):
         bar = tqdm.tqdm(match, desc='uploading projects')
         for root in bar:
             bar.set_description(root)
-            client.upload_experiment(root)
+            client.upload_experiment(root, overwrite_project=args.proj)
+        bar.close()
+    elif args.action == 'projpull':
+        match = client.list_experiments(args.src)
+        bar = tqdm.tqdm(match, desc='downloading projects')
+        for dexp in bar:
+            bar.set_description(dexp)
+            exp_id = os.path.basename(dexp)
+            proj_id = os.path.dirname(dexp)
+            client.download_experiment(proj_id, exp_id, dout=args.tgt)
+            client.get_experiment(proj_id, exp_id)
         bar.close()

@@ -90,16 +90,17 @@ class S3Client:
         with open(fname, 'wb') as f:
             f.write(data)
 
-    def upload_experiment(self, dexp):
+    def upload_experiment(self, dexp, overwrite_project=None):
         """
         Uploads an experiment, including its config and logs.
 
         Args:
             dexp: local path to experiment directory.
+            overwrite_project: optionally overwrite project name.
         """
         dexp = pathlib.Path(dexp)
         config = OmegaConf.to_container(OmegaConf.load(dexp.joinpath('config.yaml')), resolve=True)
-        project_id = config['project']
+        project_id = overwrite_project or config['project']
 
         # make sure collection exists for project
         df = []
@@ -116,6 +117,32 @@ class S3Client:
         config_response = self.upload_content(project_id=project_id, experiment_id=experiment_id, fname='config.json', content=json.dumps(config, indent=2))
         log_response = self.upload_content(project_id=project_id, experiment_id=experiment_id, fname='logs.json', content=json.dumps(logs, indent=2))
         return dict(config=config_response, log=log_response)
+
+    def download_experiment(self, project_id, experiment_id, dout):
+        """
+        Downloads an experiment, including its config and logs.
+
+        Args:
+            project_id: name of project.
+            experiment_id: name of experiment.
+            dout: output directory
+        """
+        config, logs = self.get_experiment(project_id, experiment_id, pandas_log=False)
+        with open(os.path.join(dout, 'config.json'), 'wt') as f:
+            json.dump(config, f, indent=2)
+        with open(os.path.join(dout, 'logs.json'), 'wt') as f:
+            json.dump(logs, f, indent=2)
+
+    def list_experiments(self, root):
+        """
+        Lists experiments with prefix root.
+        """
+        match = []
+        for item in self.client.list_objects(self.bucket, recursive=True, prefix=root):
+            if item.object_name.endswith('config.json'):
+                root = os.path.dirname(item.object_name)
+                match.append(root)
+        return match
 
     @classmethod
     def get_path(cls, project_id, experiment_id, fname):
@@ -136,18 +163,20 @@ class S3Client:
         obj = json.loads(self.client.get_object(self.bucket, self.get_path(project_id, experiment_id, fname)).data.decode())
         return obj
 
-    def get_experiment(self, project_id: str, experiment_id: str) -> Tuple[OmegaConf, pd.DataFrame]:
+    def get_experiment(self, project_id: str, experiment_id: str, pandas_log: bool = True) -> Tuple[OmegaConf, pd.DataFrame]:
         """
         Returns the experiment's config and logs.
 
         Args:
             project_id: name of project.
             experiment_id: name of experiment.
+            pandas_log: whether to load logs into dataframe.
         """
         config = self.download_content(project_id, experiment_id, 'config.json')
         logs = self.download_content(project_id, experiment_id, 'logs.json')
-        df = pd.DataFrame(logs)
-        return config, df
+        if pandas_log:
+            logs = pd.DataFrame(logs)
+        return config, logs
 
     def plot_experiment(self, project_id: str, experiment_id: str, x='step', y: Union[str, List[str]] = 'loss', **plot_kwargs):
         """
