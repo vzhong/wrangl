@@ -52,7 +52,7 @@ def main(args):
         bar = tqdm.tqdm(files, desc='downloading')
         for tgt in bar:
             sub = tgt.replace(args.remote, '').strip('/')
-            src = os.path.join(args.local, sub)
+            src = os.path.join(args.local, sub) if sub else args.local
             client.client.fget_object(client.bucket, tgt, src)
             bar.set_description(sub)
         bar.close()
