@@ -6,6 +6,7 @@ import json
 import torch
 import random
 import logging
+import pathlib
 import pytorch_lightning as pl
 from typing import List
 from omegaconf import OmegaConf
@@ -345,3 +346,22 @@ class SupervisedModel(BaseModel):
             for b in trainer.predict(model, eval_loader):
                 result.extend(b)
         return result
+
+    @classmethod
+    def load_experiment(cls, dexp):
+        """
+        Loads experiment from disk.
+        """
+        import pandas as pd
+        dexp = pathlib.Path(dexp)
+        config = OmegaConf.to_container(OmegaConf.load(dexp.joinpath('config.yaml')), resolve=True)
+
+        # make sure collection exists for project
+        df = []
+        for flog in dexp.joinpath('logs').glob('*/*.csv'):
+            df.append(pd.read_csv(flog))
+        if df:
+            logs = pd.concat(df).to_dict()
+        else:
+            logs = {}
+        return config, logs
