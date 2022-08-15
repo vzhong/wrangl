@@ -42,7 +42,7 @@ def main(args):
         bar = tqdm.tqdm(files, desc='uploading')
         for src in bar:
             sub = src.replace(args.local, '').strip('/')
-            tgt = os.path.join(args.remote, sub)
+            tgt = os.path.join(args.remote, sub) if sub else args.remote
             client.client.fput_object(client.bucket, tgt, src)
             bar.set_description(sub)
         bar.close()
