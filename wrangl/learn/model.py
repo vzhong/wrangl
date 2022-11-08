@@ -8,13 +8,14 @@ from hydra.utils import get_original_cwd
 class BaseModel(pl.LightningModule):
 
     @classmethod
-    def load_model_class(cls, model_name, model_dir='model'):
+    def load_model_class(cls, model_name, model_dir='model', root_dir=None):
         """
         Loads a model from file. Note that model class must be `Model`.
 
         Args:
             model_name: name of model to load.
             model_dir: directory of model files.
+            root_dir: source directory. If not specified, then it is inferred from HydraConfig's launch directory.
 
         Suppose we have our model files in a directory `mymodels`, and in `mymodels/cool_model.py` we have:
 
@@ -29,7 +30,9 @@ class BaseModel(pl.LightningModule):
         MyModel = SupervisedModel.load_model_class('cool_model', 'mymodels')
         ```
         """
-        fname = os.path.join(get_original_cwd(), model_dir, '{}.py'.format(model_name))
+        if root_dir is None:
+            root_dir = get_original_cwd()
+        fname = os.path.join(root_dir, model_dir, '{}.py'.format(model_name))
         spec = importlib.util.spec_from_file_location(model_name, fname)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
