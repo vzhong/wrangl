@@ -1,3 +1,5 @@
+import os
+import csv
 import typing
 import pathlib
 import logging
@@ -31,23 +33,29 @@ def detect_log_type(dlogs):
 def load_supervised(dlogs: typing.List[pathlib.Path], n: int = 2):
     ret = []
     for dlog in dlogs:
-        name = '/'.join(dlog.parts[-n:])
-        flog = dlog.joinpath('metrics.log.json')
-        if not flog.exists():
-            logging.error('Could not find {}'.format(flog))
-            continue
-        with flog.open('rt') as f:
-            raw_log = json.load(f)
-        log = []
-        for entry in raw_log:
-            train = entry['train']
-            train['type'] = 'train'
-            val = entry['eval']
-            val['type'] = 'eval'
-            train['train_steps'] = val['train_steps'] = entry['train_steps']
-            log.append(train)
-            log.append(val)
-        ret.append((name, log))
+        for root, dirs, files in os.walk(dlog):
+            if 'metrics.csv' in files:
+                fmetric = os.path.join(root, 'metrics.csv')
+                log = []
+                with open(fmetric, 'rt') as f:
+                    reader = csv.reader(f)
+                    header = next(reader)
+                    key = '/'.join(root.split('/')[-n:])
+                    for r in reader:
+                        d = dict(zip(header, r))
+                        d['train_steps'] = d['step']
+                        del d['step']
+                        for k, v in d.items():
+                            x = pd.to_numeric(v, errors='ignore')
+                            if not pd.isna(x):
+                                d[k] = x
+                        train = {k: v for k, v in d.items() if not k.startswith('val')}
+                        train['type'] = 'train'
+                        val = d.copy()
+                        val['type'] = 'eval'
+                        log.append(train)
+                        log.append(val)
+                ret.append((key, log))
     return ret
 
 
@@ -93,7 +101,7 @@ def main(args):
     for exp, log in logs:
         if log:
             if args.curves in {'train', 'both'}:
-                df = pd.DataFrame([e for e in log if e['type'] == 'train' and e[args.x] is not None and e.get(args.y) is not None])
+                df = pd.DataFrame([e for e in log if e['type'] == 'train' and e[args.x] not in {'', None} and e.get(args.y) not in {'', None}])
                 fig.plot(
                     X=df[args.x],
                     Y=df[args.y].rolling(args.window, min_periods=1).mean(),
@@ -101,7 +109,7 @@ def main(args):
                     **kwargs
                 )
             if args.curves in {'eval', 'both'}:
-                df = pd.DataFrame([e for e in log if e['type'] == 'eval' and e[args.x] is not None and e.get(args.y) is not None])
+                df = pd.DataFrame([e for e in log if e['type'] == 'eval' and e[args.x] not in {'', None} and e.get(args.y) not in {'', None}])
                 fig.plot(
                     X=df[args.x],
                     Y=df[args.y].rolling(args.window, min_periods=1).mean(),
