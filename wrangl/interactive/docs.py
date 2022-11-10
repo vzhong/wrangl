@@ -30,7 +30,7 @@ def main(args):
         show_source=True,
         template_directory=DOCDIR.joinpath('templates'),
     )
-    pdoc('wrangl', output_directory=DOCDIR.joinpath('build'), format='html')
+    pdoc('wrangl', output_directory=DOCDIR.joinpath('build'))
     os.remove(DOCDIR.joinpath('build', 'index.html'))
     # use the package html as the index
     shutil.copy(DOCDIR.joinpath('build', 'wrangl.html'), DOCDIR.joinpath('build', 'index.html'))
