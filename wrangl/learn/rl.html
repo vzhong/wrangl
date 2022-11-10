@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 12.1.0"/>
+    <meta name="generator" content="pdoc 12.2.1"/>
     <title>wrangl.learn.rl API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -125,9 +125,9 @@
                         <div class="docstring"><p>Adapted from <a href="https://github.com/facebookresearch/moolib">https://github.com/facebookresearch/moolib</a></p>
 </div>
 
-                        <input id="rl-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                        <input id="mod-rl-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
-                        <label class="view-source-button" for="rl-view-source"><span>View Source</span></label>
+                        <label class="view-source-button" for="mod-rl-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="sd">&quot;&quot;&quot;</span>
@@ -2599,13 +2599,15 @@ would produce a deadlock as not all processes would perform this log call.</li>
 
 <p>This method must return a tuple <code>(output, state_tracker_state)</code> of the following format:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code><span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
     <span class="n">policy_logits</span><span class="o">=</span><span class="n">policy_logits</span>  <span class="c1"># shape [T, B, num_actions],</span>
     <span class="n">baseline</span><span class="o">=</span><span class="n">baseline</span>  <span class="c1"># shape [T, B],</span>
     <span class="n">action</span><span class="o">=</span><span class="n">action</span>  <span class="c1"># shape [T, B],</span>
 <span class="p">)</span>
 <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">state_tracker_state</span>
-</code></pre></div>
+</code></pre>
+</div>
 </div>
 
 
@@ -2622,7 +2624,6 @@ would produce a deadlock as not all processes would perform this log call.</li>
             <div><dt>pytorch_lightning.core.module.LightningModule</dt>
                                 <dd id="MoolibVtrace.optimizers" class="function">optimizers</dd>
                 <dd id="MoolibVtrace.lr_schedulers" class="function">lr_schedulers</dd>
-                <dd id="MoolibVtrace.trainer" class="variable">trainer</dd>
                 <dd id="MoolibVtrace.example_input_array" class="variable">example_input_array</dd>
                 <dd id="MoolibVtrace.current_epoch" class="variable">current_epoch</dd>
                 <dd id="MoolibVtrace.global_step" class="variable">global_step</dd>
@@ -2662,13 +2663,10 @@ would produce a deadlock as not all processes would perform this log call.</li>
                 <dd id="MoolibVtrace.unfreeze" class="function">unfreeze</dd>
                 <dd id="MoolibVtrace.to_onnx" class="function">to_onnx</dd>
                 <dd id="MoolibVtrace.to_torchscript" class="function">to_torchscript</dd>
-                <dd id="MoolibVtrace.use_amp" class="variable">use_amp</dd>
 
             </div>
-            <div><dt>pytorch_lightning.core.mixins.device_dtype_mixin.DeviceDtypeModuleMixin</dt>
-                                <dd id="MoolibVtrace.dtype" class="variable">dtype</dd>
-                <dd id="MoolibVtrace.device" class="variable">device</dd>
-                <dd id="MoolibVtrace.to" class="function">to</dd>
+            <div><dt>lightning_lite.utilities.device_dtype_mixin._DeviceDtypeModuleMixin</dt>
+                                <dd id="MoolibVtrace.to" class="function">to</dd>
                 <dd id="MoolibVtrace.cuda" class="function">cuda</dd>
                 <dd id="MoolibVtrace.cpu" class="function">cpu</dd>
                 <dd id="MoolibVtrace.type" class="function">type</dd>
@@ -2684,12 +2682,7 @@ would produce a deadlock as not all processes would perform this log call.</li>
 
             </div>
             <div><dt>pytorch_lightning.core.saving.ModelIO</dt>
-                                <dd id="MoolibVtrace.CHECKPOINT_HYPER_PARAMS_KEY" class="variable">CHECKPOINT_HYPER_PARAMS_KEY</dd>
-                <dd id="MoolibVtrace.CHECKPOINT_HYPER_PARAMS_NAME" class="variable">CHECKPOINT_HYPER_PARAMS_NAME</dd>
-                <dd id="MoolibVtrace.CHECKPOINT_HYPER_PARAMS_TYPE" class="variable">CHECKPOINT_HYPER_PARAMS_TYPE</dd>
-                <dd id="MoolibVtrace.load_from_checkpoint" class="function">load_from_checkpoint</dd>
-                <dd id="MoolibVtrace.on_hpc_save" class="function">on_hpc_save</dd>
-                <dd id="MoolibVtrace.on_hpc_load" class="function">on_hpc_load</dd>
+                                <dd id="MoolibVtrace.load_from_checkpoint" class="function">load_from_checkpoint</dd>
 
             </div>
             <div><dt>pytorch_lightning.core.hooks.ModelHooks</dt>
@@ -2703,8 +2696,6 @@ would produce a deadlock as not all processes would perform this log call.</li>
                 <dd id="MoolibVtrace.on_test_end" class="function">on_test_end</dd>
                 <dd id="MoolibVtrace.on_predict_start" class="function">on_predict_start</dd>
                 <dd id="MoolibVtrace.on_predict_end" class="function">on_predict_end</dd>
-                <dd id="MoolibVtrace.on_pretrain_routine_start" class="function">on_pretrain_routine_start</dd>
-                <dd id="MoolibVtrace.on_pretrain_routine_end" class="function">on_pretrain_routine_end</dd>
                 <dd id="MoolibVtrace.on_train_batch_start" class="function">on_train_batch_start</dd>
                 <dd id="MoolibVtrace.on_train_batch_end" class="function">on_train_batch_end</dd>
                 <dd id="MoolibVtrace.on_validation_batch_start" class="function">on_validation_batch_start</dd>
@@ -2718,8 +2709,6 @@ would produce a deadlock as not all processes would perform this log call.</li>
                 <dd id="MoolibVtrace.on_test_model_train" class="function">on_test_model_train</dd>
                 <dd id="MoolibVtrace.on_test_model_eval" class="function">on_test_model_eval</dd>
                 <dd id="MoolibVtrace.on_predict_model_eval" class="function">on_predict_model_eval</dd>
-                <dd id="MoolibVtrace.on_epoch_start" class="function">on_epoch_start</dd>
-                <dd id="MoolibVtrace.on_epoch_end" class="function">on_epoch_end</dd>
                 <dd id="MoolibVtrace.on_train_epoch_start" class="function">on_train_epoch_start</dd>
                 <dd id="MoolibVtrace.on_train_epoch_end" class="function">on_train_epoch_end</dd>
                 <dd id="MoolibVtrace.on_validation_epoch_start" class="function">on_validation_epoch_start</dd>
@@ -2754,8 +2743,7 @@ would produce a deadlock as not all processes would perform this log call.</li>
 
             </div>
             <div><dt>torch.nn.modules.module.Module</dt>
-                                <dd id="MoolibVtrace.dump_patches" class="variable">dump_patches</dd>
-                <dd id="MoolibVtrace.register_buffer" class="function">register_buffer</dd>
+                                <dd id="MoolibVtrace.register_buffer" class="function">register_buffer</dd>
                 <dd id="MoolibVtrace.register_parameter" class="function">register_parameter</dd>
                 <dd id="MoolibVtrace.add_module" class="function">add_module</dd>
                 <dd id="MoolibVtrace.register_module" class="function">register_module</dd>
@@ -2773,7 +2761,6 @@ would produce a deadlock as not all processes would perform this log call.</li>
                 <dd id="MoolibVtrace.register_full_backward_hook" class="function">register_full_backward_hook</dd>
                 <dd id="MoolibVtrace.register_forward_pre_hook" class="function">register_forward_pre_hook</dd>
                 <dd id="MoolibVtrace.register_forward_hook" class="function">register_forward_hook</dd>
-                <dd id="MoolibVtrace.T_destination" class="variable">T_destination</dd>
                 <dd id="MoolibVtrace.state_dict" class="function">state_dict</dd>
                 <dd id="MoolibVtrace.register_load_state_dict_post_hook" class="function">register_load_state_dict_post_hook</dd>
                 <dd id="MoolibVtrace.load_state_dict" class="function">load_state_dict</dd>
@@ -2897,7 +2884,7 @@ would produce a deadlock as not all processes would perform this log call.</li>
                 }
 
                 let heading;
-                switch (result.doc.type) {
+                switch (result.doc.kind) {
                     case "function":
                         if (doc.fullname.endsWith(".__init__")) {
                             heading = `<span class="name">${doc.fullname.replace(/\.__init__$/, "")}</span>${doc.signature}`;
@@ -2924,7 +2911,7 @@ would produce a deadlock as not all processes would perform this log call.</li>
                 }
                 html += `
                         <section class="search-result">
-                        <a href="${url}" class="attr ${doc.type}">${heading}</a>
+                        <a href="${url}" class="attr ${doc.kind}">${heading}</a>
                         <div class="docstring">${doc.doc}</div>
                         </section>
                     `;

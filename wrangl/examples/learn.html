@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 12.1.0"/>
+    <meta name="generator" content="pdoc 12.2.1"/>
     <title>wrangl.examples.learn API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -75,17 +75,20 @@
 The finished project for this example is in <code><a href="learn/dynasent_clf.html">wrangl.examples.learn.dynasent_clf</a></code>.
 First, let's bootstrap our model using the <code>xor_clf</code> example and download the dataset.</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>wrangl project --source xor_clf --name dynasent_clf
+<div class="pdoc-code codehilite">
+<pre><span></span><code>wrangl project --source xor_clf --name dynasent_clf
 <span class="nb">cd</span> dynasent_clf
 wget https://github.com/cgpotts/dynasent/raw/main/dynasent-v1.1.zip
 unzip dynasent-v1.1.zip
 rm -rf __MACOSX dynasent-v1.1.zip
 mv dynasent-v1.1 data
-</code></pre></div>
+</code></pre>
+</div>
 
 <p>Now we'll modify <code>train.py</code> to use these data files.</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code><span class="c1"># train.py</span>
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="c1"># train.py</span>
 <span class="c1"># ...</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
 <span class="k">class</span> <span class="nc">MyProcessor</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
@@ -109,12 +112,14 @@ mv dynasent-v1.1 data
     <span class="n">train</span> <span class="o">=</span> <span class="n">IterableDataset</span><span class="p">(</span><span class="n">load_data</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">ftrain</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">IterableDataset</span><span class="p">(</span><span class="n">load_data</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">feval</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
     <span class="n">Model</span><span class="o">.</span><span class="n">run_train_test</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">train</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
-</code></pre></div>
+</code></pre>
+</div>
 
 <p>Next, we'll update the config file to use these data files, and specify what pretrained LM we'll use.
 We'll also drop the learning rate a bit since we'll be finetuning a pretrained LM.</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code><span class="c1"># conf/default.yaml</span><span class="w"></span>
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="c1"># conf/default.yaml</span><span class="w"></span>
 <span class="nn">...</span><span class="w"></span>
 <span class="nt">learning_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.00001</span><span class="w"></span>
 <span class="nn">...</span><span class="w"></span>
@@ -122,7 +127,8 @@ We'll also drop the learning rate a bit since we'll be finetuning a pretrained L
 <span class="nt">feval</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;${oc.env:PWD}/data/dynasent-v1.1-round01-yelp-dev.jsonl&#39;</span><span class="w"></span>
 <span class="nt">num_workers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w"></span>
 <span class="nt">lm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bert-base-uncased</span><span class="w"></span>
-</code></pre></div>
+</code></pre>
+</div>
 
 <p>Next, we'll overload the existing model as follows:</p>
 
@@ -131,7 +137,8 @@ We'll also drop the learning rate a bit since we'll be finetuning a pretrained L
 <li>instantiate a BERT encoder and use it during the forward pass.</li>
 </ul>
 
-<div class="pdoc-code codehilite"><pre><span></span><code><span class="c1"># model/mymodel.py</span>
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="c1"># model/mymodel.py</span>
 <span class="o">...</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModel</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
 
@@ -164,12 +171,15 @@ We'll also drop the learning rate a bit since we'll be finetuning a pretrained L
         <span class="n">sent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">batch_encode_plus</span><span class="p">(</span><span class="n">feat</span><span class="p">[</span><span class="s1">&#39;sent&#39;</span><span class="p">],</span> <span class="n">add_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;max_length&#39;</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="p">(</span><span class="o">**</span><span class="n">sent</span><span class="p">)</span><span class="o">.</span><span class="n">last_hidden_state</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="n">out</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>  <span class="c1"># use the [CLS] token for classification</span>
-</code></pre></div>
+</code></pre>
+</div>
 
 <p>Let's train this and save its output to S3 (you can delete the S3 flags if you don't have that set up).</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>python train.py <span class="nv">gpus</span><span class="o">=</span><span class="m">1</span> git.enable<span class="o">=</span><span class="nb">true</span> s3.enable<span class="o">=</span><span class="nb">true</span> s3.fcredentials<span class="o">=</span>/data/home/vzhong/wrangl_sync/s3.json
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>python train.py <span class="nv">gpus</span><span class="o">=</span><span class="m">1</span> git.enable<span class="o">=</span><span class="nb">true</span> s3.enable<span class="o">=</span><span class="nb">true</span> s3.fcredentials<span class="o">=</span>/data/home/vzhong/wrangl_sync/s3.json
+</code></pre>
+</div>
 
 <p>Here is the validation accuracy across steps, logged onto S3:</p>
 
@@ -180,9 +190,9 @@ We'll also drop the learning rate a bit since we'll be finetuning a pretrained L
 <p>Example of RL can be found in <code><a href="learn/atari_rl.html">wrangl.examples.learn.atari_rl</a></code>.</p>
 </div>
 
-                        <input id="learn-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                        <input id="mod-learn-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
-                        <label class="view-source-button" for="learn-view-source"><span>View Source</span></label>
+                        <label class="view-source-button" for="mod-learn-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="sd">.. include:: README.md</span>
@@ -292,7 +302,7 @@ We'll also drop the learning rate a bit since we'll be finetuning a pretrained L
                 }
 
                 let heading;
-                switch (result.doc.type) {
+                switch (result.doc.kind) {
                     case "function":
                         if (doc.fullname.endsWith(".__init__")) {
                             heading = `<span class="name">${doc.fullname.replace(/\.__init__$/, "")}</span>${doc.signature}`;
@@ -319,7 +329,7 @@ We'll also drop the learning rate a bit since we'll be finetuning a pretrained L
                 }
                 html += `
                         <section class="search-result">
-                        <a href="${url}" class="attr ${doc.type}">${heading}</a>
+                        <a href="${url}" class="attr ${doc.kind}">${heading}</a>
                         <div class="docstring">${doc.doc}</div>
                         </section>
                     `;
